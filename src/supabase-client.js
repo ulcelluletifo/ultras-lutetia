@@ -4,7 +4,8 @@
 // ============================================================
 
 const SUPABASE_URL = 'https://ypsvdicatkckrxrcyxax.supabase.co';
-const SUPABASE_ANON_KEY = 'sb_publishable_Wq8Megzoj3bKeDgOx1Pw2g_gBYaz...';
+const SUPABASE_ANON_KEY = 'sb_publishable_Wq8Megzoj3bKeDgOx1Pw2g_gBYazJ89';
+
 
 // ── Init client Supabase ──────────────────────────────────────
 const { createClient } = supabase;
