@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#CC0000">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Ultras Lutetia">
+  <title>Ultras Lutetia</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="stylesheet" href="src/styles.css">
+</head>
+<body>
+
+<!-- ── LOGIN ──────────────────────────────────────────────── -->
+<div id="loginPage" class="login-page">
+  <div class="login-logo">UL</div>
+  <h1 class="login-title">Ultras Lutetia</h1>
+  <p class="login-subtitle">Paris FC — Espace Membre</p>
+
+  <div class="login-form" id="loginForm">
+    <div class="form-group">
+      <label>Pseudo Telegram</label>
+      <input type="text" id="loginTelegram" placeholder="@pseudo" autocomplete="username">
+    </div>
+    <div class="form-group">
+      <label>Mot de passe</label>
+      <input type="password" id="loginPassword" placeholder="••••••••" autocomplete="current-password">
+    </div>
+    <button class="btn btn-primary" onclick="doLogin()">Connexion</button>
+    <div style="text-align:center; margin-top:16px;">
+      <span style="font-size:13px; color:var(--gris); cursor:pointer;" onclick="showInscription()">
+        Pas encore membre ? S'inscrire
+      </span>
+    </div>
+  </div>
+
+  <div class="login-form" id="inscriptionForm" style="display:none;">
+    <h2 style="font-size:18px; font-weight:700; margin-bottom:20px; text-align:center;">Inscription</h2>
+    <div class="form-group">
+      <label>Prénom</label>
+      <input type="text" id="regPrenom" placeholder="Ton prénom">
+    </div>
+    <div class="form-group">
+      <label>Nom</label>
+      <input type="text" id="regNom" placeholder="Ton nom">
+    </div>
+    <div class="form-group">
+      <label>Pseudo Telegram</label>
+      <input type="text" id="regTelegram" placeholder="@pseudo">
+    </div>
+    <div class="form-group">
+      <label>Email (celui de ton abonnement PFC)</label>
+      <input type="email" id="regEmail" placeholder="email@exemple.fr">
+    </div>
+    <div class="form-group">
+      <label>Ville</label>
+      <input type="text" id="regVille" placeholder="Paris">
+    </div>
+    <div class="form-group">
+      <label>Mot de passe</label>
+      <input type="password" id="regPassword" placeholder="Minimum 8 caractères">
+    </div>
+    <div class="form-group" style="display:flex; align-items:flex-start; gap:10px;">
+      <input type="checkbox" id="regRgpd" style="width:20px; margin-top:2px; flex-shrink:0;">
+      <label for="regRgpd" style="font-size:13px;">J'accepte que mes données soient utilisées pour la gestion des Ultras Lutetia (RGPD)</label>
+    </div>
+    <button class="btn btn-primary" onclick="doInscription()">Créer mon compte</button>
+    <div style="text-align:center; margin-top:12px;">
+      <span style="font-size:13px; color:var(--gris); cursor:pointer;" onclick="showLogin()">
+        Déjà membre ? Se connecter
+      </span>
+    </div>
+  </div>
+</div>
+
+<!-- ── APP ─────────────────────────────────────────────────── -->
+<div id="appContainer" class="app-container" style="display:none;">
+
+  <!-- Header -->
+  <header class="app-header">
+    <div class="app-logo">
+      <div class="logo-dot">UL</div>
+      <span>Ultras Lutetia</span>
+    </div>
+    <div id="headerUser" style="font-size:13px; color:var(--gris);"></div>
+  </header>
+
+  <!-- PAGE ACCUEIL -->
+  <div id="pageAccueil" class="page active">
+    <div id="charteAlert" class="info-box" style="display:none;">
+      ⚠️ Vous devez signer la charte pour accéder à tous les modules.
+      <button class="btn btn-sm btn-primary" style="margin-top:8px;" onclick="showPage('pageCharte')">Signer la charte →</button>
+    </div>
+
+    <div id="annoncesContainer"></div>
+
+    <div class="section-title">Prochaines sessions</div>
+    <div id="sessionsAccueil"></div>
+
+    <div class="section-title">Prochains déplacements</div>
+    <div id="deplacementsAccueil"></div>
+
+    <div class="section-title">Mes stats</div>
+    <div class="stats-grid" id="mesStats"></div>
+  </div>
+
+  <!-- PAGE SESSIONS -->
+  <div id="pageSessions" class="page">
+    <div class="section-title">Sessions à venir</div>
+    <div id="sessionsListe"></div>
+    <div class="section-title" style="margin-top:24px;">Historique</div>
+    <div id="sessionsHistorique"></div>
+  </div>
+
+  <!-- PAGE DÉPLACEMENTS -->
+  <div id="pageDeplacements" class="page">
+    <div class="section-title">Déplacements</div>
+    <div id="deplacementsListe"></div>
+  </div>
+
+  <!-- PAGE PROFIL -->
+  <div id="pageProfil" class="page">
+    <div class="card" id="profilCard"></div>
+    <div class="section-title">Mon activité</div>
+    <div class="stats-grid" id="profilStats"></div>
+    <div style="margin-top:16px;">
+      <button class="btn btn-secondary" onclick="showChangeMdp()">Changer mon mot de passe</button>
+    </div>
+    <div style="margin-top:10px;">
+      <button class="btn btn-danger" onclick="doLogout()">Se déconnecter</button>
+    </div>
+    <div style="margin-top:10px;" id="adminBtnContainer" style="display:none;">
+      <button class="btn btn-secondary" onclick="window.location='admin.html'">⚙️ Console Admin</button>
+    </div>
+  </div>
+
+  <!-- PAGE CHARTE -->
+  <div id="pageCharte" class="page">
+    <h2 style="font-size:18px; font-weight:700; margin-bottom:16px;">Charte des Ultras Lutetia</h2>
+    <p style="font-size:13px; color:var(--gris); margin-bottom:12px;">Lisez attentivement la charte jusqu'en bas avant de signer.</p>
+    <div class="charte-content" id="charteTexte" onscroll="checkScroll(this)"></div>
+    <div class="form-group" style="display:flex; align-items:flex-start; gap:10px; margin-top:16px;">
+      <input type="checkbox" id="charteAccept" style="width:20px; margin-top:2px; flex-shrink:0;" disabled>
+      <label for="charteAccept" style="font-size:13px;">J'ai lu et j'accepte la charte des Ultras Lutetia</label>
+    </div>
+    <button class="btn btn-primary" id="btnSignerCharte" onclick="signerCharte()" disabled>
+      Signer la charte
+    </button>
+  </div>
+
+  <!-- Bottom nav -->
+  <nav class="bottom-nav">
+    <div class="nav-item active" onclick="showPage('pageAccueil')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/>
+        <polyline points="9 22 9 12 15 12 15 22"/>
+      </svg>
+      <span>Accueil</span>
+    </div>
+    <div class="nav-item" onclick="showPage('pageSessions')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/>
+        <line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+      </svg>
+      <span>Sessions</span>
+    </div>
+    <div class="nav-item" onclick="showPage('pageDeplacements')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M5 17H3a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v9a2 2 0 01-2 2h-3"/>
+        <circle cx="7.5" cy="17.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/>
+      </svg>
+      <span>Déplacements</span>
+    </div>
+    <div class="nav-item" onclick="showPage('pageProfil')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/>
+        <circle cx="12" cy="7" r="4"/>
+      </svg>
+      <span>Profil</span>
+    </div>
+  </nav>
+
+</div>
+
+<!-- ── MODALS ───────────────────────────────────────────────── -->
+
+<!-- Modal session détail -->
+<div class="modal-overlay" id="modalSession" style="display:none;" onclick="closeModal('modalSession')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-handle"></div>
+    <div id="modalSessionContent"></div>
+  </div>
+</div>
+
+<!-- Modal déplacement détail -->
+<div class="modal-overlay" id="modalDeplacement" style="display:none;" onclick="closeModal('modalDeplacement')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-handle"></div>
+    <div id="modalDeplacementContent"></div>
+  </div>
+</div>
+
+<!-- Modal validation présence -->
+<div class="modal-overlay" id="modalPresence" style="display:none;" onclick="closeModal('modalPresence')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-handle"></div>
+    <h3 class="modal-title">Valider ma présence</h3>
+    <p style="color:var(--gris); font-size:14px; margin-bottom:16px;">Entre le code 4 chiffres affiché par le responsable de session.</p>
+    <div class="form-group">
+      <input type="number" id="codePresence" placeholder="Code à 4 chiffres" maxlength="4" inputmode="numeric">
+    </div>
+    <button class="btn btn-primary" onclick="doValiderPresence()">Valider</button>
+  </div>
+</div>
+
+<!-- Modal changer mdp -->
+<div class="modal-overlay" id="modalMdp" style="display:none;" onclick="closeModal('modalMdp')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-handle"></div>
+    <h3 class="modal-title">Changer mon mot de passe</h3>
+    <div class="form-group">
+      <label>Nouveau mot de passe</label>
+      <input type="password" id="newPassword" placeholder="Minimum 8 caractères">
+    </div>
+    <div class="form-group">
+      <label>Confirmer</label>
+      <input type="password" id="newPasswordConfirm" placeholder="Répète le mot de passe">
+    </div>
+    <button class="btn btn-primary" onclick="doChangeMdp()">Enregistrer</button>
+  </div>
+</div>
+
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="src/config.js"></script>
+<script src="src/supabase-client.js"></script>
+<script>
+// ─── State ──────────────────────────────────────────────────
+let currentSession = null;
+let currentDeplacement = null;
+
+// ─── Init ────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', async () => {
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/ultras-lutetia/sw.js').catch(console.error);
+  }
+  // Overwrite SUPABASE credentials from config
+  window.UL.sb = supabase.createClient(UL_CONFIG.SUPABASE_URL, UL_CONFIG.SUPABASE_ANON_KEY);
+
+  const { membre } = await UL.initSession();
+  if (membre) {
+    showApp(membre);
+  } else {
+    showLoginPage();
+  }
+});
+
+// ─── Auth ────────────────────────────────────────────────────
+function showLoginPage() {
+  document.getElementById('loginPage').style.display = 'flex';
+  document.getElementById('appContainer').style.display = 'none';
+}
+
+function showLogin() {
+  document.getElementById('loginForm').style.display = 'block';
+  document.getElementById('inscriptionForm').style.display = 'none';
+}
+
+function showInscription() {
+  document.getElementById('loginForm').style.display = 'none';
+  document.getElementById('inscriptionForm').style.display = 'block';
+}
+
+async function doLogin() {
+  const pseudo = document.getElementById('loginTelegram').value.trim();
+  const password = document.getElementById('loginPassword').value;
+  if (!pseudo || !password) return toast('Remplis tous les champs', 'error');
+  try {
+    showLoading();
+    const { membre } = await UL.loginByTelegram(pseudo, password);
+    hideLoading();
+    showApp(membre);
+  } catch(e) {
+    hideLoading();
+    toast(e.message || 'Erreur de connexion', 'error');
+  }
+}
+
+async function doInscription() {
+  const prenom = document.getElementById('regPrenom').value.trim();
+  const nom = document.getElementById('regNom').value.trim();
+  const pseudo = document.getElementById('regTelegram').value.trim();
+  const email = document.getElementById('regEmail').value.trim();
+  const ville = document.getElementById('regVille').value.trim();
+  const password = document.getElementById('regPassword').value;
+  const rgpd = document.getElementById('regRgpd').checked;
+
+  if (!prenom || !nom || !pseudo || !password) return toast('Remplis tous les champs obligatoires', 'error');
+  if (password.length < 8) return toast('Mot de passe trop court (8 caractères min)', 'error');
+  if (!rgpd) return toast('Tu dois accepter les conditions RGPD', 'error');
+
+  try {
+    showLoading();
+    await UL.inscription({ prenom, nom, pseudoTelegram: pseudo, email, ville, password });
+    hideLoading();
+    toast('Compte créé ! Attends la validation admin.', 'success');
+    showLogin();
+  } catch(e) {
+    hideLoading();
+    toast(e.message || 'Erreur lors de l\'inscription', 'error');
+  }
+}
+
+async function doLogout() {
+  await UL.logout();
+  showLoginPage();
+}
+
+// ─── App ─────────────────────────────────────────────────────
+async function showApp(membre) {
+  document.getElementById('loginPage').style.display = 'none';
+  document.getElementById('appContainer').style.display = 'block';
+
+  // Header
+  document.getElementById('headerUser').textContent = `@${membre.pseudo_telegram}`;
+
+  // Bouton admin
+  if (['admin','bureau'].includes(membre.statut)) {
+    document.getElementById('adminBtnContainer').style.display = 'block';
+  }
+
+  // Charte
+  if (!membre.charte_signee) {
+    document.getElementById('charteAlert').style.display = 'block';
+    await loadCharte();
+  }
+
+  await loadAccueil();
+}
+
+// ─── Navigation ───────────────────────────────────────────────
+function showPage(pageId) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById(pageId).classList.add('active');
+
+  const pageNav = { pageAccueil: 0, pageSessions: 1, pageDeplacements: 2, pageProfil: 3 };
+  const navIdx = pageNav[pageId];
+  if (navIdx !== undefined) {
+    document.querySelectorAll('.nav-item')[navIdx].classList.add('active');
+  }
+
+  // Lazy load
+  if (pageId === 'pageSessions') loadSessions();
+  if (pageId === 'pageDeplacements') loadDeplacements();
+  if (pageId === 'pageProfil') loadProfil();
+}
+
+// ─── Accueil ──────────────────────────────────────────────────
+async function loadAccueil() {
+  // Annonces
+  try {
+    const annonces = await UL.getAnnonces();
+    const el = document.getElementById('annoncesContainer');
+    el.innerHTML = annonces.slice(0,2).map(a => `
+      <div class="info-box ${a.categorie === 'urgent' ? '' : 'success'}">
+        <strong>${a.titre}</strong><br>
+        <span style="font-size:13px;">${a.contenu}</span>
+      </div>`).join('');
+  } catch(e) {}
+
+  // Sessions
+  try {
+    const sessions = await UL.getUpcomingSessions();
+    const el = document.getElementById('sessionsAccueil');
+    if (!sessions.length) {
+      el.innerHTML = '<p style="color:var(--gris); font-size:14px;">Aucune session à venir</p>';
+    } else {
+      el.innerHTML = sessions.slice(0,2).map(s => renderSessionCard(s)).join('');
+    }
+  } catch(e) {}
+
+  // Déplacements
+  try {
+    const depls = await UL.getDeplacements(true);
+    const el = document.getElementById('deplacementsAccueil');
+    if (!depls.length) {
+      el.innerHTML = '<p style="color:var(--gris); font-size:14px;">Aucun déplacement à venir</p>';
+    } else {
+      el.innerHTML = depls.slice(0,1).map(d => renderDeplCard(d)).join('');
+    }
+  } catch(e) {}
+
+  // Stats perso
+  try {
+    const stats = await UL.getMesStats();
+    document.getElementById('mesStats').innerHTML = `
+      <div class="stat-card">
+        <div class="stat-value">${stats.sessionsPresent}</div>
+        <div class="stat-label">Sessions présent</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value">${stats.tauxPresence}%</div>
+        <div class="stat-label">Taux présence</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value">${stats.deplacements}</div>
+        <div class="stat-label">Déplacements</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value">${stats.sessionsInscrites}</div>
+        <div class="stat-label">Sessions inscrites</div>
+      </div>`;
+  } catch(e) {}
+}
+
+// ─── Sessions ─────────────────────────────────────────────────
+async function loadSessions() {
+  try {
+    const sessions = await UL.getUpcomingSessions();
+    document.getElementById('sessionsListe').innerHTML =
+      sessions.length ? sessions.map(s => renderSessionCard(s)).join('') :
+      '<p style="color:var(--gris); font-size:14px;">Aucune session à venir</p>';
+
+    const past = await UL.getPastSessions();
+    document.getElementById('sessionsHistorique').innerHTML =
+      past.length ? past.map(s => renderSessionCard(s, true)).join('') :
+      '<p style="color:var(--gris); font-size:14px;">Aucun historique</p>';
+  } catch(e) { toast('Erreur chargement sessions', 'error'); }
+}
+
+function renderSessionCard(s, past = false) {
+  const date = new Date(s.date).toLocaleDateString('fr-FR', { weekday:'short', day:'numeric', month:'short' });
+  const types = { Tracage:'🖊️', Assemblage:'🔧', Peinture:'🖌️' };
+  return `<div class="card" onclick="openSession('${s.id}')">
+    <div class="card-header">
+      <div>
+        <div class="card-title">${types[s.type_session] || '📋'} ${s.nom}</div>
+        <div class="card-sub">${date}${s.heure ? ' — ' + s.heure.slice(0,5) : ''} · ${s.lieu}</div>
+      </div>
+      <span class="badge ${s.statut === 'en_cours' ? 'badge-vert' : s.statut === 'terminee' ? 'badge-gris' : 'badge-rouge'}">
+        ${s.statut === 'a_venir' ? 'À venir' : s.statut === 'en_cours' ? 'En cours' : s.statut === 'terminee' ? 'Terminée' : 'Annulée'}
+      </span>
+    </div>
+    ${s.capacite_max ? `<div style="font-size:13px; color:var(--gris);">Capacité max: ${s.capacite_max}</div>` : ''}
+    ${s.avec_pizza ? '<div style="font-size:13px; color:#ff9800;">🍕 Session pizza</div>' : ''}
+  </div>`;
+}
+
+async function openSession(sessionId) {
+  currentSession = sessionId;
+  try {
+    const { session, inscrits, monInscrit } = await UL.getSessionDetails(sessionId);
+    const estInscrit = !!monInscrit;
+    const estPresent = monInscrit?.statut === 'present';
+    const membre = UL.getCurrentMembre();
+
+    document.getElementById('modalSessionContent').innerHTML = `
+      <h3 class="modal-title">${session.nom}</h3>
+      <div style="color:var(--gris); font-size:14px; margin-bottom:16px;">
+        📅 ${new Date(session.date).toLocaleDateString('fr-FR', {weekday:'long', day:'numeric', month:'long'})}<br>
+        ${session.heure ? '🕐 ' + session.heure.slice(0,5) + '<br>' : ''}
+        📍 ${session.lieu}<br>
+        ${session.description ? '<br>' + session.description : ''}
+        ${session.avec_pizza ? '<br>🍕 Session pizza' : ''}
+      </div>
+      <div style="font-size:14px; margin-bottom:16px;">
+        👥 ${inscrits.length} inscrit${inscrits.length > 1 ? 's' : ''}
+        ${session.capacite_max ? ' / ' + session.capacite_max : ''}
+      </div>
+      ${session.lien_telegram ? `<a href="${session.lien_telegram}" style="color:var(--rouge-light); font-size:14px;">📲 Groupe Telegram</a><br><br>` : ''}
+
+      ${!estInscrit && session.statut === 'a_venir' ?
+        `<button class="btn btn-primary" onclick="doInscrire('${session.id}')">S'inscrire</button>` : ''}
+      ${estInscrit && !estPresent && session.statut === 'a_venir' ?
+        `<button class="btn btn-secondary" onclick="doDesinscrire('${session.id}')">Se désinscrire</button>` : ''}
+      ${estInscrit && session.statut === 'en_cours' && !estPresent ?
+        `<button class="btn btn-success" onclick="showPresenceCode()">✅ Valider ma présence</button>` : ''}
+      ${estPresent ?
+        `<div class="info-box success" style="text-align:center;">✅ Présence validée</div>` : ''}
+
+      ${session.avec_pizza && estInscrit && session.statut === 'a_venir' ? `
+        <div style="margin-top:12px;">
+          <label>Commande pizza</label>
+          <select id="pizzaChoice" onchange="doPizza('${session.id}')">
+            <option value="non">Pas de pizza</option>
+            <option value="margherita">Margherita</option>
+            <option value="reine">Reine</option>
+            <option value="4 fromages">4 Fromages</option>
+            <option value="vegetarienne">Végétarienne</option>
+          </select>
+        </div>` : ''}
+    `;
+    if (monInscrit?.pizza) {
+      const sel = document.getElementById('pizzaChoice');
+      if (sel) sel.value = monInscrit.pizza;
+    }
+
+    document.getElementById('modalSession').style.display = 'flex';
+  } catch(e) { toast('Erreur chargement session', 'error'); }
+}
+
+async function doInscrire(sessionId) {
+  try {
+    await UL.inscrire(sessionId);
+    toast('Inscription confirmée !', 'success');
+    closeModal('modalSession');
+    loadSessions();
+  } catch(e) { toast(e.message, 'error'); }
+}
+
+async function doDesinscrire(sessionId) {
+  try {
+    await UL.desinscrire(sessionId);
+    toast('Désinscription effectuée', 'success');
+    closeModal('modalSession');
+    loadSessions();
+  } catch(e) { toast(e.message, 'error'); }
+}
+
+function showPresenceCode() {
+  closeModal('modalSession');
+  document.getElementById('modalPresence').style.display = 'flex';
+}
+
+async function doValiderPresence() {
+  const code = document.getElementById('codePresence').value;
+  if (!code || code.length !== 4) return toast('Code à 4 chiffres requis', 'error');
+  try {
+    await UL.validerPresence(currentSession, code);
+    toast('Présence validée ! ✅', 'success');
+    closeModal('modalPresence');
+    loadAccueil();
+  } catch(e) { toast(e.message || 'Code incorrect', 'error'); }
+}
+
+async function doPizza(sessionId) {
+  const pizza = document.getElementById('pizzaChoice').value;
+  try {
+    await UL.savePizzaChoice(sessionId, pizza);
+    toast('Commande pizza enregistrée', 'success');
+  } catch(e) { toast('Erreur', 'error'); }
+}
+
+// ─── Déplacements ─────────────────────────────────────────────
+async function loadDeplacements() {
+  try {
+    const depls = await UL.getDeplacements(true);
+    const el = document.getElementById('deplacementsListe');
+    if (!depls.length) {
+      el.innerHTML = '<p style="color:var(--gris); font-size:14px;">Aucun déplacement à venir</p>';
+      return;
+    }
+    el.innerHTML = depls.map(d => renderDeplCard(d)).join('');
+  } catch(e) { toast('Erreur chargement déplacements', 'error'); }
+}
+
+function renderDeplCard(d) {
+  const date = d.date_match ? new Date(d.date_match).toLocaleDateString('fr-FR', {weekday:'short', day:'numeric', month:'short'}) : '';
+  const pct = d.places_max ? Math.min(100, Math.round(((d._inscrits || 0) / d.places_max) * 100)) : 0;
+  return `<div class="depl-card" onclick="openDeplacement('${d.id}')">
+    <div class="depl-match">Paris FC — ${d.adversaire || (d.match?.equipe_exterieur) || '?'}</div>
+    <div class="depl-infos">
+      ${date ? `<span class="depl-info">📅 ${date}</span>` : ''}
+      ${d.stade || d.match?.stade ? `<span class="depl-info">📍 ${d.stade || d.match?.stade}</span>` : ''}
+      ${d.prix_total ? `<span class="depl-info">💶 ${d.prix_total}€</span>` : ''}
+    </div>
+    ${d.places_max ? `
+    <div class="depl-places">
+      <span style="font-size:12px; color:var(--gris);">${d._inscrits || 0}/${d.places_max} places</span>
+      <div class="places-bar"><div class="places-fill" style="width:${pct}%"></div></div>
+    </div>` : ''}
+  </div>`;
+}
+
+async function openDeplacement(deplId) {
+  currentDeplacement = deplId;
+  try {
+    const { deplacement: d, inscrits, monInscrit, nbInscrits } = await UL.getDeplacement(deplId);
+    const estInscrit = !!monInscrit;
+    const estPaye = monInscrit && monInscrit.statut_paiement !== 'en_attente';
+    const date = d.date_match ? new Date(d.date_match).toLocaleDateString('fr-FR', {weekday:'long', day:'numeric', month:'long'}) : '';
+
+    let content = `
+      <h3 class="modal-title">Paris FC — ${d.adversaire || d.match?.equipe_exterieur}</h3>
+      <div style="color:var(--gris); font-size:14px; margin-bottom:16px;">
+        ${date ? `📅 ${date}<br>` : ''}
+        ${d.stade || d.match?.stade ? `🏟️ ${d.stade || d.match?.stade}<br>` : ''}
+        ${d.ville ? `📍 ${d.ville}<br>` : ''}
+        ${d.point_rdv ? `🚌 RDV: ${d.point_rdv}<br>` : ''}
+        ${d.heure_depart ? `⏰ Départ: ${d.heure_depart}<br>` : ''}
+        ${d.prix_total ? `💶 Prix: ${d.prix_total}€ (bus + entrée)<br>` : ''}
+        ${d.date_limite_inscription ? `⏳ Limite: ${new Date(d.date_limite_inscription).toLocaleDateString('fr-FR')}<br>` : ''}
+      </div>
+      <div style="font-size:14px; margin-bottom:16px; font-weight:600;">
+        👥 ${nbInscrits} inscrit${nbInscrits > 1 ? 's' : ''}${d.places_max ? ' / ' + d.places_max + ' places' : ''}
+      </div>`;
+
+    if (!estInscrit) {
+      content += `<button class="btn btn-primary" onclick="doInscritDepl('${d.id}')">M'inscrire</button>`;
+    } else if (!estPaye) {
+      content += `
+        <div class="info-box">⏳ Inscription confirmée — en attente de paiement</div>
+        ${d.lien_helloasso ? `<a href="${d.lien_helloasso}" target="_blank"><button class="btn btn-primary">💳 Payer via HelloAsso</button></a>` : ''}
+        <div style="margin-top:8px; font-size:12px; color:var(--gris); text-align:center;">
+          Paiement cash possible — contacte l'admin via Telegram
+        </div>`;
+    } else {
+      // Afficher le QR code
+      const qr = monInscrit.qr_code || '';
+      content += `
+        <div class="info-box success">✅ Paiement confirmé — ton billet est prêt</div>
+        <div class="qr-container" id="qrContainer"></div>
+        <p style="text-align:center; font-size:12px; color:var(--gris);">Code: ${qr}<br>Montre ce QR dans le bus</p>`;
+    }
+
+    if (d.notes) content += `<div style="margin-top:12px; font-size:13px; color:var(--gris);">📝 ${d.notes}</div>`;
+
+    document.getElementById('modalDeplacementContent').innerHTML = content;
+
+    // Générer QR si payé
+    if (estPaye && monInscrit?.qr_code) {
+      generateQR(monInscrit.qr_code, 'qrContainer');
+    }
+
+    document.getElementById('modalDeplacement').style.display = 'flex';
+  } catch(e) { toast('Erreur chargement déplacement', 'error'); }
+}
+
+async function doInscritDepl(deplId) {
+  try {
+    await UL.sInscrireDeplacements(deplId);
+    toast('Inscription confirmée !', 'success');
+    closeModal('modalDeplacement');
+    loadDeplacements();
+  } catch(e) { toast(e.message, 'error'); }
+}
+
+// QR Code simple (texte encodé)
+function generateQR(text, containerId) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  // QR simple via API tierce (cache-friendly)
+  el.innerHTML = `<img src="https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encodeURIComponent(text)}" alt="QR ${text}" width="160" height="160">`;
+}
+
+// ─── Profil ───────────────────────────────────────────────────
+async function loadProfil() {
+  const m = UL.getCurrentMembre();
+  if (!m) return;
+  const initiales = (m.prenom[0] + m.nom[0]).toUpperCase();
+  const statutLabel = { sympathisant:'💙 Sympathisant', draft:'🚀 Draft', confirme:'🏅 Confirmé', membre_cellule:'🛡️ Membre Cellule', bureau:'🏆 Bureau', admin:'⚙️ Admin' };
+  const etoiles = '⭐'.repeat(m.etoiles || 0) + '☆'.repeat(3 - (m.etoiles || 0));
+
+  document.getElementById('profilCard').innerHTML = `
+    <div style="display:flex; align-items:center; gap:14px; margin-bottom:16px;">
+      <div class="avatar" style="width:56px; height:56px; font-size:18px;">${initiales}</div>
+      <div>
+        <div style="font-weight:700; font-size:17px;">${m.prenom} ${m.nom}</div>
+        <div style="font-size:14px; color:var(--gris);">@${m.pseudo_telegram}</div>
+        <div style="font-size:14px; margin-top:4px;" class="statut-${m.statut}">${statutLabel[m.statut] || m.statut}</div>
+      </div>
+    </div>
+    <div class="divider"></div>
+    ${m.section ? `<div style="font-size:14px; margin-bottom:8px;">🛡️ Section: <strong>${m.section.nom}</strong></div>` : ''}
+    <div style="font-size:14px; margin-bottom:8px;">⭐ Évaluation: ${etoiles}</div>
+    <div style="font-size:14px; margin-bottom:8px;">📋 Charte: ${m.charte_signee ? '✅ Signée' : '❌ Non signée'}</div>
+    <div style="font-size:14px;">💶 Cotisation: ${m.cotisation_a_jour ? '✅ À jour' : '⏳ En attente'}</div>
+  `;
+
+  try {
+    const stats = await UL.getMesStats();
+    document.getElementById('profilStats').innerHTML = `
+      <div class="stat-card"><div class="stat-value">${stats.sessionsPresent}</div><div class="stat-label">Présences</div></div>
+      <div class="stat-card"><div class="stat-value">${stats.tauxPresence}%</div><div class="stat-label">Assiduité</div></div>
+      <div class="stat-card"><div class="stat-value">${stats.deplacements}</div><div class="stat-label">Déplacements</div></div>
+      <div class="stat-card"><div class="stat-value">${stats.sessionsInscrites}</div><div class="stat-label">Inscriptions</div></div>`;
+  } catch(e) {}
+}
+
+// ─── Charte ───────────────────────────────────────────────────
+async function loadCharte() {
+  try {
+    const charte = await UL.getCharteActive();
+    if (!charte) return;
+    document.getElementById('charteTexte').textContent = charte.contenu;
+    document.getElementById('pageCharte')._charteId = charte.id;
+  } catch(e) {}
+}
+
+function checkScroll(el) {
+  const atBottom = el.scrollTop + el.clientHeight >= el.scrollHeight - 20;
+  if (atBottom) {
+    document.getElementById('charteAccept').disabled = false;
+    document.getElementById('charteAccept').addEventListener('change', function() {
+      document.getElementById('btnSignerCharte').disabled = !this.checked;
+    });
+  }
+}
+
+async function signerCharte() {
+  const charteId = document.getElementById('pageCharte')._charteId;
+  if (!charteId) return;
+  try {
+    await UL.signerCharte(charteId);
+    toast('Charte signée ! ✅', 'success');
+    document.getElementById('charteAlert').style.display = 'none';
+    showPage('pageAccueil');
+  } catch(e) { toast('Erreur signature', 'error'); }
+}
+
+// ─── Mot de passe ─────────────────────────────────────────────
+function showChangeMdp() {
+  document.getElementById('modalMdp').style.display = 'flex';
+}
+
+async function doChangeMdp() {
+  const p1 = document.getElementById('newPassword').value;
+  const p2 = document.getElementById('newPasswordConfirm').value;
+  if (!p1 || p1.length < 8) return toast('Mot de passe trop court', 'error');
+  if (p1 !== p2) return toast('Les mots de passe ne correspondent pas', 'error');
+  try {
+    await UL.changePassword(p1);
+    toast('Mot de passe modifié ✅', 'success');
+    closeModal('modalMdp');
+  } catch(e) { toast('Erreur', 'error'); }
+}
+
+// ─── Utils ────────────────────────────────────────────────────
+function closeModal(id) {
+  document.getElementById(id).style.display = 'none';
+}
+
+function toast(msg, type = 'info') {
+  const el = document.createElement('div');
+  el.className = `toast ${type}`;
+  el.textContent = msg;
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 2800);
+}
+
+let loadingEl = null;
+function showLoading() {
+  loadingEl = document.createElement('div');
+  loadingEl.className = 'loading-overlay';
+  loadingEl.innerHTML = '<div class="spinner"></div>';
+  document.body.appendChild(loadingEl);
+}
+
+function hideLoading() {
+  if (loadingEl) { loadingEl.remove(); loadingEl = null; }
+}
+</script>
+</body>
+</html>
