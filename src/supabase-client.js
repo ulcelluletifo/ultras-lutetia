@@ -3,8 +3,8 @@
 // Remplace gas-shim.js — même interface, backend Supabase
 // ============================================================
 
-const SUPABASE_URL = 'REMPLACER_PAR_TON_URL_SUPABASE';
-const SUPABASE_ANON_KEY = 'REMPLACER_PAR_TA_CLE_ANON';
+const SUPABASE_URL = 'https://ypsvdicatkckrxrcyxax.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_Wq8Megzoj3bKeDgOx1Pw2g_gBYaz...';
 
 // ── Init client Supabase ──────────────────────────────────────
 const { createClient } = supabase;
