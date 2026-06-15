@@ -972,32 +972,79 @@ async function getAllCotisations() {
 // STORAGE — Upload photos
 // ============================================================
 
-async function uploadPhoto(file, bucket, fileName) {
-  // Sanitize filename
-  const ext = file.name.split('.').pop().toLowerCase();
+async function compressImage(file, maxWidthPx = 800, qualite = 0.75) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      // Calculer les nouvelles dimensions en gardant le ratio
+      let { width, height } = img;
+      if (width > maxWidthPx) {
+        height = Math.round((height * maxWidthPx) / width);
+        width = maxWidthPx;
+      }
+      const canvas = document.createElement('canvas');
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, width, height);
+      canvas.toBlob(
+        blob => {
+          if (!blob) return reject(new Error('Compression échouée'));
+          // Créer un nouveau File avec le bon nom
+          const compressed = new File([blob], file.name.replace(/\.[^.]+$/, '.jpg'), {
+            type: 'image/jpeg', lastModified: Date.now()
+          });
+          resolve(compressed);
+        },
+        'image/jpeg',
+        qualite
+      );
+    };
+    img.onerror = () => reject(new Error('Image invalide'));
+    img.src = url;
+  });
+}
+
+async function uploadPhoto(file, bucket, fileName, maxWidth = 800, qualite = 0.75) {
+  // 1. Compression automatique avant upload
+  let fileToUpload = file;
+  const MAX_SIZE_KB = 100; // au-delà de 100KB on compresse
+  if (file.size > MAX_SIZE_KB * 1024) {
+    try {
+      fileToUpload = await compressImage(file, maxWidth, qualite);
+      console.log(`Compression: ${Math.round(file.size/1024)}KB → ${Math.round(fileToUpload.size/1024)}KB`);
+    } catch(e) {
+      console.warn('Compression échouée, upload original:', e);
+      fileToUpload = file;
+    }
+  }
+
+  // 2. Sanitize filename
   const cleanName = fileName.normalize('NFD')
     .replace(/[̀-ͯ]/g, '')
     .replace(/[^a-z0-9]/gi, '-')
     .toLowerCase();
-  const path = `${cleanName}-${Date.now()}.${ext}`;
+  const path = `${cleanName}-${Date.now()}.jpg`;
 
   const { data, error } = await sb.storage
     .from(bucket)
-    .upload(path, file, { cacheControl: '3600', upsert: false });
+    .upload(path, fileToUpload, { cacheControl: '3600', upsert: false, contentType: 'image/jpeg' });
 
   if (error) throw new Error('Erreur upload: ' + error.message);
 
-  // Récupérer l'URL publique
   const { data: urlData } = sb.storage.from(bucket).getPublicUrl(path);
   return urlData.publicUrl;
 }
 
 async function uploadPhotoMatos(file, produitNom) {
-  return uploadPhoto(file, 'matos', produitNom);
+  // 400px max, ratio carré optimisé pour affichage vignette boutique
+  return uploadPhoto(file, 'matos', produitNom, 400, 0.80);
 }
 
 async function uploadPhotoStick(file, stickNom) {
-  return uploadPhoto(file, 'sticks', stickNom);
+  return uploadPhoto(file, 'sticks', stickNom, 400, 0.80);
 }
 
 async function updatePhotoMatos(produitId, photoUrl) {
