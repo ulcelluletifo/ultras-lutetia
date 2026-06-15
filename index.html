@@ -10,6 +10,50 @@
   <title>Ultras Lutetia</title>
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="stylesheet" href="src/styles.css">
+  <style>
+    /* ── Boutique buttons fix ───────────────────────────── */
+    .btn-tab {
+      flex: 1; padding: 8px 10px;
+      border: none;
+      background: transparent;
+      color: #94A3B8;
+      font-family: 'Barlow Condensed', -apple-system, sans-serif;
+      font-size: 13px; font-weight: 700;
+      letter-spacing: .04em; text-transform: uppercase;
+      cursor: pointer; border-radius: 6px;
+      transition: all .15s ease;
+      white-space: nowrap;
+      -webkit-appearance: none; appearance: none; outline: none;
+    }
+    .btn-tab:hover { color: #E2E8F0; }
+    .btn-tab.active { background: #1A56DB; color: #FFFFFF; }
+
+    .filter-btn {
+      padding: 6px 14px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: #1F2937;
+      color: #94A3B8;
+      font-family: 'Barlow Condensed', -apple-system, sans-serif;
+      font-size: 12px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: .04em;
+      border-radius: 20px; cursor: pointer;
+      transition: all .15s ease;
+      white-space: nowrap; flex-shrink: 0;
+      -webkit-appearance: none; appearance: none; outline: none;
+    }
+    .filter-btn:hover { border-color: #3B82F6; color: #E2E8F0; }
+    .filter-btn.active { background: #1A56DB; border-color: #1A56DB; color: #FFFFFF; }
+
+    /* Sous-onglets wrapper */
+    .boutique-tabs-wrap {
+      display: flex; gap: 0;
+      margin-bottom: 16px;
+      background: #111827;
+      border-radius: 9px;
+      padding: 3px;
+      border: 1px solid rgba(255,255,255,.08);
+    }
+  </style>
 </head>
 <body>
 
@@ -225,7 +269,7 @@
   <div id="pageBoutique" class="page">
 
     <!-- Sous-onglets -->
-    <div style="display:flex;gap:0;margin-bottom:16px;background:var(--surface-2);border-radius:var(--radius-sm);padding:3px;">
+    <div class="boutique-tabs-wrap">
       <button class="btn-tab active" id="tabMatos" onclick="switchBoutiqueTab('matos')">🛍️ Matos</button>
       <button class="btn-tab" id="tabSticks" onclick="switchBoutiqueTab('sticks')">🎟️ Sticks</button>
       <button class="btn-tab" id="tabCotisation" onclick="switchBoutiqueTab('cotisation')">💶 Cotisation</button>
@@ -260,7 +304,6 @@
       <div style="display:flex;gap:6px;overflow-x:auto;padding-bottom:8px;margin-bottom:12px;scrollbar-width:none;">
         <button class="filter-btn active" onclick="filtrerSticks('tous')">Tous</button>
         <button class="filter-btn" onclick="filtrerSticks('sticker')">Stickers</button>
-        <button class="filter-btn" onclick="filtrerSticks('fumigene')">Fumigènes</button>
         <button class="filter-btn" onclick="filtrerSticks('collector')">Collectors</button>
       </div>
       <!-- Bouton admin distribution -->
