@@ -555,6 +555,14 @@
     <div class="modal-handle"></div>
     <h3 class="modal-title">Ajouter un article matos</h3>
     <div class="form-group"><label>Nom de l'article</label><input type="text" id="pNom" placeholder="ex: Tee-shirt UL 2026"></div>
+    <div class="form-group">
+      <label>Photo de l'article</label>
+      <div id="photoPreviewMatos" style="display:none;margin-bottom:8px;">
+        <img id="photoPreviewImgMatos" style="width:80px;height:80px;object-fit:cover;border-radius:8px;border:1px solid var(--surface-4);">
+      </div>
+      <input type="file" id="pPhoto" accept="image/*" onchange="previewPhoto(this,'matos')"
+        style="background:var(--surface-2);border:1.5px dashed var(--surface-4);border-radius:9px;padding:10px;color:var(--gris);width:100%;cursor:pointer;">
+    </div>
     <div class="form-group"><label>Description</label><textarea id="pDesc" rows="2" placeholder="Description optionnelle"></textarea></div>
     <div class="form-group"><label>Catégorie</label>
       <select id="pCat">
@@ -1546,8 +1554,9 @@ function renderMatos(produits) {
           ${p.mode === 'precommande' ? '📋 Précommander' : '🛒 Commander'}
         </button>` : ''}
         ${isCellule(UL.getCurrentMembre()) ? `
-        <div style="display:flex;gap:5px;margin-top:6px;">
+        <div style="display:flex;gap:5px;margin-top:6px;flex-wrap:wrap;">
           <button class="btn btn-sm btn-secondary" onclick="modifierStock('${p.id}','${esc(p.nom)}',${p.stock})">📦 Stock</button>
+          <button class="btn btn-sm btn-secondary" onclick="uploadPhotoExistant('${p.id}','matos')">🖼️ Photo</button>
           <button class="btn btn-sm btn-danger" onclick="doArchiverProduit('${p.id}')">Archiver</button>
         </div>` : ''}
       </div>
@@ -1559,38 +1568,61 @@ async function openCommander(produitId) {
   try {
     const p = await UL.getProduitById(produitId);
     const icones = { textile:'👕', accessoire:'🎒', collector:'⭐' };
-    document.getElementById('modalCommanderContent').innerHTML = `
-      <h3 class="modal-title">${esc(p.nom)}</h3>
-      <div style="font-size:22px;font-family:'Bebas Neue',sans-serif;color:var(--bleu-clair);margin-bottom:12px;">${p.prix}€</div>
-      ${p.description ? `<p style="font-size:13px;color:var(--gris);margin-bottom:14px;">${esc(p.description)}</p>` : ''}
-      ${p.quota_par_membre ? `<div class="info-box">⚠️ Quota: max ${p.quota_par_membre} par membre</div>` : ''}
-      ${p.avec_tailles ? `
+
+    // Section tailles — boutons cliquables
+    const taillesHtml = p.avec_tailles ? `
       <div class="form-group">
         <label>Taille</label>
-        <select id="cmdTaille">
-          <option value="XS">XS</option><option value="S">S</option>
-          <option value="M" selected>M</option><option value="L">L</option>
-          <option value="XL">XL</option><option value="XXL">XXL</option>
-        </select>
-      </div>` : ''}
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:2px;" id="taillesContainer">
+          ${['XS','S','M','L','XL','XXL'].map((t,i) => `
+            <button type="button"
+              class="taille-btn ${i===2?'active':''}"
+              onclick="selectTaille('${t}')"
+              data-taille="${t}">
+              ${t}
+            </button>`).join('')}
+        </div>
+        <input type="hidden" id="cmdTaille" value="M">
+      </div>` : '';
+
+    document.getElementById('modalCommanderContent').innerHTML = `
+      <h3 class="modal-title">${esc(p.nom)}</h3>
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;">
+        ${p.photo_url ? `<img src="${p.photo_url}" style="width:70px;height:70px;object-fit:cover;border-radius:10px;">` : `<div style="font-size:42px;">${icones[p.categorie]||'📦'}</div>`}
+        <div>
+          <div style="font-size:24px;font-family:'Bebas Neue',sans-serif;color:var(--bleu-clair);">${p.prix}€</div>
+          <div style="font-size:12px;color:var(--gris);">${p.categorie}${p.mode==='precommande'?' · Précommande':''}</div>
+          ${p.stock > 0 ? `<div style="font-size:12px;color:var(--vert);">Stock: ${p.stock}</div>` : `<div style="font-size:12px;color:var(--orange);">Précommande</div>`}
+        </div>
+      </div>
+      ${p.description ? `<p style="font-size:13px;color:var(--gris);margin-bottom:14px;line-height:1.6;">${esc(p.description)}</p>` : ''}
+      ${p.quota_par_membre ? `<div class="info-box warning">⚠️ Quota: max ${p.quota_par_membre} par membre</div>` : ''}
+      ${taillesHtml}
       <div class="form-group">
         <label>Mode de paiement</label>
-        <select id="cmdMode">
+        <select id="cmdMode" style="background:#1F2937;border:1.5px solid #4B5563;color:white;padding:11px 14px;border-radius:9px;width:100%;font-size:15px;">
           <option value="helloasso">💳 HelloAsso (en ligne)</option>
           <option value="cash">💵 Cash (en présentiel)</option>
         </select>
       </div>
-      ${p.lien_helloasso ? `<div class="info-box" style="font-size:12px;">Après validation, tu recevras le lien HelloAsso pour payer en ligne.</div>` : ''}
-      <button class="btn btn-primary" onclick="doCommander('${p.id}')">Valider la commande</button>
+      ${p.lien_helloasso ? `<div class="info-box" style="font-size:12px;">💡 Le lien HelloAsso te sera communiqué après validation.</div>` : ''}
+      <button class="btn btn-primary" onclick="doCommander('${p.id}',${!!p.avec_tailles})">Valider la commande</button>
       <button class="btn btn-secondary" style="margin-top:8px;" onclick="closeModal('modalCommander')">Annuler</button>
     `;
     showModal('modalCommander');
-  } catch(e) { toast('Erreur', 'error'); }
+  } catch(e) { toast('Erreur chargement article', 'error'); }
 }
 
-async function doCommander(produitId) {
-  const taille = document.getElementById('cmdTaille')?.value || null;
+function selectTaille(taille) {
+  document.querySelectorAll('.taille-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll(`.taille-btn[data-taille="${taille}"]`).forEach(b => b.classList.add('active'));
+  document.getElementById('cmdTaille').value = taille;
+}
+
+async function doCommander(produitId, avecTailles = false) {
+  const taille = avecTailles ? (document.getElementById('cmdTaille')?.value || null) : null;
   const mode = document.getElementById('cmdMode').value;
+  if (avecTailles && !taille) return toast('Sélectionne une taille', 'error');
   try {
     await UL.passerCommande(produitId, taille, mode);
     toast('Commande enregistrée ✅', 'success');
@@ -1702,6 +1734,7 @@ function renderSticks(sticks) {
       <div style="display:flex;flex-direction:column;gap:5px;flex-shrink:0;">
         ${s.lien_helloasso ? `<a href="${s.lien_helloasso}" target="_blank"><button class="btn btn-sm btn-primary">HelloAsso</button></a>` : ''}
         <button class="btn btn-sm btn-secondary" onclick="demanderStickCash('${s.id}','${esc(s.nom)}')">Cash</button>
+        ${isCellule(UL.getCurrentMembre()) ? `<button class="btn btn-sm btn-secondary" onclick="uploadPhotoExistant('${s.id}','stick')">🖼️</button>` : ''}
       </div>
     </div>`).join('');
 }
@@ -1863,6 +1896,49 @@ function toggleSectionSelect() {
   document.getElementById('sectionSelectGroup').style.display = val === 'section' ? 'block' : 'none';
 }
 
+function previewPhoto(input, type) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  if (type === 'matos') {
+    reader.onload = e => {
+      document.getElementById('photoPreviewImgMatos').src = e.target.result;
+      document.getElementById('photoPreviewMatos').style.display = 'block';
+    };
+  } else if (type === 'stick') {
+    reader.onload = e => {
+      document.getElementById('photoPreviewImgStick').src = e.target.result;
+      document.getElementById('photoPreviewStick').style.display = 'block';
+    };
+  }
+  reader.readAsDataURL(file);
+}
+
+// Upload photo sur un article existant (bouton photo dans la liste)
+async function uploadPhotoExistant(produitId, type) {
+  const input = document.createElement('input');
+  input.type = 'file'; input.accept = 'image/*';
+  input.onchange = async () => {
+    const file = input.files[0];
+    if (!file) return;
+    try {
+      showLoading();
+      let url;
+      if (type === 'matos') {
+        url = await UL.uploadPhotoMatos(file, produitId);
+        await UL.updatePhotoMatos(produitId, url);
+      } else {
+        url = await UL.uploadPhotoStick(file, produitId);
+        await UL.updatePhotoStick(produitId, url);
+      }
+      hideLoading();
+      toast('Photo mise à jour ✅', 'success');
+      type === 'matos' ? loadMatos() : loadSticks();
+    } catch(e) { hideLoading(); toast(e.message || 'Erreur upload', 'error'); }
+  };
+  input.click();
+}
+
 async function loadSectionsForModal() {
   try {
     const sections = await UL.getSections();
@@ -1884,7 +1960,16 @@ async function doCreerProduit() {
   if (acces === 'section' && !sectionId) return toast('Sélectionne une section', 'error');
 
   try {
-    const { error } = await UL.sb.from('produits').insert({
+    showLoading();
+
+    // Upload photo si présente
+    let photoUrl = null;
+    const photoFile = document.getElementById('pPhoto').files[0];
+    if (photoFile) {
+      photoUrl = await UL.uploadPhotoMatos(photoFile, nom);
+    }
+
+    const { data: produit, error } = await UL.sb.from('produits').insert({
       nom,
       description: document.getElementById('pDesc').value || null,
       categorie: document.getElementById('pCat').value,
@@ -1895,21 +1980,26 @@ async function doCreerProduit() {
       section_id: sectionId,
       mode: document.getElementById('pMode').value,
       statut: 'disponible',
-    });
+      photo_url: photoUrl,
+    }).select().single();
     if (error) throw error;
 
+    hideLoading();
     const sectionNom = acces === 'section'
       ? document.getElementById('pSection').options[document.getElementById('pSection').selectedIndex].text
       : null;
 
     toast(`Article créé ✅ ${sectionNom ? '— Section ' + sectionNom : '— Généraliste'}`, 'success');
     closeModal('modalCreerProduit');
-    // Reset form
     ['pNom','pDesc','pPrix','pStock'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('pPhoto').value = '';
+    document.getElementById('photoPreviewMatos').style.display = 'none';
     document.getElementById('pAcces').value = 'tous';
     document.getElementById('pTailles').checked = false;
     document.getElementById('sectionSelectGroup').style.display = 'none';
+    loadMatos();
   } catch(e) {
+    hideLoading();
     toast(e.message || 'Erreur création article', 'error');
   }
 }
