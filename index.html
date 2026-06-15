@@ -99,8 +99,8 @@
       <input type="text" id="regTelegram" placeholder="@pseudo">
     </div>
     <div class="form-group">
-      <label>Email</label>
-      <input type="email" id="regEmail" placeholder="email@exemple.fr">
+      <label>Email <span style="color:var(--gris);font-size:11px;text-transform:none;letter-spacing:0;">(optionnel)</span></label>
+      <input type="email" id="regEmail" placeholder="email@exemple.fr (optionnel)">
     </div>
     <div class="form-group">
       <label>Ville</label>
@@ -153,6 +153,15 @@
     <!-- Bouton publier annonce (Bureau+) -->
     <div id="btnPublierAnnonce" style="display:none;margin-bottom:12px;">
       <button class="btn btn-sm btn-secondary" onclick="showModal('modalAnnonce')">📣 Publier une annonce</button>
+    </div>
+
+    <!-- Demandes d'inscription en attente (Admin/Bureau/Comité de passage) -->
+    <div id="demandesSection" style="display:none;">
+      <div class="section-title" style="display:flex;align-items:center;justify-content:space-between;">
+        <span>🔔 Demandes d'inscription</span>
+        <span id="demandesBadge" class="badge badge-orange" style="display:none;"></span>
+      </div>
+      <div id="demandesListe"></div>
     </div>
 
     <div class="section-title">Prochaines sessions</div>
@@ -486,6 +495,7 @@
     <div class="form-group"><label>Prénom</label><input type="text" id="editPrenom"></div>
     <div class="form-group"><label>Nom</label><input type="text" id="editNom"></div>
     <div class="form-group"><label>Pseudo Telegram</label><input type="text" id="editTelegram"></div>
+    <div class="form-group"><label>Email</label><input type="email" id="editEmail" placeholder="email@exemple.fr"></div>
     <div class="form-group"><label>Statut</label>
       <select id="editStatut">
         <option value="sympathisant">Sympathisant</option>
@@ -750,7 +760,7 @@ async function doInscription() {
     showLoading();
     await UL.inscription({ prenom, nom, pseudoTelegram: pseudo, email, ville, password: pwd });
     hideLoading();
-    toast('Compte créé ! En attente de validation admin.', 'success');
+    toast('Compte créé ✅ — En attente de validation par le bureau.', 'success');
     showLogin();
   } catch(e) { hideLoading(); toast(e.message || 'Erreur inscription', 'error'); }
 }
@@ -794,8 +804,26 @@ function applyRights(membre) {
   // Section admin complète
   if (isAdmin(membre)) {
     document.getElementById('sectionAdmin').style.display = 'block';
-    document.getElementById('sectionStats').style.display = 'none'; // remplacé par section admin
+    document.getElementById('sectionStats').style.display = 'none';
   }
+  // Demandes en attente : admin, bureau, membre cellule comité de passage
+  if (peutValiderInscriptions(membre)) {
+    document.getElementById('demandesSection').style.display = 'block';
+  }
+}
+
+function peutValiderInscriptions(membre) {
+  if (!membre) return false;
+  if (['admin', 'bureau'].includes(membre.statut)) return true;
+  // Membre cellule comité de passage
+  if (membre.statut === 'membre_cellule') {
+    const cellules = membre.membres_cellules || [];
+    return cellules.some(mc =>
+      mc.cellule?.nom?.toLowerCase().includes('comite') ||
+      mc.cellule?.nom?.toLowerCase().includes('passage')
+    );
+  }
+  return false;
 }
 
 // ─── Navigation ───────────────────────────────────────────────
@@ -856,6 +884,74 @@ async function loadAccueil() {
       <div class="stat-card"><div class="stat-value">${stats.deplacements}</div><div class="stat-label">Déplacements</div></div>
       <div class="stat-card"><div class="stat-value">${stats.sessionsInscrites}</div><div class="stat-label">Inscriptions</div></div>`;
   } catch(e) {}
+
+  // Demandes en attente
+  const m = UL.getCurrentMembre();
+  if (peutValiderInscriptions(m)) {
+    await loadDemandes();
+  }
+}
+
+async function loadDemandes() {
+  try {
+    const { data } = await UL.sb.from('membres')
+      .select('*, section:sections(nom)')
+      .eq('statut', 'sympathisant')
+      .eq('actif', true)
+      .order('created_at', { ascending: true });
+
+    const demandes = data || [];
+    const badge = document.getElementById('demandesBadge');
+
+    if (demandes.length > 0) {
+      badge.textContent = demandes.length + ' en attente';
+      badge.style.display = 'inline-flex';
+    } else {
+      badge.style.display = 'none';
+    }
+
+    const el = document.getElementById('demandesListe');
+    if (!demandes.length) {
+      el.innerHTML = '<p style="color:var(--gris);font-size:13px;margin-bottom:16px;">Aucune demande en attente</p>';
+      return;
+    }
+
+    el.innerHTML = demandes.map(m => `
+      <div class="card" style="margin-bottom:8px;padding:14px;">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+          <div class="avatar" style="width:38px;height:38px;font-size:14px;">${((m.prenom||'?')[0]+(m.nom||'?')[0]).toUpperCase()}</div>
+          <div style="flex:1;min-width:0;">
+            <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;">${esc(m.prenom)} ${esc(m.nom)}</div>
+            <div style="font-size:12px;color:var(--gris);">@${esc(m.pseudo_telegram)}</div>
+            ${m.email ? `<div style="font-size:11px;color:var(--gris);">✉️ ${esc(m.email)}</div>` : ''}
+            <div style="font-size:11px;color:var(--gris);">📅 ${new Date(m.created_at).toLocaleDateString('fr-FR')}</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;">
+          <button class="btn btn-sm btn-success" onclick="validerDemande('${m.id}','draft')">✅ Accepter → Draft</button>
+          <button class="btn btn-sm btn-secondary" onclick="validerDemande('${m.id}','confirme')">⭐ Accepter → Confirmé</button>
+          <button class="btn btn-sm btn-danger" onclick="refuserDemande('${m.id}')">❌ Refuser</button>
+        </div>
+      </div>`).join('');
+  } catch(e) { console.error('Erreur demandes:', e); }
+}
+
+async function validerDemande(membreId, nouveauStatut) {
+  const label = nouveauStatut === 'draft' ? 'Draft' : 'Confirmé';
+  try {
+    await UL.updateStatutMembre(membreId, nouveauStatut);
+    toast(`Membre accepté en tant que ${label} ✅`, 'success');
+    await loadDemandes();
+  } catch(e) { toast('Erreur', 'error'); }
+}
+
+async function refuserDemande(membreId) {
+  if (!confirm('Refuser et désactiver ce compte ?')) return;
+  try {
+    await UL.toggleBlocageMembre(membreId, false);
+    toast('Demande refusée — compte désactivé', 'success');
+    await loadDemandes();
+  } catch(e) { toast('Erreur', 'error'); }
 }
 
 // ─── SESSIONS ─────────────────────────────────────────────────
@@ -1316,11 +1412,13 @@ function renderMembres(membres) {
     <div class="membre-card">
       <div class="membre-card-header">
         <div class="avatar">${((m.prenom||'?')[0]+(m.nom||'?')[0]).toUpperCase()}</div>
-        <div style="flex:1;">
+        <div style="flex:1;min-width:0;">
           <div class="membre-name">${m.prenom} ${m.nom}</div>
           <div class="membre-meta">@${m.pseudo_telegram} · <span class="statut-${m.statut}">${m.statut}</span></div>
+          ${m.email ? `<div style="font-size:11px;color:var(--gris);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">✉️ ${esc(m.email)}</div>` : ''}
+          ${m.section ? `<div style="font-size:11px;color:var(--bleu-clair);margin-top:1px;">🛡️ ${esc(m.section.nom)}</div>` : ''}
         </div>
-        <span>${'⭐'.repeat(m.etoiles||0)}</span>
+        <span style="font-size:14px;">${'⭐'.repeat(m.etoiles||0)}</span>
       </div>
       <div class="membre-card-actions">
         <button class="btn btn-sm btn-secondary" onclick="openEditMembre('${m.id}')">✏️ Modifier</button>
@@ -1337,6 +1435,7 @@ function openEditMembre(id) {
   document.getElementById('editPrenom').value = m.prenom||'';
   document.getElementById('editNom').value = m.nom||'';
   document.getElementById('editTelegram').value = m.pseudo_telegram||'';
+  document.getElementById('editEmail').value = m.email||'';
   document.getElementById('editStatut').value = m.statut;
   document.getElementById('editEtoiles').value = m.etoiles||0;
   showModal('modalEditMembre');
@@ -1348,6 +1447,7 @@ async function doSauvegarderMembre() {
       prenom: document.getElementById('editPrenom').value.trim(),
       nom: document.getElementById('editNom').value.trim(),
       pseudo_telegram: document.getElementById('editTelegram').value.trim(),
+      email: document.getElementById('editEmail').value.trim() || null,
       statut: document.getElementById('editStatut').value,
       etoiles: parseInt(document.getElementById('editEtoiles').value),
     });
