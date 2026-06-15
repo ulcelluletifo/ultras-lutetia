@@ -111,12 +111,12 @@
       <input type="password" id="regPassword" placeholder="Minimum 8 caractères">
     </div>
     <div class="form-group">
-      <div style="display:flex;align-items:flex-start;gap:12px;padding:12px 14px;background:rgba(255,255,255,.07);border:1.5px solid rgba(255,255,255,.12);border-radius:9px;cursor:pointer;" onclick="document.getElementById('regRgpd').click()">
-        <input type="checkbox" id="regRgpd" style="width:20px;height:20px;flex-shrink:0;margin-top:1px;cursor:pointer;accent-color:#1A56DB;" onclick="event.stopPropagation()">
-        <span style="font-size:13px;color:#CBD5E1;line-height:1.5;">
-          J'accepte que mes données soient utilisées pour la gestion des Ultras Lutetia (RGPD)
-          <span onclick="event.stopPropagation();showModal('modalRgpd')" style="display:inline-block;margin-top:5px;font-size:11px;color:#3B82F6;text-decoration:underline;cursor:pointer;">Consulter la politique de confidentialité →</span>
-        </span>
+      <label for="regRgpd" style="display:flex;align-items:flex-start;gap:12px;padding:12px 14px;background:rgba(255,255,255,.07);border:1.5px solid rgba(255,255,255,.12);border-radius:9px;cursor:pointer;margin:0;">
+        <input type="checkbox" id="regRgpd" style="width:20px;height:20px;flex-shrink:0;margin-top:1px;cursor:pointer;accent-color:#1A56DB;">
+        <span style="font-size:13px;color:#CBD5E1;line-height:1.5;">J'accepte que mes données soient utilisées pour la gestion des Ultras Lutetia (RGPD)</span>
+      </label>
+      <div style="margin-top:6px;padding-left:4px;">
+        <span onclick="showModal('modalRgpd')" style="font-size:12px;color:#3B82F6;text-decoration:underline;cursor:pointer;">Consulter la politique de confidentialité →</span>
       </div>
     </div>
     <button class="btn btn-primary" onclick="doInscription()">Créer mon compte</button>
