@@ -168,6 +168,10 @@
         <button class="btn btn-secondary" onclick="showModal('modalMatchs')">Gérer le calendrier</button>
       </div>
       <div class="card">
+        <div class="card-label">Boutique Matos</div>
+        <button class="btn btn-secondary" onclick="showModal('modalCreerProduit');loadSectionsForModal()">+ Ajouter un article</button>
+      </div>
+      <div class="card">
         <div class="card-label">Stats globales</div>
         <button class="btn btn-secondary" onclick="showPage('pageStats')">Voir les statistiques</button>
       </div>
@@ -415,6 +419,57 @@
     </div>
     <div id="matchsList"></div>
     <button class="btn btn-secondary" style="margin-top:8px;" onclick="closeModal('modalMatchs')">Fermer</button>
+  </div>
+</div>
+
+<!-- Modal Créer/Modifier Produit Matos (Admin/Cellule Matos) -->
+<div class="modal-overlay" id="modalCreerProduit" style="display:none;" onclick="closeModalOutside(event,'modalCreerProduit')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-handle"></div>
+    <h3 class="modal-title">Ajouter un article matos</h3>
+    <div class="form-group"><label>Nom de l'article</label><input type="text" id="pNom" placeholder="ex: Tee-shirt UL 2026"></div>
+    <div class="form-group"><label>Description</label><textarea id="pDesc" rows="2" placeholder="Description optionnelle"></textarea></div>
+    <div class="form-group"><label>Catégorie</label>
+      <select id="pCat">
+        <option value="textile">Textile</option>
+        <option value="accessoire">Accessoire</option>
+        <option value="collector">Collector</option>
+      </select>
+    </div>
+    <div class="form-group"><label>Prix (€)</label><input type="number" id="pPrix" placeholder="25"></div>
+    <div class="form-group"><label>Stock disponible</label><input type="number" id="pStock" placeholder="0"></div>
+    <div class="form-group">
+      <label>Tailles disponibles</label>
+      <div style="display:flex;align-items:center;gap:10px;padding:11px 14px;background:rgba(255,255,255,.07);border:1.5px solid var(--border);border-radius:9px;cursor:pointer;" onclick="document.getElementById('pTailles').click()">
+        <input type="checkbox" id="pTailles" style="width:20px;height:20px;flex-shrink:0;cursor:pointer;accent-color:var(--bleu);" onclick="event.stopPropagation()">
+        <span style="font-size:14px;">Article avec tailles (S/M/L/XL/XXL)</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Niveau d'accès</label>
+      <select id="pAcces" onchange="toggleSectionSelect()">
+        <option value="tous">Généraliste — tout le monde</option>
+        <option value="section">Section spécifique</option>
+      </select>
+    </div>
+    <div class="form-group" id="sectionSelectGroup" style="display:none;">
+      <label>Section concernée</label>
+      <select id="pSection">
+        <option value="">Chargement...</option>
+      </select>
+      <p style="font-size:11px;color:var(--gris);margin-top:6px;">
+        Draft de cette section + tous les Confirmés pourront voir et commander cet article.
+      </p>
+    </div>
+    <div class="form-group">
+      <label>Mode</label>
+      <select id="pMode">
+        <option value="stock">Stock en temps réel</option>
+        <option value="precommande">Précommande groupée</option>
+      </select>
+    </div>
+    <button class="btn btn-primary" onclick="doCreerProduit()">Ajouter l'article</button>
+    <button class="btn btn-secondary" style="margin-top:8px;" onclick="closeModal('modalCreerProduit')">Annuler</button>
   </div>
 </div>
 
@@ -1239,6 +1294,64 @@ async function doSupprimerMatch(id) {
   catch(e) { toast('Erreur', 'error'); }
 }
 document.getElementById('modalMatchs')?.addEventListener('ul:show', loadMatchsList);
+
+// ─── MATOS ────────────────────────────────────────────────────
+
+function toggleSectionSelect() {
+  const val = document.getElementById('pAcces').value;
+  document.getElementById('sectionSelectGroup').style.display = val === 'section' ? 'block' : 'none';
+}
+
+async function loadSectionsForModal() {
+  try {
+    const sections = await UL.getSections();
+    const sel = document.getElementById('pSection');
+    sel.innerHTML = sections.map(s =>
+      `<option value="${s.id}">${s.nom}</option>`
+    ).join('');
+  } catch(e) {}
+}
+
+async function doCreerProduit() {
+  const nom = document.getElementById('pNom').value.trim();
+  const prix = parseFloat(document.getElementById('pPrix').value);
+  const acces = document.getElementById('pAcces').value;
+  const sectionId = acces === 'section' ? document.getElementById('pSection').value : null;
+
+  if (!nom) return toast('Nom requis', 'error');
+  if (!prix || isNaN(prix)) return toast('Prix requis', 'error');
+  if (acces === 'section' && !sectionId) return toast('Sélectionne une section', 'error');
+
+  try {
+    const { error } = await UL.sb.from('produits').insert({
+      nom,
+      description: document.getElementById('pDesc').value || null,
+      categorie: document.getElementById('pCat').value,
+      prix,
+      stock: parseInt(document.getElementById('pStock').value) || 0,
+      avec_tailles: document.getElementById('pTailles').checked,
+      niveau_acces: acces,
+      section_id: sectionId,
+      mode: document.getElementById('pMode').value,
+      statut: 'disponible',
+    });
+    if (error) throw error;
+
+    const sectionNom = acces === 'section'
+      ? document.getElementById('pSection').options[document.getElementById('pSection').selectedIndex].text
+      : null;
+
+    toast(`Article créé ✅ ${sectionNom ? '— Section ' + sectionNom : '— Généraliste'}`, 'success');
+    closeModal('modalCreerProduit');
+    // Reset form
+    ['pNom','pDesc','pPrix','pStock'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('pAcces').value = 'tous';
+    document.getElementById('pTailles').checked = false;
+    document.getElementById('sectionSelectGroup').style.display = 'none';
+  } catch(e) {
+    toast(e.message || 'Erreur création article', 'error');
+  }
+}
 
 // ─── UTILS ────────────────────────────────────────────────────
 function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
