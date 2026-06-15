@@ -6,7 +6,6 @@
 const SUPABASE_URL = 'https://ypsvdicatkckrxrcyxax.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inlwc3ZkaWNhdGtja3J4cmN5eGF4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE0NjI5NjUsImV4cCI6MjA5NzAzODk2NX0.qDWSmYYCB6_95rnwqXjOYqizMFG2VOfUmifw_h6bEmU';
 
-
 // ── Init client Supabase ──────────────────────────────────────
 const { createClient } = supabase;
 const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -689,6 +688,287 @@ async function getMesStats() {
 }
 
 // ============================================================
+// BOUTIQUE — MATOS
+// ============================================================
+
+async function getProduits() {
+  const membre = currentMembre;
+  if (!membre) return [];
+  const statut = membre.statut;
+  const sectionId = membre.section_id;
+  const isAdminBureau = ['admin', 'bureau', 'membre_cellule'].includes(statut);
+  const isConfirme = ['confirme', 'membre_cellule', 'bureau', 'admin'].includes(statut);
+  const { data } = await sb.from('produits')
+    .select('*, section:sections(id, nom)')
+    .eq('statut', 'disponible')
+    .order('nom');
+  return (data || []).filter(p => {
+    if (isAdminBureau) return true;
+    if (p.niveau_acces === 'tous') return true;
+    if (p.niveau_acces === 'section') {
+      if (isConfirme) return true;
+      if (statut === 'draft' && sectionId && p.section_id === sectionId) return true;
+      return false;
+    }
+    return false;
+  });
+}
+
+async function getProduitById(id) {
+  const { data } = await sb.from('produits')
+    .select('*, section:sections(id, nom)')
+    .eq('id', id).single();
+  return data;
+}
+
+async function updateProduit(id, updates) {
+  const { data, error } = await sb.from('produits')
+    .update(updates).eq('id', id).select().single();
+  if (error) throw error;
+  return data;
+}
+
+async function archiverProduit(id) {
+  return updateProduit(id, { statut: 'archive' });
+}
+
+async function passerCommande(produitId, taille, modePaiement, quantite = 1) {
+  const produit = await getProduitById(produitId);
+  if (!produit) throw new Error('Article introuvable');
+  // Vérif quota si collector
+  if (produit.quota_par_membre) {
+    const { data: dejaCommande } = await sb.from('commandes')
+      .select('commande_items(quantite)')
+      .eq('membre_id', currentUser.id)
+      .in('statut', ['en_attente', 'validee', 'prete', 'recuperee']);
+    const totalDeja = (dejaCommande || [])
+      .flatMap(c => c.commande_items || [])
+      .reduce((sum, i) => sum + (i.quantite || 0), 0);
+    if (totalDeja + quantite > produit.quota_par_membre) {
+      throw new Error(`Quota dépassé — max ${produit.quota_par_membre} par membre`);
+    }
+  }
+  const { data: commande, error } = await sb.from('commandes').insert({
+    membre_id: currentUser.id,
+    total: produit.prix * quantite,
+    statut: 'en_attente',
+    mode_paiement: modePaiement,
+  }).select().single();
+  if (error) throw error;
+  await sb.from('commande_items').insert({
+    commande_id: commande.id,
+    produit_id: produitId,
+    quantite,
+    taille: taille || null,
+    prix_unitaire: produit.prix,
+  });
+  return commande;
+}
+
+async function getMesCommandes() {
+  const { data } = await sb.from('commandes')
+    .select('*, commande_items(*, produit:produits(nom, photo_url, categorie))')
+    .eq('membre_id', currentUser.id)
+    .order('created_at', { ascending: false });
+  return data || [];
+}
+
+async function getAllCommandes() {
+  const { data } = await sb.from('commandes')
+    .select('*, membre:membres(nom, prenom, pseudo_telegram), commande_items(*, produit:produits(nom))')
+    .order('created_at', { ascending: false });
+  return data || [];
+}
+
+async function updateCommandeStatut(commandeId, statut) {
+  const { error } = await sb.from('commandes')
+    .update({ statut, updated_at: new Date().toISOString() })
+    .eq('id', commandeId);
+  if (error) throw error;
+  return { success: true };
+}
+
+// ============================================================
+// BOUTIQUE — STICKS
+// ============================================================
+
+async function getSticks() {
+  const membre = currentMembre;
+  if (!membre) return [];
+  const statut = membre.statut;
+  const sectionId = membre.section_id;
+  const isAdminBureau = ['admin', 'bureau', 'membre_cellule'].includes(statut);
+  const isConfirme = ['confirme', 'membre_cellule', 'bureau', 'admin'].includes(statut);
+  const { data } = await sb.from('sticks_catalogue')
+    .select('*, section:sections(id, nom)')
+    .eq('statut', 'disponible')
+    .order('nom');
+  return (data || []).filter(s => {
+    if (isAdminBureau) return true;
+    if (s.niveau_acces === 'tous') return true;
+    if (s.niveau_acces === 'section') {
+      if (isConfirme) return true;
+      if (statut === 'draft' && sectionId && s.section_id === sectionId) return true;
+      return false;
+    }
+    return false;
+  });
+}
+
+async function getMonQuotaStick(stickId) {
+  const { data: stick } = await sb.from('sticks_catalogue')
+    .select('quota_par_membre').eq('id', stickId).single();
+  if (!stick?.quota_par_membre) return null; // pas de quota
+  const { data: distribs } = await sb.from('sticks_distribution')
+    .select('quantite')
+    .eq('stick_id', stickId)
+    .eq('membre_id', currentUser.id);
+  const total = (distribs || []).reduce((s, d) => s + (d.quantite || 0), 0);
+  return { quota: stick.quota_par_membre, utilise: total, restant: stick.quota_par_membre - total };
+}
+
+async function demanderStick(stickId, modePaiement = 'helloasso', quantite = 1) {
+  const quota = await getMonQuotaStick(stickId);
+  if (quota && quota.restant < quantite) {
+    throw new Error(`Quota dépassé — il te reste ${quota.restant} sur ${quota.quota}`);
+  }
+  const { error } = await sb.from('sticks_distribution').insert({
+    stick_id: stickId,
+    membre_id: currentUser.id,
+    quantite,
+    distribue_par: currentUser.id,
+    mode_paiement: modePaiement,
+    statut: modePaiement === 'helloasso' ? 'en_attente' : 'distribue',
+  });
+  if (error) throw error;
+  return { success: true };
+}
+
+async function getMesSticks() {
+  const { data } = await sb.from('sticks_distribution')
+    .select('*, stick:sticks_catalogue(nom, visuel_url, categorie, prix, section_id, section:sections(nom))')
+    .eq('membre_id', currentUser.id)
+    .order('created_at', { ascending: false });
+  return data || [];
+}
+
+async function distribuerStickAdmin(stickId, membreId, quantite, modePaiement = 'cash') {
+  const { data: stick } = await sb.from('sticks_catalogue')
+    .select('quota_par_membre').eq('id', stickId).single();
+  if (stick?.quota_par_membre) {
+    const { data: deja } = await sb.from('sticks_distribution')
+      .select('quantite').eq('stick_id', stickId).eq('membre_id', membreId);
+    const totalDeja = (deja || []).reduce((s, d) => s + d.quantite, 0);
+    if (totalDeja + quantite > stick.quota_par_membre) {
+      throw new Error(`Quota dépassé pour ce membre (max ${stick.quota_par_membre})`);
+    }
+  }
+  const { error } = await sb.from('sticks_distribution').insert({
+    stick_id: stickId,
+    membre_id: membreId,
+    quantite,
+    distribue_par: currentUser.id,
+    mode_paiement: modePaiement,
+    statut: modePaiement === 'helloasso' ? 'en_attente' : 'distribue',
+  });
+  if (error) throw error;
+  return { success: true };
+}
+
+async function getAllDistributions() {
+  const { data } = await sb.from('sticks_distribution')
+    .select('*, stick:sticks_catalogue(nom, categorie), membre:membres(nom, prenom, pseudo_telegram)')
+    .order('created_at', { ascending: false })
+    .limit(100);
+  return data || [];
+}
+
+async function validerPaiementStick(distribId) {
+  const { error } = await sb.from('sticks_distribution')
+    .update({ statut: 'paye_helloasso' })
+    .eq('id', distribId);
+  if (error) throw error;
+  return { success: true };
+}
+
+// ============================================================
+// BOUTIQUE — COTISATIONS
+// ============================================================
+
+async function getConfigCotisation() {
+  const { data } = await sb.from('config_asso')
+    .select('*').in('cle', ['cotisation_lien_helloasso', 'cotisation_montant', 'cotisation_saison']);
+  const cfg = {};
+  (data || []).forEach(r => { cfg[r.cle] = r.valeur; });
+  return {
+    lien: cfg.cotisation_lien_helloasso || '',
+    montant: cfg.cotisation_montant || '20',
+    saison: cfg.cotisation_saison || '2026-2027',
+  };
+}
+
+async function updateConfigCotisation(lien, montant) {
+  await Promise.all([
+    sb.from('config_asso').update({ valeur: lien }).eq('cle', 'cotisation_lien_helloasso'),
+    sb.from('config_asso').update({ valeur: montant }).eq('cle', 'cotisation_montant'),
+  ]);
+  return { success: true };
+}
+
+async function getMaCotisation() {
+  const cfg = await getConfigCotisation();
+  const { data } = await sb.from('cotisations')
+    .select('*')
+    .eq('membre_id', currentUser.id)
+    .eq('saison', cfg.saison)
+    .single();
+  return { cotisation: data, config: cfg };
+}
+
+async function validerCotisationCash(membreId) {
+  const cfg = await getConfigCotisation();
+  const { error } = await sb.from('cotisations').upsert({
+    membre_id: membreId,
+    saison: cfg.saison,
+    montant: parseFloat(cfg.montant),
+    mode_paiement: 'cash',
+    statut: 'paye',
+    valide_par: currentUser.id,
+    paye_at: new Date().toISOString(),
+  }, { onConflict: 'membre_id,saison' });
+  if (error) throw error;
+  await sb.from('membres').update({ cotisation_a_jour: true }).eq('id', membreId);
+  return { success: true };
+}
+
+async function validerCotisationHelloAsso(membreId) {
+  const cfg = await getConfigCotisation();
+  const { error } = await sb.from('cotisations').upsert({
+    membre_id: membreId,
+    saison: cfg.saison,
+    montant: parseFloat(cfg.montant),
+    mode_paiement: 'helloasso',
+    statut: 'paye',
+    valide_par: currentUser.id,
+    paye_at: new Date().toISOString(),
+  }, { onConflict: 'membre_id,saison' });
+  if (error) throw error;
+  await sb.from('membres').update({ cotisation_a_jour: true }).eq('id', membreId);
+  return { success: true };
+}
+
+async function getAllCotisations() {
+  const cfg = await getConfigCotisation();
+  const { data } = await sb.from('membres')
+    .select('id, nom, prenom, pseudo_telegram, cotisation_a_jour, section:sections(nom), cotisations(statut, mode_paiement, paye_at)')
+    .order('nom');
+  return (data || []).map(m => ({
+    ...m,
+    cotisation_saison: (m.cotisations || []).find(c => true) || null,
+  }));
+}
+
+// ============================================================
 // EXPORT GLOBAL
 // ============================================================
 
@@ -724,6 +1004,15 @@ window.UL = {
   getAnnonces, publierAnnonce,
   // Stats
   getStats, getMesStats,
+  // Matos
+  getProduits, getProduitById, updateProduit, archiverProduit,
+  passerCommande, getMesCommandes, getAllCommandes, updateCommandeStatut,
+  // Sticks
+  getSticks, getMonQuotaStick, demanderStick, getMesSticks,
+  distribuerStickAdmin, getAllDistributions, validerPaiementStick,
+  // Cotisations
+  getConfigCotisation, updateConfigCotisation, getMaCotisation,
+  validerCotisationCash, validerCotisationHelloAsso, getAllCotisations,
   // Direct Supabase access
   sb, getCurrentUser: () => currentUser, getCurrentMembre: () => currentMembre,
 };
