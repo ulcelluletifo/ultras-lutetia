@@ -111,10 +111,13 @@
       <input type="password" id="regPassword" placeholder="Minimum 8 caractères">
     </div>
     <div class="form-group">
-      <label for="regRgpd" style="display:flex;align-items:flex-start;gap:12px;padding:12px 14px;background:rgba(255,255,255,.07);border:1.5px solid rgba(255,255,255,.12);border-radius:9px;cursor:pointer;margin:0;">
-        <input type="checkbox" id="regRgpd" style="width:20px;height:20px;flex-shrink:0;margin-top:1px;cursor:pointer;accent-color:#1A56DB;">
+      <div id="rgpdToggle" style="display:flex;align-items:flex-start;gap:12px;padding:12px 14px;background:rgba(255,255,255,.07);border:1.5px solid rgba(255,255,255,.12);border-radius:9px;cursor:pointer;user-select:none;-webkit-user-select:none;">
+        <div id="rgpdBox" style="width:20px;height:20px;flex-shrink:0;margin-top:1px;border-radius:4px;border:2px solid #3B82F6;background:transparent;display:flex;align-items:center;justify-content:center;transition:background .15s;">
+          <svg id="rgpdCheck" viewBox="0 0 12 10" style="display:none;width:12px;height:10px;"><polyline points="1,5 4,9 11,1" style="fill:none;stroke:#fff;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"/></svg>
+        </div>
         <span style="font-size:13px;color:#CBD5E1;line-height:1.5;">J'accepte que mes données soient utilisées pour la gestion des Ultras Lutetia (RGPD)</span>
-      </label>
+      </div>
+      <input type="checkbox" id="regRgpd" style="display:none;">
       <div style="margin-top:6px;padding-left:4px;">
         <span onclick="showModal('modalRgpd')" style="font-size:12px;color:#3B82F6;text-decoration:underline;cursor:pointer;">Consulter la politique de confidentialité →</span>
       </div>
@@ -812,6 +815,28 @@ async function doLogin() {
     showApp(membre);
   } catch(e) { hideLoading(); toast(e.message || 'Erreur de connexion', 'error'); }
 }
+// ─── RGPD toggle custom ──────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  const toggle = document.getElementById('rgpdToggle');
+  if (toggle) {
+    toggle.addEventListener('click', () => {
+      const cb = document.getElementById('regRgpd');
+      const box = document.getElementById('rgpdBox');
+      const check = document.getElementById('rgpdCheck');
+      cb.checked = !cb.checked;
+      if (cb.checked) {
+        box.style.background = '#1A56DB';
+        box.style.borderColor = '#1A56DB';
+        check.style.display = 'block';
+      } else {
+        box.style.background = 'transparent';
+        box.style.borderColor = '#3B82F6';
+        check.style.display = 'none';
+      }
+    });
+  }
+});
+
 async function doInscription() {
   const prenom = document.getElementById('regPrenom').value.trim();
   const nom = document.getElementById('regNom').value.trim();
