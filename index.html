@@ -113,7 +113,10 @@
     <div class="form-group">
       <div style="display:flex;align-items:flex-start;gap:12px;padding:12px 14px;background:rgba(255,255,255,.07);border:1.5px solid rgba(255,255,255,.12);border-radius:9px;cursor:pointer;" onclick="document.getElementById('regRgpd').click()">
         <input type="checkbox" id="regRgpd" style="width:20px;height:20px;flex-shrink:0;margin-top:1px;cursor:pointer;accent-color:#1A56DB;" onclick="event.stopPropagation()">
-        <span style="font-size:13px;color:#CBD5E1;line-height:1.5;">J'accepte que mes données soient utilisées pour la gestion des Ultras Lutetia (RGPD)</span>
+        <span style="font-size:13px;color:#CBD5E1;line-height:1.5;">
+          J'accepte que mes données soient utilisées pour la gestion des Ultras Lutetia (RGPD)
+          <span onclick="event.stopPropagation();showModal('modalRgpd')" style="display:inline-block;margin-top:5px;font-size:11px;color:#3B82F6;text-decoration:underline;cursor:pointer;">Consulter la politique de confidentialité →</span>
+        </span>
       </div>
     </div>
     <button class="btn btn-primary" onclick="doInscription()">Créer mon compte</button>
@@ -657,6 +660,66 @@
     </div>
     <button class="btn btn-primary" onclick="doDistribuerStick()">Enregistrer</button>
     <button class="btn btn-secondary" style="margin-top:8px;" onclick="closeModal('modalDistribuer')">Annuler</button>
+  </div>
+</div>
+
+<!-- Modal RGPD -->
+<div class="modal-overlay" id="modalRgpd" style="display:none;" onclick="closeModalOutside(event,'modalRgpd')">
+  <div class="modal" onclick="event.stopPropagation()" style="max-height:85vh;overflow-y:auto;">
+    <div class="modal-handle"></div>
+    <h3 class="modal-title">🔒 Politique de confidentialité</h3>
+    <p style="font-size:11px;color:var(--gris);margin-bottom:16px;">Ultras Lutetia · Saison 2026/2027 · Version 1.0</p>
+
+    <div style="font-size:13px;color:#CBD5E1;line-height:1.7;">
+
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;color:#93C5FD;margin-bottom:6px;text-transform:uppercase;letter-spacing:.04em;">1. Responsable du traitement</div>
+      <p style="margin-bottom:12px;">Association <strong>Ultras Lutetia</strong> (loi 1901) — Contact RGPD : <span style="color:#3B82F6;">ultras.lutetia@gmail.com</span>. Aucun DPO désigné (association &lt; 250 personnes, art. 37 RGPD).</p>
+
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;color:#93C5FD;margin-bottom:6px;text-transform:uppercase;letter-spacing:.04em;">2. Données collectées &amp; finalités</div>
+      <div style="margin-bottom:12px;">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px;">
+          <div style="background:var(--surface-2);border-radius:6px;padding:8px;">
+            <div style="font-weight:700;font-size:12px;color:#93C5FD;margin-bottom:3px;">Gestion adhésion</div>
+            <div style="font-size:11px;color:var(--gris);">Nom, prénom, email, pseudo — Base : contrat d'adhésion — Conservation : saison + 1 an</div>
+          </div>
+          <div style="background:var(--surface-2);border-radius:6px;padding:8px;">
+            <div style="font-weight:700;font-size:12px;color:#93C5FD;margin-bottom:3px;">Déplacements</div>
+            <div style="font-size:11px;color:var(--gris);">Nom, prénom, infos réservation — Base : exécution du contrat — Conservation : durée de la saison</div>
+          </div>
+          <div style="background:var(--surface-2);border-radius:6px;padding:8px;">
+            <div style="font-weight:700;font-size:12px;color:#93C5FD;margin-bottom:3px;">Application PWA</div>
+            <div style="font-size:11px;color:var(--gris);">Identifiant, statut, présences sessions — Base : consentement — Conservation : durée d'adhésion</div>
+          </div>
+          <div style="background:var(--surface-2);border-radius:6px;padding:8px;">
+            <div style="font-weight:700;font-size:12px;color:#93C5FD;margin-bottom:3px;">Comptabilité</div>
+            <div style="font-size:11px;color:var(--gris);">Nom, prénom, cotisation — Base : obligation légale (loi 1901) — Conservation : 10 ans</div>
+          </div>
+        </div>
+        <p style="font-size:11px;color:var(--gris);background:var(--surface-2);border-radius:6px;padding:8px;">ℹ️ Aucune donnée n'est vendue ou cédée à des tiers. Pas de transfert hors UE. Aucun profilage automatisé (art. 22 RGPD).</p>
+      </div>
+
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;color:#93C5FD;margin-bottom:6px;text-transform:uppercase;letter-spacing:.04em;">3. Stockage des données</div>
+      <p style="margin-bottom:12px;">Tes données sont hébergées sur <strong>Supabase</strong> (PostgreSQL, région Europe de l'Ouest — Irlande), accessible uniquement aux membres du Bureau via identifiants nominatifs, en connexion HTTPS/TLS. Aucune donnée de paiement n'est stockée dans l'application.</p>
+
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;color:#93C5FD;margin-bottom:6px;text-transform:uppercase;letter-spacing:.04em;">4. Destinataires</div>
+      <p style="margin-bottom:12px;">Membres du Bureau · Responsables de cellules (dans la limite de leur mission) · Prestataires techniques (hébergeur) en qualité de sous-traitants (art. 28 RGPD). <br>Aucune transmission au Paris FC, à la LFP ou à tout autre tiers sans consentement exprès.</p>
+
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;color:#93C5FD;margin-bottom:6px;text-transform:uppercase;letter-spacing:.04em;">5. Tes droits (art. 15–22 RGPD)</div>
+      <div style="display:flex;flex-direction:column;gap:5px;margin-bottom:12px;">
+        <div style="background:var(--surface-2);border-radius:6px;padding:7px 10px;font-size:12px;"><span style="color:#93C5FD;font-weight:700;">Accès (art. 15)</span> — Obtenir une copie de tes données</div>
+        <div style="background:var(--surface-2);border-radius:6px;padding:7px 10px;font-size:12px;"><span style="color:#93C5FD;font-weight:700;">Rectification (art. 16)</span> — Corriger des données inexactes</div>
+        <div style="background:var(--surface-2);border-radius:6px;padding:7px 10px;font-size:12px;"><span style="color:#93C5FD;font-weight:700;">Effacement (art. 17)</span> — Supprimer tes données (sauf obligation légale)</div>
+        <div style="background:var(--surface-2);border-radius:6px;padding:7px 10px;font-size:12px;"><span style="color:#93C5FD;font-weight:700;">Portabilité (art. 20)</span> — Recevoir tes données en format structuré</div>
+        <div style="background:var(--surface-2);border-radius:6px;padding:7px 10px;font-size:12px;"><span style="color:#93C5FD;font-weight:700;">Opposition (art. 21)</span> — T'opposer à un traitement fondé sur intérêt légitime</div>
+        <div style="background:var(--surface-2);border-radius:6px;padding:7px 10px;font-size:12px;"><span style="color:#93C5FD;font-weight:700;">Retrait du consentement</span> — À tout moment, sans effet rétroactif</div>
+      </div>
+      <p style="margin-bottom:12px;font-size:12px;">Pour exercer tes droits : <span style="color:#3B82F6;">ultras.lutetia@gmail.com</span> — Réponse sous 30 jours max (art. 12 RGPD).<br>Réclamation possible auprès de la <strong>CNIL</strong> — <span style="color:#3B82F6;">cnil.fr</span> — 3 Place de Fontenoy, 75007 Paris.</p>
+
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;color:#93C5FD;margin-bottom:6px;text-transform:uppercase;letter-spacing:.04em;">6. Sécurité</div>
+      <p style="margin-bottom:16px;font-size:12px;">Accès aux fichiers membres protégés par mot de passe · Communications via canaux chiffrés (Telegram) · Application accessible uniquement en HTTPS · Destruction sécurisée des documents papier à l'issue de leur durée de conservation.</p>
+    </div>
+
+    <button class="btn btn-primary" onclick="closeModal('modalRgpd')">J'ai compris — Fermer</button>
   </div>
 </div>
 
