@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#CC0000">
+  <meta name="theme-color" content="#07003D">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Ultras Lutetia">
@@ -13,9 +13,13 @@
 </head>
 <body>
 
-<!-- ── LOGIN ──────────────────────────────────────────────── -->
+<!-- ══════════════════════════════════════════════════════════
+     LOGIN
+══════════════════════════════════════════════════════════ -->
 <div id="loginPage" class="login-page">
-  <div class="login-logo"><img src="logo_ul.png" alt="Ultras Lutetia" style="width:70px;height:70px;object-fit:contain;border-radius:10px;"></div>
+  <div class="login-logo">
+    <img src="logo_ul.png" alt="Ultras Lutetia" style="width:100px;height:100px;object-fit:contain;">
+  </div>
   <h1 class="login-title">Ultras Lutetia</h1>
   <p class="login-subtitle">Paris FC — Espace Membre</p>
 
@@ -29,15 +33,15 @@
       <input type="password" id="loginPassword" placeholder="••••••••" autocomplete="current-password">
     </div>
     <button class="btn btn-primary" onclick="doLogin()">Connexion</button>
-    <div style="text-align:center; margin-top:16px;">
-      <span style="font-size:13px; color:var(--gris); cursor:pointer;" onclick="showInscription()">
+    <div style="text-align:center;margin-top:16px;">
+      <span style="font-size:13px;color:var(--gris);cursor:pointer;" onclick="showInscription()">
         Pas encore membre ? S'inscrire
       </span>
     </div>
   </div>
 
   <div class="login-form" id="inscriptionForm" style="display:none;">
-    <h2 style="font-size:18px; font-weight:700; margin-bottom:20px; text-align:center;">Inscription</h2>
+    <h2 style="font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:.05em;margin-bottom:20px;text-align:center;">Inscription</h2>
     <div class="form-group">
       <label>Prénom</label>
       <input type="text" id="regPrenom" placeholder="Ton prénom">
@@ -51,7 +55,7 @@
       <input type="text" id="regTelegram" placeholder="@pseudo">
     </div>
     <div class="form-group">
-      <label>Email (celui de ton abonnement PFC)</label>
+      <label>Email</label>
       <input type="email" id="regEmail" placeholder="email@exemple.fr">
     </div>
     <div class="form-group">
@@ -62,20 +66,20 @@
       <label>Mot de passe</label>
       <input type="password" id="regPassword" placeholder="Minimum 8 caractères">
     </div>
-    <div class="form-group" style="display:flex; align-items:flex-start; gap:10px;">
-      <input type="checkbox" id="regRgpd" style="width:20px; margin-top:2px; flex-shrink:0;">
-      <label for="regRgpd" style="font-size:13px;">J'accepte que mes données soient utilisées pour la gestion des Ultras Lutetia (RGPD)</label>
+    <div class="form-group" style="display:flex;align-items:flex-start;gap:10px;">
+      <input type="checkbox" id="regRgpd" style="width:20px;margin-top:2px;flex-shrink:0;">
+      <label for="regRgpd" style="font-size:12px;text-transform:none;letter-spacing:0;">J'accepte que mes données soient utilisées pour la gestion des Ultras Lutetia (RGPD)</label>
     </div>
     <button class="btn btn-primary" onclick="doInscription()">Créer mon compte</button>
-    <div style="text-align:center; margin-top:12px;">
-      <span style="font-size:13px; color:var(--gris); cursor:pointer;" onclick="showLogin()">
-        Déjà membre ? Se connecter
-      </span>
+    <div style="text-align:center;margin-top:12px;">
+      <span style="font-size:13px;color:var(--gris);cursor:pointer;" onclick="showLogin()">Déjà membre ? Se connecter</span>
     </div>
   </div>
 </div>
 
-<!-- ── APP ─────────────────────────────────────────────────── -->
+<!-- ══════════════════════════════════════════════════════════
+     APP
+══════════════════════════════════════════════════════════ -->
 <div id="appContainer" class="app-container" style="display:none;">
 
   <!-- Header -->
@@ -84,142 +88,191 @@
       <img src="logo_ul.png" alt="UL" style="width:32px;height:32px;object-fit:contain;border-radius:6px;">
       <span>Ultras Lutetia</span>
     </div>
-    <div style="display:flex;align-items:center;gap:12px;">
-      <div id="headerUser" style="font-size:12px;color:var(--gris);"></div>
-      <button onclick="doLogout()" style="background:transparent;border:1px solid var(--border);border-radius:7px;color:var(--gris);font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:5px 12px;cursor:pointer;transition:all .15s;" onmouseover="this.style.color='white';this.style.borderColor='rgba(255,255,255,.3)'" onmouseout="this.style.color='var(--gris)';this.style.borderColor='var(--border)'">← Quitter</button>
+    <div style="display:flex;align-items:center;gap:10px;">
+      <span id="headerUser" style="font-size:12px;color:var(--gris);"></span>
+      <button onclick="doLogout()" class="btn-logout">← Quitter</button>
     </div>
   </header>
 
-  <!-- PAGE ACCUEIL -->
+  <!-- ── PAGE ACCUEIL ───────────────────────────────────────── -->
   <div id="pageAccueil" class="page active">
+
+    <!-- Alerte charte non signée -->
     <div id="charteAlert" class="info-box" style="display:none;">
-      ⚠️ Vous devez signer la charte pour accéder à tous les modules.
-      <button class="btn btn-sm btn-primary" style="margin-top:8px;" onclick="showPage('pageCharte')">Signer la charte →</button>
+      ⚠️ Tu dois signer la charte pour accéder à tous les modules.
+      <button class="btn btn-sm btn-primary" style="margin-top:8px;width:100%;" onclick="showPage('pageCharte')">Signer la charte →</button>
     </div>
 
+    <!-- Annonces -->
     <div id="annoncesContainer"></div>
+
+    <!-- Bouton publier annonce (Bureau+) -->
+    <div id="btnPublierAnnonce" style="display:none;margin-bottom:12px;">
+      <button class="btn btn-sm btn-secondary" onclick="showModal('modalAnnonce')">📣 Publier une annonce</button>
+    </div>
 
     <div class="section-title">Prochaines sessions</div>
     <div id="sessionsAccueil"></div>
 
-    <div class="section-title">Prochains déplacements</div>
-    <div id="deplacementsAccueil"></div>
+    <div class="section-title">Prochain déplacement</div>
+    <div id="deplAccueil"></div>
 
     <div class="section-title">Mes stats</div>
     <div class="stats-grid" id="mesStats"></div>
   </div>
 
-  <!-- PAGE SESSIONS -->
+  <!-- ── PAGE SESSIONS ──────────────────────────────────────── -->
   <div id="pageSessions" class="page">
+
+    <!-- Bouton créer session (Bureau+ ou Membre Cellule) -->
+    <div id="btnCreerSession" style="display:none;margin-bottom:16px;">
+      <button class="btn btn-primary" onclick="showModal('modalCreerSession')">+ Nouvelle session</button>
+    </div>
+
     <div class="section-title">Sessions à venir</div>
     <div id="sessionsListe"></div>
+
     <div class="section-title" style="margin-top:24px;">Historique</div>
     <div id="sessionsHistorique"></div>
   </div>
 
-  <!-- PAGE DÉPLACEMENTS -->
+  <!-- ── PAGE DÉPLACEMENTS ──────────────────────────────────── -->
   <div id="pageDeplacements" class="page">
+
+    <!-- Bouton créer déplacement (Bureau+) -->
+    <div id="btnCreerDepl" style="display:none;margin-bottom:16px;">
+      <button class="btn btn-primary" onclick="showModal('modalCreerDepl')">+ Nouveau déplacement</button>
+    </div>
+
     <div class="section-title">Déplacements</div>
     <div id="deplacementsListe"></div>
   </div>
 
-  <!-- PAGE PROFIL -->
+  <!-- ── PAGE PROFIL ────────────────────────────────────────── -->
   <div id="pageProfil" class="page">
     <div class="card" id="profilCard"></div>
+
     <div class="section-title">Mon activité</div>
     <div class="stats-grid" id="profilStats"></div>
+
     <div style="margin-top:16px;">
-      <button class="btn btn-secondary" onclick="showChangeMdp()">Changer mon mot de passe</button>
+      <button class="btn btn-secondary" onclick="showModal('modalMdp')">Changer mon mot de passe</button>
     </div>
-    <div style="margin-top:10px;">
-      <button class="btn btn-danger" onclick="doLogout()">Se déconnecter</button>
+
+    <!-- Gestion membres (Admin seulement) -->
+    <div id="sectionAdmin" style="display:none;">
+      <div class="section-title" style="margin-top:24px;">⚙️ Administration</div>
+      <div class="card">
+        <div class="card-label">Membres</div>
+        <button class="btn btn-secondary" style="margin-bottom:8px;" onclick="showPage('pageMembres')">Gérer les membres</button>
+        <button class="btn btn-secondary" onclick="showModal('modalMatchs')">Gérer le calendrier</button>
+      </div>
+      <div class="card">
+        <div class="card-label">Stats globales</div>
+        <button class="btn btn-secondary" onclick="showPage('pageStats')">Voir les statistiques</button>
+      </div>
     </div>
-    <div style="margin-top:10px;" id="adminBtnContainer" style="display:none;">
-      <button class="btn btn-secondary" onclick="window.location='admin.html'">⚙️ Console Admin</button>
+
+    <!-- Stats globales (Membre Cellule+) -->
+    <div id="sectionStats" style="display:none;">
+      <div class="section-title" style="margin-top:24px;">📊 Stats cellule</div>
+      <button class="btn btn-secondary" onclick="showPage('pageStats')">Voir les statistiques</button>
     </div>
   </div>
 
-  <!-- PAGE CHARTE -->
+  <!-- ── PAGE CHARTE ────────────────────────────────────────── -->
   <div id="pageCharte" class="page">
-    <h2 style="font-size:18px; font-weight:700; margin-bottom:16px;">Charte des Ultras Lutetia</h2>
-    <p style="font-size:13px; color:var(--gris); margin-bottom:12px;">Lisez attentivement la charte jusqu'en bas avant de signer.</p>
-    <div class="charte-content" id="charteTexte" onscroll="checkScroll(this)"></div>
-    <div class="form-group" style="display:flex; align-items:flex-start; gap:10px; margin-top:16px;">
-      <input type="checkbox" id="charteAccept" style="width:20px; margin-top:2px; flex-shrink:0;" disabled>
-      <label for="charteAccept" style="font-size:13px;">J'ai lu et j'accepte la charte des Ultras Lutetia</label>
+    <h2 style="font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:.05em;margin-bottom:8px;">Charte des Ultras Lutetia</h2>
+    <p style="font-size:12px;color:var(--gris);margin-bottom:14px;">Lis attentivement jusqu'en bas avant de signer.</p>
+    <div class="charte-content" id="charteTexte" onscroll="checkCharteScroll(this)"></div>
+    <div class="form-group" style="display:flex;align-items:flex-start;gap:10px;margin-top:16px;">
+      <input type="checkbox" id="charteAccept" style="width:20px;margin-top:2px;flex-shrink:0;" disabled>
+      <label for="charteAccept" style="font-size:13px;text-transform:none;letter-spacing:0;">J'ai lu et j'accepte la charte des Ultras Lutetia</label>
     </div>
-    <button class="btn btn-primary" id="btnSignerCharte" onclick="signerCharte()" disabled>
-      Signer la charte
-    </button>
+    <button class="btn btn-primary" id="btnSignerCharte" onclick="signerCharte()" disabled>Signer la charte</button>
+    <button class="btn btn-secondary" style="margin-top:8px;" onclick="showPage('pageAccueil')">Retour</button>
+  </div>
+
+  <!-- ── PAGE MEMBRES (Admin) ───────────────────────────────── -->
+  <div id="pageMembres" class="page">
+    <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;">
+      <button class="btn btn-sm btn-secondary" onclick="showPage('pageProfil')">← Retour</button>
+      <input type="text" id="searchMembre" placeholder="Rechercher..." style="flex:1;min-width:120px;" oninput="filtrerMembres()">
+      <select id="filterStatut" onchange="filtrerMembres()" style="flex:1;min-width:110px;">
+        <option value="">Tous statuts</option>
+        <option value="sympathisant">Sympathisant</option>
+        <option value="draft">Draft</option>
+        <option value="confirme">Confirmé</option>
+        <option value="membre_cellule">Membre Cellule</option>
+        <option value="bureau">Bureau</option>
+        <option value="admin">Admin</option>
+      </select>
+    </div>
+    <div id="membresList"></div>
+  </div>
+
+  <!-- ── PAGE STATS ─────────────────────────────────────────── -->
+  <div id="pageStats" class="page">
+    <button class="btn btn-sm btn-secondary" style="margin-bottom:16px;" onclick="showPage('pageProfil')">← Retour</button>
+    <div id="statsContent"><div class="empty-state"><div>⏳</div>Chargement…</div></div>
   </div>
 
   <!-- Bottom nav -->
   <nav class="bottom-nav">
-    <div class="nav-item active" onclick="showPage('pageAccueil')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/>
-        <polyline points="9 22 9 12 15 12 15 22"/>
-      </svg>
+    <div class="nav-item active" onclick="showPage('pageAccueil')" id="nav0">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
       <span>Accueil</span>
     </div>
-    <div class="nav-item" onclick="showPage('pageSessions')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/>
-        <line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
-      </svg>
+    <div class="nav-item" onclick="showPage('pageSessions')" id="nav1">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
       <span>Sessions</span>
     </div>
-    <div class="nav-item" onclick="showPage('pageDeplacements')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M5 17H3a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v9a2 2 0 01-2 2h-3"/>
-        <circle cx="7.5" cy="17.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/>
-      </svg>
+    <div class="nav-item" onclick="showPage('pageDeplacements')" id="nav2">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 17H3a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v9a2 2 0 01-2 2h-3"/><circle cx="7.5" cy="17.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg>
       <span>Déplacements</span>
     </div>
-    <div class="nav-item" onclick="showPage('pageProfil')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/>
-        <circle cx="12" cy="7" r="4"/>
-      </svg>
+    <div class="nav-item" onclick="showPage('pageProfil')" id="nav3">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
       <span>Profil</span>
     </div>
   </nav>
-
 </div>
 
-<!-- ── MODALS ───────────────────────────────────────────────── -->
+<!-- ══════════════════════════════════════════════════════════
+     MODALS
+══════════════════════════════════════════════════════════ -->
 
-<!-- Modal session détail -->
-<div class="modal-overlay" id="modalSession" style="display:none;" onclick="closeModal('modalSession')">
+<!-- Modal Session Détail -->
+<div class="modal-overlay" id="modalSession" style="display:none;" onclick="closeModalOutside(event,'modalSession')">
   <div class="modal" onclick="event.stopPropagation()">
     <div class="modal-handle"></div>
     <div id="modalSessionContent"></div>
   </div>
 </div>
 
-<!-- Modal déplacement détail -->
-<div class="modal-overlay" id="modalDeplacement" style="display:none;" onclick="closeModal('modalDeplacement')">
+<!-- Modal Déplacement Détail -->
+<div class="modal-overlay" id="modalDepl" style="display:none;" onclick="closeModalOutside(event,'modalDepl')">
   <div class="modal" onclick="event.stopPropagation()">
     <div class="modal-handle"></div>
-    <div id="modalDeplacementContent"></div>
+    <div id="modalDeplContent"></div>
   </div>
 </div>
 
-<!-- Modal validation présence -->
-<div class="modal-overlay" id="modalPresence" style="display:none;" onclick="closeModal('modalPresence')">
+<!-- Modal Valider Présence -->
+<div class="modal-overlay" id="modalPresence" style="display:none;" onclick="closeModalOutside(event,'modalPresence')">
   <div class="modal" onclick="event.stopPropagation()">
     <div class="modal-handle"></div>
     <h3 class="modal-title">Valider ma présence</h3>
-    <p style="color:var(--gris); font-size:14px; margin-bottom:16px;">Entre le code 4 chiffres affiché par le responsable de session.</p>
+    <p style="color:var(--gris);font-size:14px;margin-bottom:16px;">Entre le code 4 chiffres affiché par le responsable.</p>
     <div class="form-group">
-      <input type="number" id="codePresence" placeholder="Code à 4 chiffres" maxlength="4" inputmode="numeric">
+      <input type="number" id="codePresence" placeholder="_ _ _ _" maxlength="4" inputmode="numeric" style="font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:.3em;text-align:center;">
     </div>
     <button class="btn btn-primary" onclick="doValiderPresence()">Valider</button>
   </div>
 </div>
 
-<!-- Modal changer mdp -->
-<div class="modal-overlay" id="modalMdp" style="display:none;" onclick="closeModal('modalMdp')">
+<!-- Modal Changer MDP -->
+<div class="modal-overlay" id="modalMdp" style="display:none;" onclick="closeModalOutside(event,'modalMdp')">
   <div class="modal" onclick="event.stopPropagation()">
     <div class="modal-handle"></div>
     <h3 class="modal-title">Changer mon mot de passe</h3>
@@ -232,32 +285,200 @@
       <input type="password" id="newPasswordConfirm" placeholder="Répète le mot de passe">
     </div>
     <button class="btn btn-primary" onclick="doChangeMdp()">Enregistrer</button>
+    <button class="btn btn-secondary" style="margin-top:8px;" onclick="closeModal('modalMdp')">Annuler</button>
   </div>
 </div>
 
-<!-- Scripts -->
+<!-- Modal Créer Session (Membre Cellule+) -->
+<div class="modal-overlay" id="modalCreerSession" style="display:none;" onclick="closeModalOutside(event,'modalCreerSession')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-handle"></div>
+    <h3 class="modal-title">Nouvelle session</h3>
+    <div class="form-group"><label>Nom</label><input type="text" id="sNom" placeholder="Session Peinture #5"></div>
+    <div class="form-group"><label>Date</label><input type="date" id="sDate"></div>
+    <div class="form-group"><label>Heure</label><input type="time" id="sHeure"></div>
+    <div class="form-group"><label>Lieu</label>
+      <select id="sLieu"><option>Paris Sud</option><option>Paris Intra Muros</option><option>Autre</option></select>
+    </div>
+    <div class="form-group"><label>Type</label>
+      <select id="sType"><option>Peinture</option><option>Tracage</option><option>Assemblage</option></select>
+    </div>
+    <div class="form-group"><label>Capacité max</label><input type="number" id="sCapacite" placeholder="25 (optionnel)"></div>
+    <div class="form-group"><label>Lien Telegram</label><input type="url" id="sTelegram" placeholder="https://t.me/..."></div>
+    <div class="form-group" style="display:flex;align-items:center;gap:10px;">
+      <input type="checkbox" id="sPizza" style="width:20px;">
+      <label for="sPizza" style="text-transform:none;letter-spacing:0;">🍕 Session avec pizza</label>
+    </div>
+    <div class="form-group"><label>Description</label><textarea id="sDesc" rows="2" placeholder="Optionnel"></textarea></div>
+    <button class="btn btn-primary" onclick="doCreerSession()">Créer la session</button>
+    <button class="btn btn-secondary" style="margin-top:8px;" onclick="closeModal('modalCreerSession')">Annuler</button>
+  </div>
+</div>
+
+<!-- Modal Créer Déplacement (Bureau+) -->
+<div class="modal-overlay" id="modalCreerDepl" style="display:none;" onclick="closeModalOutside(event,'modalCreerDepl')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-handle"></div>
+    <h3 class="modal-title">Nouveau déplacement</h3>
+    <div class="form-group"><label>Adversaire</label><input type="text" id="dAdv" placeholder="OGC Nice"></div>
+    <div class="form-group"><label>Date du match</label><input type="date" id="dDate"></div>
+    <div class="form-group"><label>Stade</label><input type="text" id="dStade" placeholder="Allianz Riviera"></div>
+    <div class="form-group"><label>Ville</label><input type="text" id="dVille" placeholder="Nice"></div>
+    <div class="form-group"><label>Point de RDV</label><input type="text" id="dRdv" placeholder="Porte de Vincennes"></div>
+    <div class="form-group"><label>Heure départ bus</label><input type="time" id="dHeure"></div>
+    <div class="form-group"><label>Prix total (€)</label><input type="number" id="dPrix" placeholder="55"></div>
+    <div class="form-group"><label>Places max</label><input type="number" id="dPlaces" placeholder="40"></div>
+    <div class="form-group"><label>Lien HelloAsso</label><input type="url" id="dHelloasso" placeholder="https://www.helloasso.com/..."></div>
+    <div class="form-group"><label>Date limite inscription</label><input type="date" id="dLimite"></div>
+    <div class="form-group"><label>Notes</label><textarea id="dNotes" rows="2" placeholder="Infos complémentaires..."></textarea></div>
+    <button class="btn btn-primary" onclick="doCreerDepl()">Créer le déplacement</button>
+    <button class="btn btn-secondary" style="margin-top:8px;" onclick="closeModal('modalCreerDepl')">Annuler</button>
+  </div>
+</div>
+
+<!-- Modal Admin — Gestion session (ouvrir/fermer/inscrits) -->
+<div class="modal-overlay" id="modalAdminSession" style="display:none;" onclick="closeModalOutside(event,'modalAdminSession')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-handle"></div>
+    <div id="modalAdminSessionContent"></div>
+  </div>
+</div>
+
+<!-- Modal Admin — Modifier membre -->
+<div class="modal-overlay" id="modalEditMembre" style="display:none;" onclick="closeModalOutside(event,'modalEditMembre')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-handle"></div>
+    <h3 class="modal-title">Modifier le membre</h3>
+    <input type="hidden" id="editMembreId">
+    <div class="form-group"><label>Prénom</label><input type="text" id="editPrenom"></div>
+    <div class="form-group"><label>Nom</label><input type="text" id="editNom"></div>
+    <div class="form-group"><label>Pseudo Telegram</label><input type="text" id="editTelegram"></div>
+    <div class="form-group"><label>Statut</label>
+      <select id="editStatut">
+        <option value="sympathisant">Sympathisant</option>
+        <option value="draft">Draft</option>
+        <option value="confirme">Confirmé</option>
+        <option value="membre_cellule">Membre Cellule</option>
+        <option value="bureau">Bureau</option>
+        <option value="admin">Admin</option>
+      </select>
+    </div>
+    <div class="form-group"><label>Étoiles (0-3)</label>
+      <select id="editEtoiles">
+        <option value="0">☆☆☆ Aucune</option>
+        <option value="1">⭐☆☆ 1 étoile</option>
+        <option value="2">⭐⭐☆ 2 étoiles</option>
+        <option value="3">⭐⭐⭐ 3 étoiles</option>
+      </select>
+    </div>
+    <button class="btn btn-primary" onclick="doSauvegarderMembre()">Enregistrer</button>
+    <button class="btn btn-secondary" style="margin-top:8px;" onclick="closeModal('modalEditMembre')">Annuler</button>
+  </div>
+</div>
+
+<!-- Modal Publier Annonce (Bureau+) -->
+<div class="modal-overlay" id="modalAnnonce" style="display:none;" onclick="closeModalOutside(event,'modalAnnonce')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-handle"></div>
+    <h3 class="modal-title">Publier une annonce</h3>
+    <div class="form-group"><label>Titre</label><input type="text" id="annonceTitre" placeholder="Titre de l'annonce"></div>
+    <div class="form-group"><label>Contenu</label><textarea id="annonceContenu" rows="3" placeholder="Message..."></textarea></div>
+    <div class="form-group"><label>Catégorie</label>
+      <select id="annonceCat">
+        <option value="info">Info</option>
+        <option value="urgent">Urgent</option>
+        <option value="cellule">Cellule</option>
+      </select>
+    </div>
+    <button class="btn btn-primary" onclick="doPublierAnnonce()">Publier</button>
+    <button class="btn btn-secondary" style="margin-top:8px;" onclick="closeModal('modalAnnonce')">Annuler</button>
+  </div>
+</div>
+
+<!-- Modal Calendrier Matchs (Admin) -->
+<div class="modal-overlay" id="modalMatchs" style="display:none;" onclick="closeModalOutside(event,'modalMatchs')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-handle"></div>
+    <h3 class="modal-title">Calendrier matchs</h3>
+    <div class="card" style="margin-bottom:12px;">
+      <div class="card-label">Ajouter un match</div>
+      <div class="form-group"><input type="text" id="mExt" placeholder="Adversaire (ex: OGC Nice)"></div>
+      <div class="form-group"><input type="date" id="mDate"></div>
+      <div class="form-group"><input type="time" id="mHeure"></div>
+      <div class="form-group">
+        <select id="mType"><option value="exterieur">Extérieur</option><option value="domicile">Domicile</option></select>
+      </div>
+      <div class="form-group"><input type="text" id="mStade" placeholder="Stade"></div>
+      <button class="btn btn-primary btn-sm" style="width:auto;" onclick="doAjouterMatch()">+ Ajouter</button>
+    </div>
+    <div id="matchsList"></div>
+    <button class="btn btn-secondary" style="margin-top:8px;" onclick="closeModal('modalMatchs')">Fermer</button>
+  </div>
+</div>
+
+<!-- Styles inline complémentaires -->
+<style>
+.btn-logout {
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  color: var(--gris);
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 12px; font-weight: 700;
+  letter-spacing: .04em; text-transform: uppercase;
+  padding: 5px 12px; cursor: pointer;
+  transition: all .15s;
+}
+.btn-logout:hover { color: white; border-color: rgba(255,255,255,.3); }
+
+.session-admin-bar {
+  display: flex; gap: 6px; flex-wrap: wrap;
+  margin-top: 12px; padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+
+.membre-card {
+  background: var(--glass); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); padding: 14px; margin-bottom: 8px;
+}
+.membre-card-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.membre-card-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+</style>
+
+<!-- ══════════════════════════════════════════════════════════
+     SCRIPTS
+══════════════════════════════════════════════════════════ -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script src="src/config.js"></script>
 <script src="src/supabase-client.js"></script>
 <script>
-// ─── State ──────────────────────────────────────────────────
-let currentSession = null;
-let currentDeplacement = null;
+// ─── Helpers droits ──────────────────────────────────────────
+const NIVEAUX = ['sympathisant','draft','confirme','membre_cellule','bureau','admin'];
+function hasRole(membre, minRole) {
+  return NIVEAUX.indexOf(membre?.statut) >= NIVEAUX.indexOf(minRole);
+}
+function isCellule(membre) {
+  return hasRole(membre, 'membre_cellule');
+}
+function isBureau(membre) {
+  return hasRole(membre, 'bureau');
+}
+function isAdmin(membre) {
+  return hasRole(membre, 'admin');
+}
+
+// ─── State ───────────────────────────────────────────────────
+let currentSessionId = null;
+let currentDeplId = null;
+let allMembres = [];
 
 // ─── Init ────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', async () => {
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/ultras-lutetia/sw.js').catch(console.error);
+    navigator.serviceWorker.register('/ultras-lutetia/sw.js').catch(() => {});
   }
-  // Overwrite SUPABASE credentials from config
-  window.UL.sb = supabase.createClient(UL_CONFIG.SUPABASE_URL, UL_CONFIG.SUPABASE_ANON_KEY);
-
   const { membre } = await UL.initSession();
-  if (membre) {
-    showApp(membre);
-  } else {
-    showLoginPage();
-  }
+  membre ? showApp(membre) : showLoginPage();
 });
 
 // ─── Auth ────────────────────────────────────────────────────
@@ -265,74 +486,57 @@ function showLoginPage() {
   document.getElementById('loginPage').style.display = 'flex';
   document.getElementById('appContainer').style.display = 'none';
 }
-
 function showLogin() {
   document.getElementById('loginForm').style.display = 'block';
   document.getElementById('inscriptionForm').style.display = 'none';
 }
-
 function showInscription() {
   document.getElementById('loginForm').style.display = 'none';
   document.getElementById('inscriptionForm').style.display = 'block';
 }
-
 async function doLogin() {
   const pseudo = document.getElementById('loginTelegram').value.trim();
-  const password = document.getElementById('loginPassword').value;
-  if (!pseudo || !password) return toast('Remplis tous les champs', 'error');
+  const pwd = document.getElementById('loginPassword').value;
+  if (!pseudo || !pwd) return toast('Remplis tous les champs', 'error');
   try {
     showLoading();
-    const { membre } = await UL.loginByTelegram(pseudo, password);
+    const { membre } = await UL.loginByTelegram(pseudo, pwd);
     hideLoading();
     showApp(membre);
-  } catch(e) {
-    hideLoading();
-    toast(e.message || 'Erreur de connexion', 'error');
-  }
+  } catch(e) { hideLoading(); toast(e.message || 'Erreur de connexion', 'error'); }
 }
-
 async function doInscription() {
   const prenom = document.getElementById('regPrenom').value.trim();
   const nom = document.getElementById('regNom').value.trim();
   const pseudo = document.getElementById('regTelegram').value.trim();
   const email = document.getElementById('regEmail').value.trim();
   const ville = document.getElementById('regVille').value.trim();
-  const password = document.getElementById('regPassword').value;
+  const pwd = document.getElementById('regPassword').value;
   const rgpd = document.getElementById('regRgpd').checked;
-
-  if (!prenom || !nom || !pseudo || !password) return toast('Remplis tous les champs obligatoires', 'error');
-  if (password.length < 8) return toast('Mot de passe trop court (8 caractères min)', 'error');
-  if (!rgpd) return toast('Tu dois accepter les conditions RGPD', 'error');
-
+  if (!prenom || !nom || !pseudo || !pwd) return toast('Champs obligatoires manquants', 'error');
+  if (pwd.length < 8) return toast('Mot de passe trop court (8 min)', 'error');
+  if (!rgpd) return toast('Accepte les conditions RGPD', 'error');
   try {
     showLoading();
-    await UL.inscription({ prenom, nom, pseudoTelegram: pseudo, email, ville, password });
+    await UL.inscription({ prenom, nom, pseudoTelegram: pseudo, email, ville, password: pwd });
     hideLoading();
-    toast('Compte créé ! Attends la validation admin.', 'success');
+    toast('Compte créé ! En attente de validation admin.', 'success');
     showLogin();
-  } catch(e) {
-    hideLoading();
-    toast(e.message || 'Erreur lors de l\'inscription', 'error');
-  }
+  } catch(e) { hideLoading(); toast(e.message || 'Erreur inscription', 'error'); }
 }
-
 async function doLogout() {
   await UL.logout();
   showLoginPage();
 }
 
-// ─── App ─────────────────────────────────────────────────────
+// ─── App init + droits ────────────────────────────────────────
 async function showApp(membre) {
   document.getElementById('loginPage').style.display = 'none';
   document.getElementById('appContainer').style.display = 'block';
+  document.getElementById('headerUser').textContent = '@' + membre.pseudo_telegram;
 
-  // Header
-  document.getElementById('headerUser').textContent = `@${membre.pseudo_telegram}`;
-
-  // Bouton admin
-  if (['admin','bureau'].includes(membre.statut)) {
-    document.getElementById('adminBtnContainer').style.display = 'block';
-  }
+  // Appliquer droits selon statut
+  applyRights(membre);
 
   // Charte
   if (!membre.charte_signee) {
@@ -343,151 +547,167 @@ async function showApp(membre) {
   await loadAccueil();
 }
 
+function applyRights(membre) {
+  // Bouton créer session : Membre Cellule et au-dessus
+  if (isCellule(membre)) {
+    document.getElementById('btnCreerSession').style.display = 'block';
+  }
+  // Boutons bureau : créer déplacement + publier annonce
+  if (isBureau(membre)) {
+    document.getElementById('btnCreerDepl').style.display = 'block';
+    document.getElementById('btnPublierAnnonce').style.display = 'block';
+  }
+  // Stats cellule visible pour membres cellule+
+  if (isCellule(membre)) {
+    document.getElementById('sectionStats').style.display = 'block';
+  }
+  // Section admin complète
+  if (isAdmin(membre)) {
+    document.getElementById('sectionAdmin').style.display = 'block';
+    document.getElementById('sectionStats').style.display = 'none'; // remplacé par section admin
+  }
+}
+
 // ─── Navigation ───────────────────────────────────────────────
 function showPage(pageId) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   document.getElementById(pageId).classList.add('active');
-
-  const pageNav = { pageAccueil: 0, pageSessions: 1, pageDeplacements: 2, pageProfil: 3 };
-  const navIdx = pageNav[pageId];
-  if (navIdx !== undefined) {
-    document.querySelectorAll('.nav-item')[navIdx].classList.add('active');
-  }
-
+  // Nav active
+  const map = { pageAccueil:0, pageSessions:1, pageDeplacements:2, pageProfil:3 };
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const idx = map[pageId];
+  if (idx !== undefined) document.getElementById('nav'+idx).classList.add('active');
   // Lazy load
   if (pageId === 'pageSessions') loadSessions();
   if (pageId === 'pageDeplacements') loadDeplacements();
   if (pageId === 'pageProfil') loadProfil();
+  if (pageId === 'pageMembres') loadMembres();
+  if (pageId === 'pageStats') loadStats();
+  if (pageId === 'pageCharte') loadCharte();
 }
 
-// ─── Accueil ──────────────────────────────────────────────────
+// ─── ACCUEIL ──────────────────────────────────────────────────
 async function loadAccueil() {
   // Annonces
   try {
     const annonces = await UL.getAnnonces();
-    const el = document.getElementById('annoncesContainer');
-    el.innerHTML = annonces.slice(0,2).map(a => `
-      <div class="info-box ${a.categorie === 'urgent' ? '' : 'success'}">
+    document.getElementById('annoncesContainer').innerHTML = annonces.slice(0,2).map(a => `
+      <div class="info-box ${a.categorie === 'urgent' ? '' : a.categorie === 'info' ? '' : 'success'}">
         <strong>${a.titre}</strong><br>
         <span style="font-size:13px;">${a.contenu}</span>
       </div>`).join('');
   } catch(e) {}
-
   // Sessions
   try {
     const sessions = await UL.getUpcomingSessions();
     const el = document.getElementById('sessionsAccueil');
-    if (!sessions.length) {
-      el.innerHTML = '<p style="color:var(--gris); font-size:14px;">Aucune session à venir</p>';
-    } else {
-      el.innerHTML = sessions.slice(0,2).map(s => renderSessionCard(s)).join('');
-    }
+    el.innerHTML = sessions.length
+      ? sessions.slice(0,2).map(s => renderSessionCard(s)).join('')
+      : '<p style="color:var(--gris);font-size:14px;">Aucune session à venir</p>';
   } catch(e) {}
-
-  // Déplacements
+  // Déplacement
   try {
     const depls = await UL.getDeplacements(true);
-    const el = document.getElementById('deplacementsAccueil');
-    if (!depls.length) {
-      el.innerHTML = '<p style="color:var(--gris); font-size:14px;">Aucun déplacement à venir</p>';
-    } else {
-      el.innerHTML = depls.slice(0,1).map(d => renderDeplCard(d)).join('');
-    }
+    const el = document.getElementById('deplAccueil');
+    el.innerHTML = depls.length
+      ? renderDeplCard(depls[0])
+      : '<p style="color:var(--gris);font-size:14px;">Aucun déplacement à venir</p>';
   } catch(e) {}
-
   // Stats perso
   try {
     const stats = await UL.getMesStats();
     document.getElementById('mesStats').innerHTML = `
-      <div class="stat-card">
-        <div class="stat-value">${stats.sessionsPresent}</div>
-        <div class="stat-label">Sessions présent</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-value">${stats.tauxPresence}%</div>
-        <div class="stat-label">Taux présence</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-value">${stats.deplacements}</div>
-        <div class="stat-label">Déplacements</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-value">${stats.sessionsInscrites}</div>
-        <div class="stat-label">Sessions inscrites</div>
-      </div>`;
+      <div class="stat-card"><div class="stat-value">${stats.sessionsPresent}</div><div class="stat-label">Présences</div></div>
+      <div class="stat-card"><div class="stat-value">${stats.tauxPresence}%</div><div class="stat-label">Assiduité</div></div>
+      <div class="stat-card"><div class="stat-value">${stats.deplacements}</div><div class="stat-label">Déplacements</div></div>
+      <div class="stat-card"><div class="stat-value">${stats.sessionsInscrites}</div><div class="stat-label">Inscriptions</div></div>`;
   } catch(e) {}
 }
 
-// ─── Sessions ─────────────────────────────────────────────────
+// ─── SESSIONS ─────────────────────────────────────────────────
 async function loadSessions() {
+  const m = UL.getCurrentMembre();
   try {
     const sessions = await UL.getUpcomingSessions();
-    document.getElementById('sessionsListe').innerHTML =
-      sessions.length ? sessions.map(s => renderSessionCard(s)).join('') :
-      '<p style="color:var(--gris); font-size:14px;">Aucune session à venir</p>';
-
+    document.getElementById('sessionsListe').innerHTML = sessions.length
+      ? sessions.map(s => renderSessionCard(s, true)).join('')
+      : '<div class="empty-state"><div>📋</div>Aucune session à venir</div>';
     const past = await UL.getPastSessions();
-    document.getElementById('sessionsHistorique').innerHTML =
-      past.length ? past.map(s => renderSessionCard(s, true)).join('') :
-      '<p style="color:var(--gris); font-size:14px;">Aucun historique</p>';
+    document.getElementById('sessionsHistorique').innerHTML = past.length
+      ? past.map(s => renderSessionCard(s)).join('')
+      : '<div class="empty-state"><div>📋</div>Aucun historique</div>';
   } catch(e) { toast('Erreur chargement sessions', 'error'); }
 }
 
-function renderSessionCard(s, past = false) {
+function renderSessionCard(s, withAdmin = false) {
+  const m = UL.getCurrentMembre();
   const date = new Date(s.date).toLocaleDateString('fr-FR', { weekday:'short', day:'numeric', month:'short' });
   const types = { Tracage:'🖊️', Assemblage:'🔧', Peinture:'🖌️' };
-  return `<div class="card" onclick="openSession('${s.id}')">
-    <div class="card-header">
-      <div>
+  const isOpen = s.statut === 'en_cours';
+  const isPlanned = s.statut === 'a_venir';
+
+  let adminBar = '';
+  if (withAdmin && isCellule(m)) {
+    adminBar = `<div class="session-admin-bar">`;
+    if (isPlanned) adminBar += `<button class="btn btn-sm btn-success" onclick="doOuvrirSession('${s.id}',event)">▶ Ouvrir</button>`;
+    if (isOpen) {
+      adminBar += `<div class="session-code">${s.code_presence || '----'}</div>`;
+      adminBar += `<button class="btn btn-sm btn-danger" onclick="doFermerSession('${s.id}',event)">■ Fermer</button>`;
+    }
+    if (isOpen || s.statut === 'terminee') {
+      adminBar += `<button class="btn btn-sm btn-secondary" onclick="voirInscrits('${s.id}','${esc(s.nom)}',event)">👥 Inscrits</button>`;
+    }
+    if (s.avec_pizza && isOpen) {
+      adminBar += `<button class="btn btn-sm" style="background:rgba(255,149,0,.15);color:var(--pizza);border:1px solid rgba(255,149,0,.3);" onclick="voirPizzas('${s.id}',event)">🍕 Pizzas</button>`;
+    }
+    if (isAdmin(m)) {
+      adminBar += `<button class="btn btn-sm btn-danger" onclick="doSupprimerSession('${s.id}',event)">🗑</button>`;
+    }
+    adminBar += `</div>`;
+  }
+
+  return `<div class="session-card ${isOpen ? 'open' : ''}" onclick="openSession('${s.id}')">
+    <div style="display:flex;align-items:center;gap:10px;">
+      <div class="status-dot ${isOpen ? 'open' : isPlanned ? 'planned' : 'closed'}"></div>
+      <div style="flex:1;">
         <div class="card-title">${types[s.type_session] || '📋'} ${s.nom}</div>
-        <div class="card-sub">${date}${s.heure ? ' — ' + s.heure.slice(0,5) : ''} · ${s.lieu}</div>
+        <div class="card-sub">${date}${s.heure ? ' · ' + s.heure.slice(0,5) : ''} · ${s.lieu}</div>
       </div>
-      <span class="badge ${s.statut === 'en_cours' ? 'badge-vert' : s.statut === 'terminee' ? 'badge-gris' : 'badge-rouge'}">
+      <span class="badge ${isOpen ? 'badge-vert' : isPlanned ? 'badge-bleu' : 'badge-gris'}">
         ${s.statut === 'a_venir' ? 'À venir' : s.statut === 'en_cours' ? 'En cours' : s.statut === 'terminee' ? 'Terminée' : 'Annulée'}
       </span>
     </div>
-    ${s.capacite_max ? `<div style="font-size:13px; color:var(--gris);">Capacité max: ${s.capacite_max}</div>` : ''}
-    ${s.avec_pizza ? '<div style="font-size:13px; color:#ff9800;">🍕 Session pizza</div>' : ''}
+    ${s.avec_pizza ? '<div style="font-size:12px;color:var(--pizza);margin-top:6px;">🍕 Session pizza</div>' : ''}
+    ${adminBar}
   </div>`;
 }
 
 async function openSession(sessionId) {
-  currentSession = sessionId;
+  currentSessionId = sessionId;
   try {
-    const { session, inscrits, monInscrit } = await UL.getSessionDetails(sessionId);
+    const { session: s, inscrits, monInscrit } = await UL.getSessionDetails(sessionId);
     const estInscrit = !!monInscrit;
     const estPresent = monInscrit?.statut === 'present';
-    const membre = UL.getCurrentMembre();
-
+    const date = new Date(s.date).toLocaleDateString('fr-FR', { weekday:'long', day:'numeric', month:'long' });
     document.getElementById('modalSessionContent').innerHTML = `
-      <h3 class="modal-title">${session.nom}</h3>
-      <div style="color:var(--gris); font-size:14px; margin-bottom:16px;">
-        📅 ${new Date(session.date).toLocaleDateString('fr-FR', {weekday:'long', day:'numeric', month:'long'})}<br>
-        ${session.heure ? '🕐 ' + session.heure.slice(0,5) + '<br>' : ''}
-        📍 ${session.lieu}<br>
-        ${session.description ? '<br>' + session.description : ''}
-        ${session.avec_pizza ? '<br>🍕 Session pizza' : ''}
+      <h3 class="modal-title">${s.nom}</h3>
+      <div style="color:var(--gris);font-size:14px;margin-bottom:16px;line-height:2;">
+        📅 ${date}<br>
+        ${s.heure ? '🕐 ' + s.heure.slice(0,5) + '<br>' : ''}
+        📍 ${s.lieu}
+        ${s.description ? '<br>📝 ' + s.description : ''}
+        ${s.avec_pizza ? '<br>🍕 Session pizza' : ''}
+        ${s.lien_telegram ? `<br><a href="${s.lien_telegram}" style="color:var(--blue-light);">📲 Groupe Telegram</a>` : ''}
       </div>
-      <div style="font-size:14px; margin-bottom:16px;">
-        👥 ${inscrits.length} inscrit${inscrits.length > 1 ? 's' : ''}
-        ${session.capacite_max ? ' / ' + session.capacite_max : ''}
-      </div>
-      ${session.lien_telegram ? `<a href="${session.lien_telegram}" style="color:var(--rouge-light); font-size:14px;">📲 Groupe Telegram</a><br><br>` : ''}
-
-      ${!estInscrit && session.statut === 'a_venir' ?
-        `<button class="btn btn-primary" onclick="doInscrire('${session.id}')">S'inscrire</button>` : ''}
-      ${estInscrit && !estPresent && session.statut === 'a_venir' ?
-        `<button class="btn btn-secondary" onclick="doDesinscrire('${session.id}')">Se désinscrire</button>` : ''}
-      ${estInscrit && session.statut === 'en_cours' && !estPresent ?
-        `<button class="btn btn-success" onclick="showPresenceCode()">✅ Valider ma présence</button>` : ''}
-      ${estPresent ?
-        `<div class="info-box success" style="text-align:center;">✅ Présence validée</div>` : ''}
-
-      ${session.avec_pizza && estInscrit && session.statut === 'a_venir' ? `
+      <div style="font-size:14px;margin-bottom:16px;font-weight:600;">👥 ${inscrits.length} inscrit${inscrits.length>1?'s':''}${s.capacite_max?' / '+s.capacite_max:''}</div>
+      ${!estInscrit && s.statut==='a_venir' ? `<button class="btn btn-primary" onclick="doInscrire('${s.id}')">S'inscrire</button>` : ''}
+      ${estInscrit && !estPresent && s.statut==='a_venir' ? `<button class="btn btn-secondary" style="margin-top:8px;" onclick="doDesinscrire('${s.id}')">Se désinscrire</button>` : ''}
+      ${estInscrit && s.statut==='en_cours' && !estPresent ? `<button class="btn btn-success" onclick="showModal('modalPresence')">✅ Valider ma présence</button>` : ''}
+      ${estPresent ? `<div class="info-box success" style="text-align:center;">✅ Présence validée</div>` : ''}
+      ${s.avec_pizza && estInscrit && s.statut==='a_venir' ? `
         <div style="margin-top:12px;">
           <label>Commande pizza</label>
-          <select id="pizzaChoice" onchange="doPizza('${session.id}')">
+          <select id="pizzaChoice" onchange="doPizza('${s.id}')">
             <option value="non">Pas de pizza</option>
             <option value="margherita">Margherita</option>
             <option value="reine">Reine</option>
@@ -500,179 +720,288 @@ async function openSession(sessionId) {
       const sel = document.getElementById('pizzaChoice');
       if (sel) sel.value = monInscrit.pizza;
     }
-
-    document.getElementById('modalSession').style.display = 'flex';
+    showModal('modalSession');
   } catch(e) { toast('Erreur chargement session', 'error'); }
 }
 
-async function doInscrire(sessionId) {
-  try {
-    await UL.inscrire(sessionId);
-    toast('Inscription confirmée !', 'success');
-    closeModal('modalSession');
-    loadSessions();
-  } catch(e) { toast(e.message, 'error'); }
+async function doInscrire(id) {
+  try { await UL.inscrire(id); toast('Inscription confirmée !', 'success'); closeModal('modalSession'); loadSessions(); }
+  catch(e) { toast(e.message, 'error'); }
 }
-
-async function doDesinscrire(sessionId) {
-  try {
-    await UL.desinscrire(sessionId);
-    toast('Désinscription effectuée', 'success');
-    closeModal('modalSession');
-    loadSessions();
-  } catch(e) { toast(e.message, 'error'); }
+async function doDesinscrire(id) {
+  try { await UL.desinscrire(id); toast('Désinscription effectuée', 'success'); closeModal('modalSession'); loadSessions(); }
+  catch(e) { toast(e.message, 'error'); }
 }
-
-function showPresenceCode() {
-  closeModal('modalSession');
-  document.getElementById('modalPresence').style.display = 'flex';
-}
-
 async function doValiderPresence() {
   const code = document.getElementById('codePresence').value;
   if (!code || code.length !== 4) return toast('Code à 4 chiffres requis', 'error');
   try {
-    await UL.validerPresence(currentSession, code);
+    await UL.validerPresence(currentSessionId, code);
     toast('Présence validée ! ✅', 'success');
     closeModal('modalPresence');
     loadAccueil();
   } catch(e) { toast(e.message || 'Code incorrect', 'error'); }
 }
-
-async function doPizza(sessionId) {
+async function doPizza(id) {
   const pizza = document.getElementById('pizzaChoice').value;
-  try {
-    await UL.savePizzaChoice(sessionId, pizza);
-    toast('Commande pizza enregistrée', 'success');
-  } catch(e) { toast('Erreur', 'error'); }
+  try { await UL.savePizzaChoice(id, pizza); toast('Commande pizza enregistrée 🍕', 'success'); }
+  catch(e) { toast('Erreur', 'error'); }
 }
 
-// ─── Déplacements ─────────────────────────────────────────────
+// Actions admin sessions
+async function doOuvrirSession(id, e) {
+  e.stopPropagation();
+  try {
+    const { code } = await UL.openSession(id);
+    toast('Session ouverte ! Code : ' + code, 'success');
+    loadSessions();
+  } catch(e) { toast('Erreur', 'error'); }
+}
+async function doFermerSession(id, e) {
+  e.stopPropagation();
+  if (!confirm('Fermer cette session ?')) return;
+  try { await UL.closeSession(id); toast('Session fermée', 'success'); loadSessions(); }
+  catch(e) { toast('Erreur', 'error'); }
+}
+async function doSupprimerSession(id, e) {
+  e.stopPropagation();
+  if (!confirm('Supprimer définitivement ?')) return;
+  try { await UL.deleteSession(id); toast('Session supprimée', 'success'); loadSessions(); }
+  catch(e) { toast('Erreur', 'error'); }
+}
+async function voirInscrits(id, nom, e) {
+  e.stopPropagation();
+  try {
+    const { inscrits } = await UL.getSessionDetails(id);
+    const presents = inscrits.filter(i => i.statut === 'present');
+    const inscritsListe = inscrits.filter(i => i.statut === 'inscrit');
+    document.getElementById('modalAdminSessionContent').innerHTML = `
+      <h3 class="modal-title">Inscrits — ${nom}</h3>
+      <div style="font-size:13px;color:var(--gris);margin-bottom:14px;">
+        ✅ ${presents.length} présents · 📋 ${inscritsListe.length} inscrits · Total: ${inscrits.length}
+      </div>
+      <button class="btn btn-sm btn-secondary" style="margin-bottom:14px;" onclick="copierInscrits(${JSON.stringify(inscrits.map(i=>i.membre?.pseudo_telegram||'?'))})">📋 Copier liste Telegram</button>
+      ${inscrits.map(i => `
+        <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px;">
+          <div class="avatar" style="width:32px;height:32px;font-size:12px;">${(i.membre?.prenom||'?')[0]}</div>
+          <div style="flex:1;">
+            <div style="font-weight:600;">${i.membre?.prenom||''} ${i.membre?.nom||''}</div>
+            <div style="color:var(--gris);">@${i.membre?.pseudo_telegram||'?'}</div>
+          </div>
+          <span class="badge ${i.statut==='present'?'badge-vert':i.statut==='absent'?'badge-rouge':'badge-bleu'}">
+            ${i.statut}
+          </span>
+        </div>`).join('')}
+    `;
+    showModal('modalAdminSession');
+  } catch(e) { toast('Erreur', 'error'); }
+}
+async function voirPizzas(id, e) {
+  e.stopPropagation();
+  try {
+    const commandes = await UL.getPizzaOrders(id);
+    const counts = commandes.reduce((acc, c) => { acc[c.pizza] = (acc[c.pizza]||0)+1; return acc; }, {});
+    document.getElementById('modalAdminSessionContent').innerHTML = `
+      <h3 class="modal-title">🍕 Commandes pizza</h3>
+      ${Object.entries(counts).map(([p,n]) => `
+        <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);">
+          <span>${p}</span><span style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--pizza);">${n}</span>
+        </div>`).join('')}
+      <div style="margin-top:12px;font-size:13px;color:var(--gris);">Total : ${commandes.length} pizzas</div>
+    `;
+    showModal('modalAdminSession');
+  } catch(e) { toast('Erreur', 'error'); }
+}
+function copierInscrits(pseudos) {
+  const texte = pseudos.map((p,i) => `${i+1}. @${p}`).join('\n');
+  navigator.clipboard.writeText(texte).then(() => toast('Liste copiée !', 'success'));
+}
+
+async function doCreerSession() {
+  const data = {
+    nom: document.getElementById('sNom').value,
+    date: document.getElementById('sDate').value,
+    heure: document.getElementById('sHeure').value || null,
+    lieu: document.getElementById('sLieu').value,
+    type_session: document.getElementById('sType').value,
+    capacite_max: parseInt(document.getElementById('sCapacite').value) || null,
+    lien_telegram: document.getElementById('sTelegram').value || null,
+    avec_pizza: document.getElementById('sPizza').checked,
+    description: document.getElementById('sDesc').value || null,
+  };
+  if (!data.nom || !data.date) return toast('Nom et date requis', 'error');
+  try {
+    await UL.createSession(data);
+    toast('Session créée ✅', 'success');
+    closeModal('modalCreerSession');
+    loadSessions();
+  } catch(e) { toast(e.message, 'error'); }
+}
+
+// ─── DÉPLACEMENTS ─────────────────────────────────────────────
 async function loadDeplacements() {
   try {
     const depls = await UL.getDeplacements(true);
-    const el = document.getElementById('deplacementsListe');
-    if (!depls.length) {
-      el.innerHTML = '<p style="color:var(--gris); font-size:14px;">Aucun déplacement à venir</p>';
-      return;
-    }
-    el.innerHTML = depls.map(d => renderDeplCard(d)).join('');
+    document.getElementById('deplacementsListe').innerHTML = depls.length
+      ? depls.map(d => renderDeplCard(d)).join('')
+      : '<div class="empty-state"><div>✈️</div>Aucun déplacement à venir</div>';
   } catch(e) { toast('Erreur chargement déplacements', 'error'); }
 }
 
 function renderDeplCard(d) {
   const date = d.date_match ? new Date(d.date_match).toLocaleDateString('fr-FR', {weekday:'short', day:'numeric', month:'short'}) : '';
-  const pct = d.places_max ? Math.min(100, Math.round(((d._inscrits || 0) / d.places_max) * 100)) : 0;
-  return `<div class="depl-card" onclick="openDeplacement('${d.id}')">
-    <div class="depl-match">Paris FC — ${d.adversaire || (d.match?.equipe_exterieur) || '?'}</div>
+  return `<div class="depl-card" onclick="openDepl('${d.id}')">
+    <div class="depl-match">Paris FC — ${d.adversaire || d.match?.equipe_exterieur || '?'}</div>
     <div class="depl-infos">
-      ${date ? `<span class="depl-info">📅 ${date}</span>` : ''}
-      ${d.stade || d.match?.stade ? `<span class="depl-info">📍 ${d.stade || d.match?.stade}</span>` : ''}
-      ${d.prix_total ? `<span class="depl-info">💶 ${d.prix_total}€</span>` : ''}
+      ${date ? `<span>📅 ${date}</span>` : ''}
+      ${d.stade||d.match?.stade ? `<span>📍 ${d.stade||d.match?.stade}</span>` : ''}
+      ${d.prix_total ? `<span>💶 ${d.prix_total}€</span>` : ''}
+      ${d.places_max ? `<span>🪑 ${d.places_max} places</span>` : ''}
     </div>
-    ${d.places_max ? `
-    <div class="depl-places">
-      <span style="font-size:12px; color:var(--gris);">${d._inscrits || 0}/${d.places_max} places</span>
-      <div class="places-bar"><div class="places-fill" style="width:${pct}%"></div></div>
-    </div>` : ''}
+    ${d.places_max ? `<div class="places-bar"><div class="places-fill" style="width:${Math.min(100,Math.round(((d._inscrits||0)/d.places_max)*100))}%"></div></div>` : ''}
   </div>`;
 }
 
-async function openDeplacement(deplId) {
-  currentDeplacement = deplId;
+async function openDepl(deplId) {
+  currentDeplId = deplId;
+  const m = UL.getCurrentMembre();
   try {
     const { deplacement: d, inscrits, monInscrit, nbInscrits } = await UL.getDeplacement(deplId);
     const estInscrit = !!monInscrit;
     const estPaye = monInscrit && monInscrit.statut_paiement !== 'en_attente';
     const date = d.date_match ? new Date(d.date_match).toLocaleDateString('fr-FR', {weekday:'long', day:'numeric', month:'long'}) : '';
-
-    let content = `
-      <h3 class="modal-title">Paris FC — ${d.adversaire || d.match?.equipe_exterieur}</h3>
-      <div style="color:var(--gris); font-size:14px; margin-bottom:16px;">
+    let html = `
+      <h3 class="modal-title">Paris FC — ${d.adversaire||d.match?.equipe_exterieur}</h3>
+      <div style="color:var(--gris);font-size:14px;margin-bottom:16px;line-height:2.2;">
         ${date ? `📅 ${date}<br>` : ''}
-        ${d.stade || d.match?.stade ? `🏟️ ${d.stade || d.match?.stade}<br>` : ''}
+        ${d.stade||d.match?.stade ? `🏟️ ${d.stade||d.match?.stade}<br>` : ''}
         ${d.ville ? `📍 ${d.ville}<br>` : ''}
         ${d.point_rdv ? `🚌 RDV: ${d.point_rdv}<br>` : ''}
         ${d.heure_depart ? `⏰ Départ: ${d.heure_depart}<br>` : ''}
-        ${d.prix_total ? `💶 Prix: ${d.prix_total}€ (bus + entrée)<br>` : ''}
+        ${d.prix_total ? `💶 ${d.prix_total}€ (bus + entrée)<br>` : ''}
         ${d.date_limite_inscription ? `⏳ Limite: ${new Date(d.date_limite_inscription).toLocaleDateString('fr-FR')}<br>` : ''}
       </div>
-      <div style="font-size:14px; margin-bottom:16px; font-weight:600;">
-        👥 ${nbInscrits} inscrit${nbInscrits > 1 ? 's' : ''}${d.places_max ? ' / ' + d.places_max + ' places' : ''}
-      </div>`;
+      <div style="font-size:14px;margin-bottom:16px;font-weight:600;">👥 ${nbInscrits} inscrit${nbInscrits>1?'s':''}${d.places_max?' / '+d.places_max+' places':''}</div>`;
 
     if (!estInscrit) {
-      content += `<button class="btn btn-primary" onclick="doInscritDepl('${d.id}')">M'inscrire</button>`;
+      html += `<button class="btn btn-primary" onclick="doInscritDepl('${d.id}')">M'inscrire</button>`;
     } else if (!estPaye) {
-      content += `
-        <div class="info-box">⏳ Inscription confirmée — en attente de paiement</div>
+      html += `<div class="info-box">⏳ Inscrit — en attente de paiement</div>
         ${d.lien_helloasso ? `<a href="${d.lien_helloasso}" target="_blank"><button class="btn btn-primary">💳 Payer via HelloAsso</button></a>` : ''}
-        <div style="margin-top:8px; font-size:12px; color:var(--gris); text-align:center;">
-          Paiement cash possible — contacte l'admin via Telegram
-        </div>`;
+        <p style="text-align:center;font-size:12px;color:var(--gris);margin-top:8px;">Paiement cash → contacter l'admin</p>`;
     } else {
-      // Afficher le QR code
-      const qr = monInscrit.qr_code || '';
-      content += `
-        <div class="info-box success">✅ Paiement confirmé — ton billet est prêt</div>
-        <div class="qr-container" id="qrContainer"></div>
-        <p style="text-align:center; font-size:12px; color:var(--gris);">Code: ${qr}<br>Montre ce QR dans le bus</p>`;
+      html += `<div class="info-box success">✅ Paiement confirmé — ton billet est prêt</div>
+        <div class="qr-container" id="qrDepl"></div>
+        <p style="text-align:center;font-size:12px;color:var(--gris);">Code: ${monInscrit.qr_code||''}</p>`;
     }
 
-    if (d.notes) content += `<div style="margin-top:12px; font-size:13px; color:var(--gris);">📝 ${d.notes}</div>`;
+    // Boutons admin déplacement
+    if (isCellule(m)) {
+      const payes = inscrits.filter(i => i.statut_paiement !== 'en_attente');
+      html += `
+        <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--border);">
+          <div class="card-label">Gestion déplacement</div>
+          <div style="font-size:13px;color:var(--gris);margin-bottom:10px;">✅ ${payes.length} payés · ⏳ ${inscrits.length-payes.length} en attente</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button class="btn btn-sm btn-secondary" onclick="voirInscritsDepl('${d.id}')">👥 Voir inscrits</button>
+            <button class="btn btn-sm btn-secondary" onclick="copierListeBus('${d.id}')">📋 Liste bus</button>
+          </div>
+        </div>`;
+    }
 
-    document.getElementById('modalDeplacementContent').innerHTML = content;
-
-    // Générer QR si payé
+    if (d.notes) html += `<div style="margin-top:12px;font-size:13px;color:var(--gris);">📝 ${d.notes}</div>`;
+    document.getElementById('modalDeplContent').innerHTML = html;
     if (estPaye && monInscrit?.qr_code) {
-      generateQR(monInscrit.qr_code, 'qrContainer');
+      document.getElementById('qrDepl').innerHTML = `<img src="https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encodeURIComponent(monInscrit.qr_code)}" width="160" height="160">`;
     }
-
-    document.getElementById('modalDeplacement').style.display = 'flex';
+    showModal('modalDepl');
   } catch(e) { toast('Erreur chargement déplacement', 'error'); }
 }
 
-async function doInscritDepl(deplId) {
+async function doInscritDepl(id) {
+  try { await UL.sInscrireDeplacements(id); toast('Inscription confirmée !', 'success'); closeModal('modalDepl'); loadDeplacements(); }
+  catch(e) { toast(e.message, 'error'); }
+}
+async function voirInscritsDepl(deplId) {
   try {
-    await UL.sInscrireDeplacements(deplId);
-    toast('Inscription confirmée !', 'success');
-    closeModal('modalDeplacement');
+    const { inscrits, deplacement: d } = await UL.getDeplacement(deplId);
+    document.getElementById('modalAdminSessionContent').innerHTML = `
+      <h3 class="modal-title">Inscrits — ${d.adversaire}</h3>
+      ${inscrits.map(i => `
+        <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px;">
+          <div style="flex:1;">
+            <div style="font-weight:600;">@${i.membre?.pseudo_telegram||'?'}</div>
+            <div style="color:var(--gris);">${i.membre?.prenom||''} ${i.membre?.nom||''}</div>
+          </div>
+          <span class="badge ${i.statut_paiement==='en_attente'?'badge-orange':i.statut_paiement.includes('paye')?'badge-vert':'badge-gris'}">
+            ${i.statut_paiement==='en_attente'?'⏳':i.statut_paiement==='paye_cash'?'Cash ✅':'HA ✅'}
+          </span>
+          ${i.statut_paiement==='en_attente' ? `
+            <button class="btn btn-sm btn-success" onclick="validerCash('${deplId}','${i.membre_id}')">Cash</button>` : ''}
+        </div>`).join('')}
+    `;
+    showModal('modalAdminSession');
+  } catch(e) { toast('Erreur', 'error'); }
+}
+async function validerCash(deplId, membreId) {
+  try { await UL.validerPaiementCash(deplId, membreId); toast('Paiement cash validé ✅', 'success'); voirInscritsDepl(deplId); }
+  catch(e) { toast('Erreur', 'error'); }
+}
+async function copierListeBus(deplId) {
+  try {
+    const liste = await UL.getListeBusTelegram(deplId);
+    await navigator.clipboard.writeText(liste);
+    toast('Liste bus copiée !', 'success');
+  } catch(e) { toast('Erreur copie', 'error'); }
+}
+async function doCreerDepl() {
+  const data = {
+    adversaire: document.getElementById('dAdv').value,
+    date_match: document.getElementById('dDate').value,
+    stade: document.getElementById('dStade').value || null,
+    ville: document.getElementById('dVille').value || null,
+    point_rdv: document.getElementById('dRdv').value || null,
+    heure_depart: document.getElementById('dHeure').value || null,
+    prix_total: parseFloat(document.getElementById('dPrix').value) || null,
+    places_max: parseInt(document.getElementById('dPlaces').value) || null,
+    lien_helloasso: document.getElementById('dHelloasso').value || null,
+    date_limite_inscription: document.getElementById('dLimite').value || null,
+    notes: document.getElementById('dNotes').value || null,
+  };
+  if (!data.adversaire || !data.date_match) return toast('Adversaire et date requis', 'error');
+  try {
+    await UL.createDeplacement(data);
+    toast('Déplacement créé ✅', 'success');
+    closeModal('modalCreerDepl');
     loadDeplacements();
   } catch(e) { toast(e.message, 'error'); }
 }
 
-// QR Code simple (texte encodé)
-function generateQR(text, containerId) {
-  const el = document.getElementById(containerId);
-  if (!el) return;
-  // QR simple via API tierce (cache-friendly)
-  el.innerHTML = `<img src="https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encodeURIComponent(text)}" alt="QR ${text}" width="160" height="160">`;
-}
-
-// ─── Profil ───────────────────────────────────────────────────
+// ─── PROFIL ───────────────────────────────────────────────────
 async function loadProfil() {
   const m = UL.getCurrentMembre();
   if (!m) return;
-  const initiales = (m.prenom[0] + m.nom[0]).toUpperCase();
-  const statutLabel = { sympathisant:'💙 Sympathisant', draft:'🚀 Draft', confirme:'🏅 Confirmé', membre_cellule:'🛡️ Membre Cellule', bureau:'🏆 Bureau', admin:'⚙️ Admin' };
-  const etoiles = '⭐'.repeat(m.etoiles || 0) + '☆'.repeat(3 - (m.etoiles || 0));
-
+  const initiales = ((m.prenom||'?')[0]+(m.nom||'?')[0]).toUpperCase();
+  const statutLabel = {
+    sympathisant:'💙 Sympathisant', draft:'🚀 Draft', confirme:'🏅 Confirmé',
+    membre_cellule:'🛡️ Membre Cellule', bureau:'🏆 Bureau', admin:'⚙️ Admin'
+  };
+  const etoiles = '⭐'.repeat(m.etoiles||0)+'☆'.repeat(3-(m.etoiles||0));
   document.getElementById('profilCard').innerHTML = `
-    <div style="display:flex; align-items:center; gap:14px; margin-bottom:16px;">
-      <div class="avatar" style="width:56px; height:56px; font-size:18px;">${initiales}</div>
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:14px;">
+      <div class="avatar" style="width:54px;height:54px;font-size:18px;">${initiales}</div>
       <div>
-        <div style="font-weight:700; font-size:17px;">${m.prenom} ${m.nom}</div>
-        <div style="font-size:14px; color:var(--gris);">@${m.pseudo_telegram}</div>
-        <div style="font-size:14px; margin-top:4px;" class="statut-${m.statut}">${statutLabel[m.statut] || m.statut}</div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:18px;">${m.prenom} ${m.nom}</div>
+        <div style="font-size:13px;color:var(--gris);">@${m.pseudo_telegram}</div>
+        <div class="statut-${m.statut}" style="font-size:13px;margin-top:3px;">${statutLabel[m.statut]||m.statut}</div>
       </div>
     </div>
-    <div class="divider"></div>
-    ${m.section ? `<div style="font-size:14px; margin-bottom:8px;">🛡️ Section: <strong>${m.section.nom}</strong></div>` : ''}
-    <div style="font-size:14px; margin-bottom:8px;">⭐ Évaluation: ${etoiles}</div>
-    <div style="font-size:14px; margin-bottom:8px;">📋 Charte: ${m.charte_signee ? '✅ Signée' : '❌ Non signée'}</div>
-    <div style="font-size:14px;">💶 Cotisation: ${m.cotisation_a_jour ? '✅ À jour' : '⏳ En attente'}</div>
+    <div style="height:1px;background:var(--border);margin-bottom:12px;"></div>
+    ${m.section ? `<div style="font-size:13px;margin-bottom:6px;">🛡️ Section: <strong>${m.section.nom}</strong></div>` : ''}
+    <div style="font-size:13px;margin-bottom:6px;">${etoiles} Évaluation</div>
+    <div style="font-size:13px;margin-bottom:6px;">📋 Charte: ${m.charte_signee ? '✅ Signée' : '❌ Non signée'}</div>
+    <div style="font-size:13px;">💶 Cotisation: ${m.cotisation_a_jour ? '✅ À jour' : '⏳ En attente'}</div>
   `;
-
   try {
     const stats = await UL.getMesStats();
     document.getElementById('profilStats').innerHTML = `
@@ -683,7 +1012,113 @@ async function loadProfil() {
   } catch(e) {}
 }
 
-// ─── Charte ───────────────────────────────────────────────────
+async function doChangeMdp() {
+  const p1 = document.getElementById('newPassword').value;
+  const p2 = document.getElementById('newPasswordConfirm').value;
+  if (p1.length < 8) return toast('Mot de passe trop court', 'error');
+  if (p1 !== p2) return toast('Les mots de passe ne correspondent pas', 'error');
+  try { await UL.changePassword(p1); toast('Mot de passe modifié ✅', 'success'); closeModal('modalMdp'); }
+  catch(e) { toast('Erreur', 'error'); }
+}
+
+// ─── MEMBRES (Admin) ──────────────────────────────────────────
+async function loadMembres() {
+  try {
+    allMembres = await UL.getAllMembres();
+    renderMembres(allMembres);
+  } catch(e) { toast('Erreur chargement membres', 'error'); }
+}
+function filtrerMembres() {
+  const q = document.getElementById('searchMembre').value.toLowerCase();
+  const s = document.getElementById('filterStatut').value;
+  renderMembres(allMembres.filter(m => {
+    const match = `${m.nom} ${m.prenom} ${m.pseudo_telegram}`.toLowerCase().includes(q);
+    return match && (!s || m.statut === s);
+  }));
+}
+function renderMembres(membres) {
+  const el = document.getElementById('membresList');
+  if (!membres.length) { el.innerHTML = '<div class="empty-state"><div>👥</div>Aucun membre</div>'; return; }
+  el.innerHTML = membres.map(m => `
+    <div class="membre-card">
+      <div class="membre-card-header">
+        <div class="avatar">${((m.prenom||'?')[0]+(m.nom||'?')[0]).toUpperCase()}</div>
+        <div style="flex:1;">
+          <div class="membre-name">${m.prenom} ${m.nom}</div>
+          <div class="membre-meta">@${m.pseudo_telegram} · <span class="statut-${m.statut}">${m.statut}</span></div>
+        </div>
+        <span>${'⭐'.repeat(m.etoiles||0)}</span>
+      </div>
+      <div class="membre-card-actions">
+        <button class="btn btn-sm btn-secondary" onclick="openEditMembre('${m.id}')">✏️ Modifier</button>
+        <button class="btn btn-sm ${m.actif?'btn-danger':'btn-success'}" onclick="toggleMembre('${m.id}',${!m.actif})">
+          ${m.actif?'Bloquer':'Débloquer'}
+        </button>
+      </div>
+    </div>`).join('');
+}
+function openEditMembre(id) {
+  const m = allMembres.find(x => x.id === id);
+  if (!m) return;
+  document.getElementById('editMembreId').value = m.id;
+  document.getElementById('editPrenom').value = m.prenom||'';
+  document.getElementById('editNom').value = m.nom||'';
+  document.getElementById('editTelegram').value = m.pseudo_telegram||'';
+  document.getElementById('editStatut').value = m.statut;
+  document.getElementById('editEtoiles').value = m.etoiles||0;
+  showModal('modalEditMembre');
+}
+async function doSauvegarderMembre() {
+  const id = document.getElementById('editMembreId').value;
+  try {
+    await UL.updateMembre(id, {
+      prenom: document.getElementById('editPrenom').value.trim(),
+      nom: document.getElementById('editNom').value.trim(),
+      pseudo_telegram: document.getElementById('editTelegram').value.trim(),
+      statut: document.getElementById('editStatut').value,
+      etoiles: parseInt(document.getElementById('editEtoiles').value),
+    });
+    toast('Membre mis à jour ✅', 'success');
+    closeModal('modalEditMembre');
+    loadMembres();
+  } catch(e) { toast('Erreur', 'error'); }
+}
+async function toggleMembre(id, actif) {
+  try { await UL.toggleBlocageMembre(id, actif); toast(actif?'Compte réactivé':'Compte bloqué', 'success'); loadMembres(); }
+  catch(e) { toast('Erreur', 'error'); }
+}
+
+// ─── STATS ────────────────────────────────────────────────────
+async function loadStats() {
+  const el = document.getElementById('statsContent');
+  try {
+    const stats = await UL.getStats();
+    const mesStats = await UL.getMesStats();
+    const COLORS = ['#1700D1','#2E18E0','#4530EF','#5B48FF','#7060FF','#8575FF'];
+    const r = stats.repartitionStatuts || {};
+    el.innerHTML = `
+      <div class="kpi-grid">
+        <div class="kpi"><div class="kpi-lbl">Total membres</div><div class="kpi-val">${stats.totalMembres}</div></div>
+        <div class="kpi"><div class="kpi-lbl">Confirmés</div><div class="kpi-val" style="color:var(--open)">${r.confirme||0}</div></div>
+        <div class="kpi"><div class="kpi-lbl">Drafts</div><div class="kpi-val" style="color:var(--pizza)">${r.draft||0}</div></div>
+      </div>
+      <div class="tranche-grid">
+        <div class="tranche"><div class="tranche-lbl" style="color:var(--blue-light)">Sympa.</div><div class="tranche-val" style="color:var(--blue-light)">${r.sympathisant||0}</div></div>
+        <div class="tranche"><div class="tranche-lbl" style="color:var(--pizza)">Draft</div><div class="tranche-val" style="color:var(--pizza)">${r.draft||0}</div></div>
+        <div class="tranche"><div class="tranche-lbl" style="color:var(--open)">Confirmé</div><div class="tranche-val" style="color:var(--open)">${r.confirme||0}</div></div>
+        <div class="tranche"><div class="tranche-lbl" style="color:#C4B5FF">Cellule</div><div class="tranche-val" style="color:#C4B5FF">${r.membre_cellule||0}</div></div>
+      </div>
+      <div class="card">
+        <div class="card-label">Mes stats perso</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+          <div class="stat-card"><div class="stat-value">${mesStats.sessionsPresent}</div><div class="stat-label">Présences</div></div>
+          <div class="stat-card"><div class="stat-value">${mesStats.tauxPresence}%</div><div class="stat-label">Assiduité</div></div>
+        </div>
+      </div>`;
+  } catch(e) { el.innerHTML = '<div class="empty-state"><div>⚠️</div>Erreur chargement</div>'; }
+}
+
+// ─── CHARTE ───────────────────────────────────────────────────
 async function loadCharte() {
   try {
     const charte = await UL.getCharteActive();
@@ -692,58 +1127,95 @@ async function loadCharte() {
     document.getElementById('pageCharte')._charteId = charte.id;
   } catch(e) {}
 }
-
-function checkScroll(el) {
-  const atBottom = el.scrollTop + el.clientHeight >= el.scrollHeight - 20;
-  if (atBottom) {
-    document.getElementById('charteAccept').disabled = false;
-    document.getElementById('charteAccept').addEventListener('change', function() {
-      document.getElementById('btnSignerCharte').disabled = !this.checked;
-    });
+function checkCharteScroll(el) {
+  if (el.scrollTop + el.clientHeight >= el.scrollHeight - 20) {
+    const cb = document.getElementById('charteAccept');
+    cb.disabled = false;
+    cb.onchange = () => { document.getElementById('btnSignerCharte').disabled = !cb.checked; };
   }
 }
-
 async function signerCharte() {
   const charteId = document.getElementById('pageCharte')._charteId;
   if (!charteId) return;
   try {
     await UL.signerCharte(charteId);
-    toast('Charte signée ! ✅', 'success');
+    toast('Charte signée ✅', 'success');
     document.getElementById('charteAlert').style.display = 'none';
     showPage('pageAccueil');
   } catch(e) { toast('Erreur signature', 'error'); }
 }
 
-// ─── Mot de passe ─────────────────────────────────────────────
-function showChangeMdp() {
-  document.getElementById('modalMdp').style.display = 'flex';
-}
-
-async function doChangeMdp() {
-  const p1 = document.getElementById('newPassword').value;
-  const p2 = document.getElementById('newPasswordConfirm').value;
-  if (!p1 || p1.length < 8) return toast('Mot de passe trop court', 'error');
-  if (p1 !== p2) return toast('Les mots de passe ne correspondent pas', 'error');
+// ─── ANNONCES ─────────────────────────────────────────────────
+async function doPublierAnnonce() {
+  const titre = document.getElementById('annonceTitre').value.trim();
+  const contenu = document.getElementById('annonceContenu').value.trim();
+  const cat = document.getElementById('annonceCat').value;
+  if (!titre || !contenu) return toast('Titre et contenu requis', 'error');
   try {
-    await UL.changePassword(p1);
-    toast('Mot de passe modifié ✅', 'success');
-    closeModal('modalMdp');
+    await UL.publierAnnonce(titre, contenu, cat);
+    toast('Annonce publiée ✅', 'success');
+    closeModal('modalAnnonce');
+    document.getElementById('annonceTitre').value = '';
+    document.getElementById('annonceContenu').value = '';
+    loadAccueil();
   } catch(e) { toast('Erreur', 'error'); }
 }
 
-// ─── Utils ────────────────────────────────────────────────────
-function closeModal(id) {
-  document.getElementById(id).style.display = 'none';
+// ─── MATCHS ───────────────────────────────────────────────────
+async function doAjouterMatch() {
+  const data = {
+    equipe_domicile: 'Paris FC',
+    equipe_exterieur: document.getElementById('mExt').value,
+    date: document.getElementById('mDate').value,
+    horaire: document.getElementById('mHeure').value || null,
+    type: document.getElementById('mType').value,
+    stade: document.getElementById('mStade').value || null,
+    competition: 'Ligue 1',
+  };
+  if (!data.equipe_exterieur || !data.date) return toast('Adversaire et date requis', 'error');
+  try {
+    await UL.addMatch(data);
+    toast('Match ajouté ✅', 'success');
+    loadMatchsList();
+  } catch(e) { toast(e.message, 'error'); }
 }
+async function loadMatchsList() {
+  try {
+    const matchs = await UL.getMatchs();
+    document.getElementById('matchsList').innerHTML = matchs.slice(0,8).map(m => `
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px;">
+        <div>
+          <div style="font-weight:600;">${m.equipe_domicile} — ${m.equipe_exterieur}</div>
+          <div style="color:var(--gris);">${m.date} · <span class="badge ${m.type==='exterieur'?'badge-rouge':'badge-vert'}">${m.type}</span></div>
+        </div>
+        <button class="btn btn-sm btn-danger" onclick="doSupprimerMatch('${m.id}')">🗑</button>
+      </div>`).join('');
+  } catch(e) {}
+}
+async function doSupprimerMatch(id) {
+  if (!confirm('Supprimer ce match ?')) return;
+  try { await UL.deleteMatch(id); toast('Match supprimé', 'success'); loadMatchsList(); }
+  catch(e) { toast('Erreur', 'error'); }
+}
+document.getElementById('modalMatchs')?.addEventListener('ul:show', loadMatchsList);
 
-function toast(msg, type = 'info') {
+// ─── UTILS ────────────────────────────────────────────────────
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+function showModal(id) {
+  document.getElementById(id).style.display = 'flex';
+  if (id === 'modalMatchs') loadMatchsList();
+}
+function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+function closeModalOutside(e, id) { if (e.target === document.getElementById(id)) closeModal(id); }
+
+function toast(msg, type='info') {
   const el = document.createElement('div');
   el.className = `toast ${type}`;
   el.textContent = msg;
   document.body.appendChild(el);
   setTimeout(() => el.remove(), 2800);
 }
-
 let loadingEl = null;
 function showLoading() {
   loadingEl = document.createElement('div');
@@ -751,10 +1223,7 @@ function showLoading() {
   loadingEl.innerHTML = '<div class="spinner"></div>';
   document.body.appendChild(loadingEl);
 }
-
-function hideLoading() {
-  if (loadingEl) { loadingEl.remove(); loadingEl = null; }
-}
+function hideLoading() { if (loadingEl) { loadingEl.remove(); loadingEl = null; } }
 </script>
 </body>
 </html>
