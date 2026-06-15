@@ -29,7 +29,7 @@ async function initSession() {
 
 async function loginByTelegram(pseudoTelegram, password) {
   // On utilise le pseudo Telegram comme email fictif
-  const email = pseudoTelegram.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/@/g, '').replace(/\s+/g, '').replace(/[^a-z0-9]/g, '') + '@ul.internal';
+  const email = pseudoTelegram.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/@/g, '').replace(/\s+/g, '').replace(/[^a-z0-9]/g, '') + '@ultralutetia.com';
   const { data, error } = await sb.auth.signInWithPassword({ email, password });
   if (error) throw new Error('Identifiants incorrects');
   currentUser = data.user;
@@ -51,7 +51,7 @@ async function changePassword(newPassword) {
 }
 
 async function inscription(data) {
-  const email = data.pseudoTelegram.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/@/g, '').replace(/\s+/g, '').replace(/[^a-z0-9]/g, '') + '@ul.internal';
+  const email = data.pseudoTelegram.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/@/g, '').replace(/\s+/g, '').replace(/[^a-z0-9]/g, '') + '@ultralutetia.com';
   const { data: authData, error: authError } = await sb.auth.signUp({
     email,
     password: data.password,
