@@ -270,6 +270,83 @@
     </div>
   </div>
 
+  <!-- ── PAGE ADMIN ────────────────────────────────────────── -->
+  <div id="pageAdmin" class="page">
+    <h2 style="font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:.05em;margin-bottom:16px;">⚙️ Administration</h2>
+
+    <!-- MEMBRES — Admin + Bureau -->
+    <div id="adminSectionMembres" style="display:none;">
+      <div class="section-title">👥 Membres</div>
+      <div class="card" style="margin-bottom:10px;">
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <button class="btn btn-secondary" onclick="showPage('pageMembres')">👤 Gérer les membres</button>
+          <button class="btn btn-secondary" onclick="showPage('pageCartage')">🪪 Gérer les cartages</button>
+          <div id="adminDemandesBtnWrap">
+            <button class="btn btn-secondary" onclick="showPage('pageAccueil')">🔔 Demandes d'inscription <span id="adminDemandesBadge" class="badge badge-orange" style="display:none;margin-left:6px;"></span></button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CALENDRIER — Admin + Bureau -->
+    <div id="adminSectionCalendrier" style="display:none;">
+      <div class="section-title">📅 Calendrier</div>
+      <div class="card" style="margin-bottom:10px;">
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <button class="btn btn-secondary" onclick="showModal('modalMatchs')">⚽ Gérer les matchs</button>
+          <button class="btn btn-secondary" onclick="showModal('modalCreerEvenement')">🎉 Créer un événement</button>
+          <button class="btn btn-secondary" onclick="showModal('modalAnnonce')">📣 Publier une annonce</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- DÉPLACEMENTS — Admin + Bureau + Cellule Déplacement -->
+    <div id="adminSectionDepl" style="display:none;">
+      <div class="section-title">🚌 Déplacements</div>
+      <div class="card" style="margin-bottom:10px;">
+        <button class="btn btn-secondary" onclick="showPage('pageDeplacements');showModal('modalCreerDepl')">+ Créer un déplacement</button>
+      </div>
+    </div>
+
+    <!-- MATOS — Admin + Bureau + Cellule Matos -->
+    <div id="adminSectionMatos" style="display:none;">
+      <div class="section-title">🛍️ Matos</div>
+      <div class="card" style="margin-bottom:10px;">
+        <button class="btn btn-secondary" onclick="showModal('modalCreerProduit');loadSectionsForModal()">+ Ajouter un article matos</button>
+      </div>
+    </div>
+
+    <!-- STICKS — Admin + Bureau + Cellule Sticks -->
+    <div id="adminSectionSticks" style="display:none;">
+      <div class="section-title">🎟️ Sticks</div>
+      <div class="card" style="margin-bottom:10px;">
+        <button class="btn btn-secondary" onclick="showModal('modalDistribuer');loadDistribuerModal()">+ Enregistrer une distribution</button>
+      </div>
+    </div>
+
+    <!-- STATISTIQUES — Admin + Bureau + Tous Cellule -->
+    <div id="adminSectionStats" style="display:none;">
+      <div class="section-title">📊 Statistiques</div>
+      <div class="card" style="margin-bottom:10px;">
+        <button class="btn btn-secondary" onclick="showPage('pageStats')">Voir les statistiques globales</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── PAGE CARTAGE ───────────────────────────────────────── -->
+  <div id="pageCartage" class="page">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+      <button class="btn btn-sm btn-secondary" onclick="showPage('pageAdmin')">← Retour</button>
+      <h2 style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:.05em;margin:0;">🪪 Cartage membres</h2>
+    </div>
+    <div style="display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap;">
+      <button class="filter-btn active" id="cartFiltreAll" onclick="filtrerCartage('tous')">Tous</button>
+      <button class="filter-btn" id="cartFiltreOk" onclick="filtrerCartage('carte')">✅ Cartés</button>
+      <button class="filter-btn" id="cartFiltreKo" onclick="filtrerCartage('incomplet')">⚠️ Incomplets</button>
+    </div>
+    <div id="cartageList"></div>
+  </div>
+
   <!-- ── PAGE CHARTE ────────────────────────────────────────── -->
   <div id="pageCharte" class="page">
     <h2 style="font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:.05em;margin-bottom:8px;">Charte des Ultras Lutetia</h2>
@@ -395,16 +472,16 @@
       <span>Accueil</span>
     </div>
     <div class="nav-item" onclick="showPage('pageCalendrier')" id="nav5">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><circle cx="8" cy="15" r="1" fill="currentColor"/><circle cx="12" cy="15" r="1" fill="currentColor"/><circle cx="16" cy="15" r="1" fill="currentColor"/></svg>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
       <span>Calendrier</span>
-    </div>
-    <div class="nav-item" onclick="showPage('pageSessions')" id="nav1">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
-      <span>Sessions</span>
     </div>
     <div class="nav-item" onclick="showPage('pageDeplacements')" id="nav2">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 17H3a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v9a2 2 0 01-2 2h-3"/><circle cx="7.5" cy="17.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg>
       <span>Dépl.</span>
+    </div>
+    <div class="nav-item" onclick="showPage('pageSessions')" id="nav1">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+      <span>Sessions</span>
     </div>
     <div class="nav-item" onclick="showPage('pageBoutique')" id="nav4">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
@@ -413,6 +490,10 @@
     <div class="nav-item" onclick="showPage('pageProfil')" id="nav3">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
       <span>Profil</span>
+    </div>
+    <div class="nav-item" onclick="showPage('pageAdmin')" id="nav6" style="display:none;">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+      <span>Admin</span>
     </div>
   </nav>
 </div>
@@ -771,6 +852,7 @@
       <select id="evtType">
         <option value="reunion">🤝 Réunion UL</option>
         <option value="bbq">🍖 BBQ</option>
+        <option value="fete">🎊 Fête Fin de Saison</option>
         <option value="autre">🎉 Autre</option>
       </select>
     </div>
@@ -967,26 +1049,49 @@ async function showApp(membre) {
 }
 
 function applyRights(membre) {
-  // Bouton créer session : Membre Cellule et au-dessus
-  if (isCellule(membre)) {
-    document.getElementById('btnCreerSession').style.display = 'block';
+  const estBureau = isBureau(membre);
+  const estAdmin = isAdmin(membre);
+  const estCellule = isCellule(membre);
+
+  // Cellules du membre
+  const cellules = (membre.membres_cellules || []).map(mc => mc.cellule?.nom?.toLowerCase() || '');
+  const aCelluleDepl = cellules.some(c => c.includes('deplacement') || c.includes('déplacement'));
+  const aCellueMatos = cellules.some(c => c.includes('matos'));
+  const aCelluleSticks = cellules.some(c => c.includes('stick'));
+
+  // Afficher l'onglet Admin si Bureau+ ou membre d'une cellule
+  if (estBureau || estCellule) {
+    document.getElementById('nav6').style.display = 'flex';
   }
-  // Boutons bureau : créer déplacement + publier annonce + créer événement
-  if (isBureau(membre)) {
+
+  // Sections Admin selon droits
+  if (estBureau) {
+    document.getElementById('adminSectionMembres').style.display = 'block';
+    document.getElementById('adminSectionCalendrier').style.display = 'block';
+    document.getElementById('adminSectionDepl').style.display = 'block';
+    document.getElementById('adminSectionMatos').style.display = 'block';
+    document.getElementById('adminSectionSticks').style.display = 'block';
+    document.getElementById('adminSectionStats').style.display = 'block';
+    // Boutons classiques (legacy)
     document.getElementById('btnCreerDepl').style.display = 'block';
     document.getElementById('btnPublierAnnonce').style.display = 'block';
     document.getElementById('btnCreerEvenement').style.display = 'block';
+  } else if (estCellule) {
+    document.getElementById('adminSectionStats').style.display = 'block';
+    if (aCelluleDepl) document.getElementById('adminSectionDepl').style.display = 'block';
+    if (aCellueMatos) document.getElementById('adminSectionMatos').style.display = 'block';
+    if (aCelluleSticks) document.getElementById('adminSectionSticks').style.display = 'block';
+    if (aCelluleDepl) document.getElementById('btnCreerDepl').style.display = 'block';
   }
-  // Stats cellule visible pour membres cellule+
-  if (isCellule(membre)) {
-    document.getElementById('sectionStats').style.display = 'block';
-  }
-  // Section admin complète
-  if (isAdmin(membre)) {
-    document.getElementById('sectionAdmin').style.display = 'block';
-    document.getElementById('sectionStats').style.display = 'none';
-  }
-  // Demandes en attente : admin, bureau, membre cellule comité de passage
+
+  // Bouton créer session : Membre Cellule+
+  if (estCellule) document.getElementById('btnCreerSession').style.display = 'block';
+
+  // Section admin profil (legacy — on garde pour compatibilité mais vide)
+  if (estAdmin) document.getElementById('sectionAdmin').style.display = 'none';
+  if (estCellule && !estBureau) document.getElementById('sectionStats').style.display = 'none';
+
+  // Demandes inscription
   if (peutValiderInscriptions(membre)) {
     document.getElementById('demandesSection').style.display = 'block';
   }
@@ -1011,7 +1116,7 @@ function showPage(pageId) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.getElementById(pageId).classList.add('active');
   // Nav active
-  const map = { pageAccueil:0, pageCalendrier:5, pageSessions:1, pageDeplacements:2, pageBoutique:4, pageProfil:3 };
+  const map = { pageAccueil:0, pageCalendrier:5, pageSessions:1, pageDeplacements:2, pageBoutique:4, pageProfil:3, pageAdmin:6, pageCartage:6 };
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   const idx = map[pageId];
   if (idx !== undefined) {
@@ -1027,6 +1132,7 @@ function showPage(pageId) {
   if (pageId === 'pageMembres') loadMembres();
   if (pageId === 'pageStats') loadStats();
   if (pageId === 'pageCharte') loadCharte();
+  if (pageId === 'pageCartage') loadCartage();
 }
 
 // ─── ACCUEIL ──────────────────────────────────────────────────
@@ -1161,9 +1267,10 @@ function filtrerCalendrier(filtre) {
 
 // Config visuelles événements
 const EVT_CONFIG = {
-  reunion: { emoji: '🤝', label: 'Réunion UL', couleur: '#1A56DB' },
-  bbq:     { emoji: '🍖', label: 'BBQ',        couleur: '#F59E0B' },
-  autre:   { emoji: '🎉', label: 'Événement',  couleur: '#10B981' },
+  reunion: { emoji: '🤝', label: 'Réunion UL',         couleur: '#1A56DB' },
+  bbq:     { emoji: '🍖', label: 'BBQ',                 couleur: '#F59E0B' },
+  fete:    { emoji: '🎊', label: 'Fête Fin de Saison',  couleur: '#F59E0B' },
+  autre:   { emoji: '🎉', label: 'Événement',           couleur: '#10B981' },
 };
 
 function renderEvenementCard(evt) {
@@ -1314,6 +1421,61 @@ async function doCreerEvenement() {
     loadCalendrier();
     loadAccueil();
   } catch(e) { toast(e.message || 'Erreur création', 'error'); }
+}
+
+// ─── CARTAGE ──────────────────────────────────────────────────
+let allCartage = [];
+let filtreCartage = 'tous';
+
+async function loadCartage() {
+  try {
+    const { data } = await UL.sb.from('membres')
+      .select('*, section:sections(nom), cotisations(statut, saison)')
+      .order('nom');
+    allCartage = data || [];
+    renderCartage();
+  } catch(e) { toast('Erreur chargement cartage', 'error'); }
+}
+
+function filtrerCartage(filtre) {
+  filtreCartage = filtre;
+  document.querySelectorAll('#pageCartage .filter-btn').forEach(b => b.classList.remove('active'));
+  const ids = { tous:'cartFiltreAll', carte:'cartFiltreOk', incomplet:'cartFiltreKo' };
+  document.getElementById(ids[filtre])?.classList.add('active');
+  renderCartage();
+}
+
+function renderCartage() {
+  let membres = allCartage;
+  if (filtreCartage === 'carte') membres = membres.filter(m => m.cotisation_a_jour && m.charte_signee);
+  if (filtreCartage === 'incomplet') membres = membres.filter(m => !m.cotisation_a_jour || !m.charte_signee);
+
+  const el = document.getElementById('cartageList');
+  if (!membres.length) { el.innerHTML = '<div class="empty-state"><div>🪪</div>Aucun membre</div>'; return; }
+
+  el.innerHTML = membres.map(m => {
+    const initiales = ((m.prenom||'?')[0]+(m.nom||'?')[0]).toUpperCase();
+    const carte = m.cotisation_a_jour && m.charte_signee;
+    return `<div class="card" style="margin-bottom:8px;padding:12px;">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div class="avatar" style="width:36px;height:36px;font-size:13px;">${initiales}</div>
+        <div style="flex:1;min-width:0;">
+          <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;">${esc(m.prenom)} ${esc(m.nom)}</div>
+          <div style="font-size:11px;color:var(--gris);">@${esc(m.pseudo_telegram)} ${m.section ? '· '+esc(m.section.nom) : ''}</div>
+        </div>
+        <span class="badge ${carte ? 'badge-vert' : 'badge-orange'}">${carte ? '🪪 Carté' : '⚠️ Incomplet'}</span>
+      </div>
+      <div style="display:flex;gap:12px;margin-top:10px;padding-top:8px;border-top:1px solid var(--border);font-size:12px;">
+        <span>${m.charte_signee ? '✅' : '❌'} Charte</span>
+        <span>${m.cotisation_a_jour ? '✅' : '❌'} Cotisation</span>
+      </div>
+      ${!m.cotisation_a_jour ? `
+      <div style="display:flex;gap:6px;margin-top:8px;">
+        <button class="btn btn-sm btn-success" onclick="doValiderCotisationCash('${m.id}');setTimeout(loadCartage,500)">💵 Cash</button>
+        <button class="btn btn-sm btn-primary" onclick="doValiderCotisationHA('${m.id}');setTimeout(loadCartage,500)">💳 HelloAsso</button>
+      </div>` : ''}
+    </div>`;
+  }).join('');
 }
 
 // ─── Pré-remplissage déplacement depuis match ─────────────────
