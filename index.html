@@ -184,6 +184,9 @@
     <div class="section-title">Prochain déplacement</div>
     <div id="deplAccueil"></div>
 
+    <div class="section-title">Prochain événement</div>
+    <div id="evenementAccueil"></div>
+
     <div class="section-title">Mes stats</div>
     <div class="stats-grid" id="mesStats"></div>
   </div>
@@ -205,11 +208,16 @@
 
   <!-- ── PAGE CALENDRIER ───────────────────────────────────── -->
   <div id="pageCalendrier" class="page">
+    <!-- Bouton créer événement (Bureau+) -->
+    <div id="btnCreerEvenement" style="display:none;margin-bottom:12px;">
+      <button class="btn btn-primary" onclick="showModal('modalCreerEvenement')">+ Nouvel événement</button>
+    </div>
     <!-- Filtres -->
-    <div style="display:flex;gap:6px;margin-bottom:14px;">
+    <div style="display:flex;gap:6px;margin-bottom:14px;overflow-x:auto;scrollbar-width:none;">
       <button class="filter-btn active" id="calFiltreAll" onclick="filtrerCalendrier('tous')">Tous</button>
       <button class="filter-btn" id="calFiltreHome" onclick="filtrerCalendrier('domicile')">🏠 Domicile</button>
       <button class="filter-btn" id="calFiltreAway" onclick="filtrerCalendrier('exterieur')">✈️ Extérieur</button>
+      <button class="filter-btn" id="calFiltreEvt" onclick="filtrerCalendrier('evenement')">🎉 Événements</button>
     </div>
     <div id="calendrierListe"></div>
   </div>
@@ -753,6 +761,35 @@
   </div>
 </div>
 
+<!-- Modal Créer Événement (Bureau+) -->
+<div class="modal-overlay" id="modalCreerEvenement" style="display:none;" onclick="closeModalOutside(event,'modalCreerEvenement')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-handle"></div>
+    <h3 class="modal-title">Nouvel événement</h3>
+    <div class="form-group">
+      <label>Type</label>
+      <select id="evtType">
+        <option value="reunion">🤝 Réunion UL</option>
+        <option value="bbq">🍖 BBQ</option>
+        <option value="autre">🎉 Autre</option>
+      </select>
+    </div>
+    <div class="form-group"><label>Nom</label><input type="text" id="evtNom" placeholder="Ex: Réunion de rentrée"></div>
+    <div class="form-group"><label>Date</label><input type="date" id="evtDate"></div>
+    <div class="form-group">
+      <label>Horaires</label>
+      <div style="display:flex;gap:8px;">
+        <input type="time" id="evtHeureDebut" placeholder="Début" style="flex:1;">
+        <input type="time" id="evtHeureFin" placeholder="Fin" style="flex:1;">
+      </div>
+    </div>
+    <div class="form-group"><label>Lieu</label><input type="text" id="evtLieu" placeholder="Ex: Bar des Supporters"></div>
+    <div class="form-group"><label>Description</label><textarea id="evtDesc" rows="2" placeholder="Optionnel"></textarea></div>
+    <button class="btn btn-primary" onclick="doCreerEvenement()">Créer l'événement</button>
+    <button class="btn btn-secondary" style="margin-top:8px;" onclick="closeModal('modalCreerEvenement')">Annuler</button>
+  </div>
+</div>
+
 <!-- Modal Saisir Score (Bureau+) -->
 <div class="modal-overlay" id="modalScore" style="display:none;" onclick="closeModalOutside(event,'modalScore')">
   <div class="modal" onclick="event.stopPropagation()">
@@ -930,10 +967,11 @@ function applyRights(membre) {
   if (isCellule(membre)) {
     document.getElementById('btnCreerSession').style.display = 'block';
   }
-  // Boutons bureau : créer déplacement + publier annonce
+  // Boutons bureau : créer déplacement + publier annonce + créer événement
   if (isBureau(membre)) {
     document.getElementById('btnCreerDepl').style.display = 'block';
     document.getElementById('btnPublierAnnonce').style.display = 'block';
+    document.getElementById('btnCreerEvenement').style.display = 'block';
   }
   // Stats cellule visible pour membres cellule+
   if (isCellule(membre)) {
@@ -1031,6 +1069,16 @@ async function loadAccueil() {
       ? renderDeplCard(depls[0])
       : '<p style="color:var(--gris);font-size:14px;">Aucun déplacement à venir</p>';
   } catch(e) {}
+  // Prochain événement
+  try {
+    const today = new Date().toISOString().split('T')[0];
+    const { data: evts } = await UL.sb.from('evenements')
+      .select('*').gte('date', today).order('date').limit(1);
+    const el = document.getElementById('evenementAccueil');
+    el.innerHTML = evts && evts.length
+      ? renderEvenementCard(evts[0])
+      : '<p style="color:var(--gris);font-size:14px;">Aucun événement à venir</p>';
+  } catch(e) {}
   // Stats perso
   try {
     const stats = await UL.getMesStats();
@@ -1083,16 +1131,18 @@ function renderMiniMatchCard(match, type) {
 
 // ─── CALENDRIER ───────────────────────────────────────────────
 let allMatchs = [];
+let allEvenements = [];
 let filtreCalendrier = 'tous';
 
 async function loadCalendrier() {
   try {
-    const { data } = await UL.sb.from('matchs')
-      .select('*, deplacements(id,statut)')
-      .order('date', { ascending: true });
-    allMatchs = data || [];
+    const [matchsRes, evtsRes] = await Promise.all([
+      UL.sb.from('matchs').select('*, deplacements(id,statut)').order('date', { ascending: true }),
+      UL.sb.from('evenements').select('*').order('date', { ascending: true })
+    ]);
+    allMatchs = matchsRes.data || [];
+    allEvenements = evtsRes.data || [];
     renderCalendrier();
-    // Charger le select du modal déplacement
     await chargerMatchsExtSelect();
   } catch(e) { toast('Erreur calendrier', 'error'); }
 }
@@ -1100,20 +1150,66 @@ async function loadCalendrier() {
 function filtrerCalendrier(filtre) {
   filtreCalendrier = filtre;
   document.querySelectorAll('#pageCalendrier .filter-btn').forEach(b => b.classList.remove('active'));
-  const ids = { tous:'calFiltreAll', domicile:'calFiltreHome', exterieur:'calFiltreAway' };
+  const ids = { tous:'calFiltreAll', domicile:'calFiltreHome', exterieur:'calFiltreAway', evenement:'calFiltreEvt' };
   document.getElementById(ids[filtre])?.classList.add('active');
   renderCalendrier();
+}
+
+// Config visuelles événements
+const EVT_CONFIG = {
+  reunion: { emoji: '🤝', label: 'Réunion UL', couleur: '#1A56DB' },
+  bbq:     { emoji: '🍖', label: 'BBQ',        couleur: '#F59E0B' },
+  autre:   { emoji: '🎉', label: 'Événement',  couleur: '#10B981' },
+};
+
+function renderEvenementCard(evt) {
+  const cfg = EVT_CONFIG[evt.type] || EVT_CONFIG.autre;
+  const date = evt.date ? new Date(evt.date+'T12:00:00').toLocaleDateString('fr-FR', {weekday:'short', day:'numeric', month:'long'}) : '';
+  const heures = [evt.horaire_debut, evt.horaire_fin].filter(Boolean).map(h => h.slice(0,5)).join(' → ');
+  return `<div class="card" style="margin-bottom:10px;padding:14px;border-left:3px solid ${cfg.couleur};">
+    <div style="display:flex;align-items:center;gap:12px;">
+      <div style="width:44px;height:44px;border-radius:12px;background:${cfg.couleur}22;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;">${cfg.emoji}</div>
+      <div style="flex:1;min-width:0;">
+        <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:16px;">${esc(evt.nom||cfg.label)}</div>
+        <div style="font-size:12px;color:var(--gris);margin-top:2px;">
+          📅 ${date}${heures ? ' · ⏰ '+heures : ''}
+        </div>
+        ${evt.lieu ? `<div style="font-size:12px;color:var(--gris);">📍 ${esc(evt.lieu)}</div>` : ''}
+        ${evt.description ? `<div style="font-size:12px;color:#CBD5E1;margin-top:4px;">${esc(evt.description)}</div>` : ''}
+      </div>
+      <span class="badge" style="background:${cfg.couleur}33;color:${cfg.couleur};flex-shrink:0;font-size:10px;">${cfg.label}</span>
+    </div>
+  </div>`;
 }
 
 function renderCalendrier() {
   const m = UL.getCurrentMembre();
   const peutScore = isBureau(m);
   const today = new Date().toISOString().split('T')[0];
-  const filtered = filtreCalendrier === 'tous' ? allMatchs : allMatchs.filter(m => m.type === filtreCalendrier);
-  const el = document.getElementById('calendrierListe');
-  if (!filtered.length) { el.innerHTML = '<div class="empty-state"><div>📅</div>Aucun match</div>'; return; }
 
-  el.innerHTML = filtered.map(match => {
+  // Construire liste combinée selon filtre
+  let items = [];
+  if (filtreCalendrier === 'evenement') {
+    items = allEvenements.map(e => ({ ...e, _kind: 'evenement', _sortDate: e.date }));
+  } else {
+    const matchsFiltres = filtreCalendrier === 'tous'
+      ? allMatchs
+      : allMatchs.filter(mm => mm.type === filtreCalendrier);
+    items = matchsFiltres.map(mm => ({ ...mm, _kind: 'match', _sortDate: mm.date }));
+    if (filtreCalendrier === 'tous') {
+      items = items.concat(allEvenements.map(e => ({ ...e, _kind: 'evenement', _sortDate: e.date })));
+    }
+    items.sort((a, b) => a._sortDate?.localeCompare(b._sortDate));
+  }
+
+  const el = document.getElementById('calendrierListe');
+  if (!items.length) { el.innerHTML = '<div class="empty-state"><div>📅</div>Rien à afficher</div>'; return; }
+
+  el.innerHTML = items.map(item => {
+    if (item._kind === 'evenement') return renderEvenementCard(item);
+
+    // --- MATCH ---
+    const match = item;
     const passe = match.date < today;
     const dateStr = match.date ? new Date(match.date+'T12:00:00').toLocaleDateString('fr-FR', {weekday:'short', day:'numeric', month:'long', year:'numeric'}) : '';
     const logoD = match.logo_domicile;
@@ -1122,7 +1218,6 @@ function renderCalendrier() {
     const deplacement = (match.deplacements||[]).find(d => d.statut === 'ouvert');
 
     return `<div class="card" style="margin-bottom:10px;padding:14px;">
-      <!-- En-tête journée + compétition -->
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
         <span style="font-size:10px;color:var(--gris);text-transform:uppercase;letter-spacing:.05em;">
           J${match.journee||'?'} · ${match.competition||''}
@@ -1131,38 +1226,27 @@ function renderCalendrier() {
           ${match.type==='domicile'?'🏠 Dom.':'✈️ Ext.'}
         </span>
       </div>
-
-      <!-- Logos + score ou date -->
       <div style="display:flex;align-items:center;gap:8px;">
-        <!-- Équipe domicile -->
         <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;">
           <div style="display:flex;justify-content:center;">${logoClub(logoD, match.equipe_domicile, 38)}</div>
           <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:12px;text-align:center;line-height:1.2;">${esc(match.equipe_domicile||'')}</div>
         </div>
-
-        <!-- Score ou date -->
         <div style="flex-shrink:0;text-align:center;min-width:70px;">
           ${aScore
             ? `<div style="font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:.05em;line-height:1;">${match.score_domicile} — ${match.score_exterieur}</div>
                <div style="font-size:10px;color:var(--gris);margin-top:2px;">Score final</div>`
             : `<div style="font-size:12px;color:var(--bleu-clair);font-weight:700;">${dateStr.split(' ').slice(0,3).join(' ')}</div>
-               <div style="font-size:11px;color:var(--gris);">${match.horaire||'Heure TBC'}</div>`
+               <div style="font-size:11px;color:var(--gris);">${match.horaire ? match.horaire.slice(0,5) : 'TBC'}</div>`
           }
         </div>
-
-        <!-- Équipe extérieur -->
         <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;">
           <div style="display:flex;justify-content:center;">${logoClub(logoE, match.equipe_exterieur, 38)}</div>
           <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:12px;text-align:center;line-height:1.2;">${esc(match.equipe_exterieur||'')}</div>
         </div>
       </div>
-
-      <!-- Stade + date complète -->
       <div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border);font-size:11px;color:var(--gris);">
         📍 ${esc(match.stade||'')} · ${dateStr}
       </div>
-
-      <!-- Actions -->
       <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;">
         ${deplacement ? `<button class="btn btn-sm btn-primary" onclick="showPage('pageDeplacements')">🚌 Bus dispo</button>` : ''}
         ${passe && peutScore ? `<button class="btn btn-sm btn-secondary" onclick="ouvrirModalScore('${match.id}','${esc(match.equipe_domicile)}','${esc(match.equipe_exterieur)}',${match.score_domicile??'null'},${match.score_exterieur??'null'})">⚽ ${aScore?'Modifier':'Saisir'} le score</button>` : ''}
@@ -1195,6 +1279,34 @@ async function doSaisirScore() {
     closeModal('modalScore');
     loadCalendrier();
   } catch(e) { toast('Erreur sauvegarde score', 'error'); }
+}
+
+async function doCreerEvenement() {
+  const nom = document.getElementById('evtNom').value.trim();
+  const date = document.getElementById('evtDate').value;
+  const type = document.getElementById('evtType').value;
+  const heureDebut = document.getElementById('evtHeureDebut').value || null;
+  const heureFin = document.getElementById('evtHeureFin').value || null;
+  const lieu = document.getElementById('evtLieu').value.trim() || null;
+  const description = document.getElementById('evtDesc').value.trim() || null;
+  if (!nom) return toast('Nom requis', 'error');
+  if (!date) return toast('Date requise', 'error');
+  try {
+    const { error } = await UL.sb.from('evenements').insert({
+      nom, date, type,
+      horaire_debut: heureDebut,
+      horaire_fin: heureFin,
+      lieu, description,
+    });
+    if (error) throw error;
+    toast('Événement créé ✅', 'success');
+    closeModal('modalCreerEvenement');
+    ['evtNom','evtDate','evtHeureDebut','evtHeureFin','evtLieu','evtDesc'].forEach(id => {
+      document.getElementById(id).value = '';
+    });
+    loadCalendrier();
+    loadAccueil();
+  } catch(e) { toast(e.message || 'Erreur création', 'error'); }
 }
 
 // ─── Pré-remplissage déplacement depuis match ─────────────────
