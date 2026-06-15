@@ -305,9 +305,11 @@
     </div>
     <div class="form-group"><label>Capacité max</label><input type="number" id="sCapacite" placeholder="25 (optionnel)"></div>
     <div class="form-group"><label>Lien Telegram</label><input type="url" id="sTelegram" placeholder="https://t.me/..."></div>
-    <div class="form-group" style="display:flex;align-items:center;gap:10px;">
-      <input type="checkbox" id="sPizza" style="width:20px;">
-      <label for="sPizza" style="text-transform:none;letter-spacing:0;">🍕 Session avec pizza</label>
+    <div class="form-group">
+      <div style="display:flex;align-items:center;gap:12px;padding:11px 14px;background:rgba(255,255,255,.07);border:1.5px solid var(--border);border-radius:9px;cursor:pointer;" onclick="document.getElementById('sPizza').click()">
+        <input type="checkbox" id="sPizza" style="width:20px;height:20px;flex-shrink:0;cursor:pointer;accent-color:var(--blue);" onclick="event.stopPropagation()">
+        <span style="font-size:14px;">🍕 Session avec pizza</span>
+      </div>
     </div>
     <div class="form-group"><label>Description</label><textarea id="sDesc" rows="2" placeholder="Optionnel"></textarea></div>
     <button class="btn btn-primary" onclick="doCreerSession()">Créer la session</button>
@@ -645,40 +647,57 @@ function renderSessionCard(s, withAdmin = false) {
   const types = { Tracage:'🖊️', Assemblage:'🔧', Peinture:'🖌️' };
   const isOpen = s.statut === 'en_cours';
   const isPlanned = s.statut === 'a_venir';
+  const isTerminee = s.statut === 'terminee';
+  const showAdmin = withAdmin && isCellule(m);
 
-  let adminBar = '';
-  if (withAdmin && isCellule(m)) {
-    adminBar = `<div class="session-admin-bar">`;
-    if (isPlanned) adminBar += `<button class="btn btn-sm btn-success" onclick="doOuvrirSession('${s.id}',event)">▶ Ouvrir</button>`;
-    if (isOpen) {
-      adminBar += `<div class="session-code">${s.code_presence || '----'}</div>`;
-      adminBar += `<button class="btn btn-sm btn-danger" onclick="doFermerSession('${s.id}',event)">■ Fermer</button>`;
+  // Côté droit de la carte : boutons admin OU badge statut
+  let rightSide = '';
+  if (showAdmin) {
+    rightSide = '<div style="display:flex;flex-direction:column;gap:5px;align-items:flex-end;flex-shrink:0;">';
+    if (isPlanned) {
+      rightSide += `<button class="btn btn-sm btn-success" onclick="doOuvrirSession('${s.id}',event)">▶ Ouvrir</button>`;
     }
-    if (isOpen || s.statut === 'terminee') {
-      adminBar += `<button class="btn btn-sm btn-secondary" onclick="voirInscrits('${s.id}','${esc(s.nom)}',event)">👥 Inscrits</button>`;
+    if (isOpen) {
+      rightSide += `<div class="session-code" style="font-size:22px;">${s.code_presence || '----'}</div>`;
+      rightSide += `<button class="btn btn-sm btn-danger" onclick="doFermerSession('${s.id}',event)">■ Fermer</button>`;
+    }
+    if (isOpen || isTerminee) {
+      rightSide += `<button class="btn btn-sm btn-secondary" onclick="voirInscrits('${s.id}','${esc(s.nom)}',event)">👥 Inscrits</button>`;
     }
     if (s.avec_pizza && isOpen) {
-      adminBar += `<button class="btn btn-sm" style="background:rgba(255,149,0,.15);color:var(--pizza);border:1px solid rgba(255,149,0,.3);" onclick="voirPizzas('${s.id}',event)">🍕 Pizzas</button>`;
+      rightSide += `<button class="btn btn-sm" style="background:rgba(255,149,0,.15);color:var(--pizza);border:1px solid rgba(255,149,0,.3);" onclick="voirPizzas('${s.id}',event)">🍕 Pizzas</button>`;
     }
     if (isAdmin(m)) {
-      adminBar += `<button class="btn btn-sm btn-danger" onclick="doSupprimerSession('${s.id}',event)">🗑</button>`;
+      rightSide += `<button class="btn btn-sm btn-danger" onclick="doSupprimerSession('${s.id}',event)" style="padding:5px 8px;">🗑</button>`;
     }
-    adminBar += `</div>`;
+    rightSide += '</div>';
+  } else {
+    rightSide = `<span class="badge ${isOpen ? 'badge-vert' : isPlanned ? 'badge-bleu' : 'badge-gris'}" style="flex-shrink:0;">
+      ${isOpen ? 'En cours' : isPlanned ? 'À venir' : isTerminee ? 'Terminée' : 'Annulée'}
+    </span>`;
   }
 
+  // Boutons inscrits visibles aussi sur accueil si admin (withAdmin=false)
+  const accueilAdminBar = (!withAdmin && isCellule(m) && (isOpen || isTerminee)) ? `
+    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:10px;padding-top:10px;border-top:1px solid var(--border);">
+      ${isOpen ? `<button class="btn btn-sm btn-success" onclick="doOuvrirSession('${s.id}',event)" style="display:none"></button>` : ''}
+      ${isOpen ? `<div class="session-code" style="font-size:22px;margin-right:8px;">${s.code_presence||'----'}</div>` : ''}
+      <button class="btn btn-sm btn-secondary" onclick="voirInscrits('${s.id}','${esc(s.nom)}',event)">👥 Inscrits</button>
+      ${s.avec_pizza && isOpen ? `<button class="btn btn-sm" style="background:rgba(255,149,0,.15);color:var(--pizza);border:1px solid rgba(255,149,0,.3);" onclick="voirPizzas('${s.id}',event)">🍕 Pizzas</button>` : ''}
+      ${isOpen ? `<button class="btn btn-sm btn-danger" onclick="doFermerSession('${s.id}',event)">■ Fermer</button>` : ''}
+    </div>` : '';
+
   return `<div class="session-card ${isOpen ? 'open' : ''}" onclick="openSession('${s.id}')">
-    <div style="display:flex;align-items:center;gap:10px;">
-      <div class="status-dot ${isOpen ? 'open' : isPlanned ? 'planned' : 'closed'}"></div>
-      <div style="flex:1;">
+    <div style="display:flex;align-items:flex-start;gap:10px;">
+      <div class="status-dot ${isOpen ? 'open' : isPlanned ? 'planned' : 'closed'}" style="margin-top:5px;"></div>
+      <div style="flex:1;min-width:0;">
         <div class="card-title">${types[s.type_session] || '📋'} ${s.nom}</div>
         <div class="card-sub">${date}${s.heure ? ' · ' + s.heure.slice(0,5) : ''} · ${s.lieu}</div>
+        ${s.avec_pizza ? '<div style="font-size:11px;color:var(--pizza);margin-top:4px;">🍕 Session pizza</div>' : ''}
       </div>
-      <span class="badge ${isOpen ? 'badge-vert' : isPlanned ? 'badge-bleu' : 'badge-gris'}">
-        ${s.statut === 'a_venir' ? 'À venir' : s.statut === 'en_cours' ? 'En cours' : s.statut === 'terminee' ? 'Terminée' : 'Annulée'}
-      </span>
+      ${rightSide}
     </div>
-    ${s.avec_pizza ? '<div style="font-size:12px;color:var(--pizza);margin-top:6px;">🍕 Session pizza</div>' : ''}
-    ${adminBar}
+    ${accueilAdminBar}
   </div>`;
 }
 
@@ -849,16 +868,38 @@ async function loadDeplacements() {
 }
 
 function renderDeplCard(d) {
+  const m = UL.getCurrentMembre();
   const date = d.date_match ? new Date(d.date_match).toLocaleDateString('fr-FR', {weekday:'short', day:'numeric', month:'short'}) : '';
+  const pct = d.places_max ? Math.min(100, Math.round(((d._inscrits||0)/d.places_max)*100)) : 0;
+
+  // Barre de places + boutons admin bus
+  const adminBar = isCellule(m) ? `
+    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:10px;padding-top:10px;border-top:1px solid var(--border);">
+      <button class="btn btn-sm btn-secondary" onclick="event.stopPropagation();voirInscritsDepl('${d.id}')">👥 Inscrits</button>
+      <button class="btn btn-sm btn-secondary" onclick="event.stopPropagation();copierListeBus('${d.id}')">📋 Liste bus</button>
+    </div>` : '';
+
   return `<div class="depl-card" onclick="openDepl('${d.id}')">
-    <div class="depl-match">Paris FC — ${d.adversaire || d.match?.equipe_exterieur || '?'}</div>
-    <div class="depl-infos">
-      ${date ? `<span>📅 ${date}</span>` : ''}
-      ${d.stade||d.match?.stade ? `<span>📍 ${d.stade||d.match?.stade}</span>` : ''}
-      ${d.prix_total ? `<span>💶 ${d.prix_total}€</span>` : ''}
-      ${d.places_max ? `<span>🪑 ${d.places_max} places</span>` : ''}
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;">
+      <div style="flex:1;min-width:0;">
+        <div class="depl-match">Paris FC — ${d.adversaire || d.match?.equipe_exterieur || '?'}</div>
+        <div class="depl-infos">
+          ${date ? `<span>📅 ${date}</span>` : ''}
+          ${d.stade||d.match?.stade ? `<span>📍 ${d.stade||d.match?.stade}</span>` : ''}
+          ${d.prix_total ? `<span>💶 ${d.prix_total}€</span>` : ''}
+          ${d.places_max ? `<span>🪑 ${d.places_max} places</span>` : ''}
+        </div>
+      </div>
+      <span class="badge ${d.statut==='ouvert'?'badge-vert':d.statut==='complet'?'badge-rouge':'badge-gris'}" style="flex-shrink:0;margin-top:2px;">
+        ${d.statut==='ouvert'?'Ouvert':d.statut==='complet'?'Complet':d.statut==='ferme'?'Fermé':'Annulé'}
+      </span>
     </div>
-    ${d.places_max ? `<div class="places-bar"><div class="places-fill" style="width:${Math.min(100,Math.round(((d._inscrits||0)/d.places_max)*100))}%"></div></div>` : ''}
+    ${d.places_max ? `
+    <div style="display:flex;align-items:center;gap:8px;margin-top:8px;">
+      <div class="places-bar" style="flex:1;"><div class="places-fill" style="width:${pct}%"></div></div>
+      <span style="font-size:11px;color:var(--gris);flex-shrink:0;">${d._inscrits||0}/${d.places_max}</span>
+    </div>` : ''}
+    ${adminBar}
   </div>`;
 }
 
