@@ -622,7 +622,7 @@
     <div class="form-group"><label>Nom</label><input type="text" id="editNom"></div>
     <div class="form-group"><label>Pseudo Telegram</label><input type="text" id="editTelegram"></div>
     <div class="form-group"><label>Email</label><input type="email" id="editEmail" placeholder="email@exemple.fr"></div>
-    <div class="form-group"><label>Statut</label>
+    <div class="form-group"><label>Statut UL</label>
       <select id="editStatut">
         <option value="sympathisant">Sympathisant</option>
         <option value="draft">Draft</option>
@@ -639,6 +639,39 @@
         <option value="2">⭐⭐☆ 2 étoiles</option>
         <option value="3">⭐⭐⭐ 3 étoiles</option>
       </select>
+    </div>
+    <div class="form-group">
+      <label>Rôles fonctionnels (accès outils)</label>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-top:6px;">
+        <label style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:rgba(255,255,255,.05);border-radius:7px;cursor:pointer;margin:0;">
+          <input type="checkbox" id="role_admin_app" value="admin_app" style="accent-color:#1A56DB;width:16px;height:16px;">
+          <span style="font-size:13px;">⚙️ Admin app — accès total</span>
+        </label>
+        <label style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:rgba(255,255,255,.05);border-radius:7px;cursor:pointer;margin:0;">
+          <input type="checkbox" id="role_bureau_app" value="bureau_app" style="accent-color:#1A56DB;width:16px;height:16px;">
+          <span style="font-size:13px;">🏆 Bureau — gestion générale</span>
+        </label>
+        <label style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:rgba(255,255,255,.05);border-radius:7px;cursor:pointer;margin:0;">
+          <input type="checkbox" id="role_cellule_tifo" value="cellule_tifo" style="accent-color:#1A56DB;width:16px;height:16px;">
+          <span style="font-size:13px;">🎨 Cellule Tifo</span>
+        </label>
+        <label style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:rgba(255,255,255,.05);border-radius:7px;cursor:pointer;margin:0;">
+          <input type="checkbox" id="role_cellule_depl" value="cellule_depl" style="accent-color:#1A56DB;width:16px;height:16px;">
+          <span style="font-size:13px;">🚌 Cellule Déplacement</span>
+        </label>
+        <label style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:rgba(255,255,255,.05);border-radius:7px;cursor:pointer;margin:0;">
+          <input type="checkbox" id="role_cellule_matos" value="cellule_matos" style="accent-color:#1A56DB;width:16px;height:16px;">
+          <span style="font-size:13px;">🛍️ Cellule Matos</span>
+        </label>
+        <label style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:rgba(255,255,255,.05);border-radius:7px;cursor:pointer;margin:0;">
+          <input type="checkbox" id="role_cellule_sticks" value="cellule_sticks" style="accent-color:#1A56DB;width:16px;height:16px;">
+          <span style="font-size:13px;">🎟️ Cellule Sticks</span>
+        </label>
+        <label style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:rgba(255,255,255,.05);border-radius:7px;cursor:pointer;margin:0;">
+          <input type="checkbox" id="role_cellule_comite" value="cellule_comite" style="accent-color:#1A56DB;width:16px;height:16px;">
+          <span style="font-size:13px;">🔔 Comité de passage</span>
+        </label>
+      </div>
     </div>
     <button class="btn btn-primary" onclick="doSauvegarderMembre()">Enregistrer</button>
     <button class="btn btn-secondary" style="margin-top:8px;" onclick="closeModal('modalEditMembre')">Annuler</button>
@@ -941,14 +974,39 @@ const NIVEAUX = ['sympathisant','draft','confirme','membre_cellule','bureau','ad
 function hasRole(membre, minRole) {
   return NIVEAUX.indexOf(membre?.statut) >= NIVEAUX.indexOf(minRole);
 }
-function isCellule(membre) {
-  return hasRole(membre, 'membre_cellule');
-}
-function isBureau(membre) {
-  return hasRole(membre, 'bureau');
+
+// ── Rôles fonctionnels (indépendants du statut UL) ────────────
+function hasAppRole(membre, ...roles) {
+  const r = membre?.roles_app || [];
+  return roles.some(role => r.includes(role));
 }
 function isAdmin(membre) {
-  return hasRole(membre, 'admin');
+  return hasAppRole(membre, 'admin_app');
+}
+function isBureau(membre) {
+  return hasAppRole(membre, 'admin_app', 'bureau_app');
+}
+function isCellule(membre) {
+  return hasAppRole(membre, 'admin_app', 'bureau_app',
+    'cellule_tifo', 'cellule_depl', 'cellule_matos', 'cellule_sticks', 'cellule_comite');
+}
+function hasCelluleTifo(membre) {
+  return hasAppRole(membre, 'admin_app', 'bureau_app', 'cellule_tifo');
+}
+function hasCelluleDepl(membre) {
+  return hasAppRole(membre, 'admin_app', 'bureau_app', 'cellule_depl');
+}
+function hasCelluleMatos(membre) {
+  return hasAppRole(membre, 'admin_app', 'bureau_app', 'cellule_matos');
+}
+function hasCelluleSticks(membre) {
+  return hasAppRole(membre, 'admin_app', 'bureau_app', 'cellule_sticks');
+}
+function hasCelluleComite(membre) {
+  return hasAppRole(membre, 'admin_app', 'bureau_app', 'cellule_comite');
+}
+function peutValiderInscriptions(membre) {
+  return hasAppRole(membre, 'admin_app', 'bureau_app', 'cellule_comite');
 }
 
 // ─── State ───────────────────────────────────────────────────
@@ -1049,67 +1107,51 @@ async function showApp(membre) {
 }
 
 function applyRights(membre) {
-  const estBureau = isBureau(membre);
   const estAdmin = isAdmin(membre);
+  const estBureau = isBureau(membre);
   const estCellule = isCellule(membre);
 
-  // Cellules du membre
-  const cellules = (membre.membres_cellules || []).map(mc => mc.cellule?.nom?.toLowerCase() || '');
-  const aCelluleDepl = cellules.some(c => c.includes('deplacement') || c.includes('déplacement'));
-  const aCellueMatos = cellules.some(c => c.includes('matos'));
-  const aCelluleSticks = cellules.some(c => c.includes('stick'));
-
-  // Afficher l'onglet Admin si Bureau+ ou membre d'une cellule
-  if (estBureau || estCellule) {
+  // Onglet Admin visible si au moins un rôle fonctionnel
+  if (estCellule) {
     document.getElementById('nav6').style.display = 'flex';
   }
 
-  // Sections Admin selon droits
+  // Sections Admin selon rôles
   if (estBureau) {
     document.getElementById('adminSectionMembres').style.display = 'block';
     document.getElementById('adminSectionCalendrier').style.display = 'block';
-    document.getElementById('adminSectionDepl').style.display = 'block';
-    document.getElementById('adminSectionMatos').style.display = 'block';
-    document.getElementById('adminSectionSticks').style.display = 'block';
-    document.getElementById('adminSectionStats').style.display = 'block';
-    // Boutons classiques (legacy)
-    document.getElementById('btnCreerDepl').style.display = 'block';
     document.getElementById('btnPublierAnnonce').style.display = 'block';
     document.getElementById('btnCreerEvenement').style.display = 'block';
-  } else if (estCellule) {
+  }
+  if (hasCelluleDepl(membre)) {
+    document.getElementById('adminSectionDepl').style.display = 'block';
+    document.getElementById('btnCreerDepl').style.display = 'block';
+  }
+  if (hasCelluleMatos(membre)) {
+    document.getElementById('adminSectionMatos').style.display = 'block';
+  }
+  if (hasCelluleSticks(membre)) {
+    document.getElementById('adminSectionSticks').style.display = 'block';
+  }
+  if (estCellule) {
     document.getElementById('adminSectionStats').style.display = 'block';
-    if (aCelluleDepl) document.getElementById('adminSectionDepl').style.display = 'block';
-    if (aCellueMatos) document.getElementById('adminSectionMatos').style.display = 'block';
-    if (aCelluleSticks) document.getElementById('adminSectionSticks').style.display = 'block';
-    if (aCelluleDepl) document.getElementById('btnCreerDepl').style.display = 'block';
   }
 
-  // Bouton créer session : Membre Cellule+
-  if (estCellule) document.getElementById('btnCreerSession').style.display = 'block';
-
-  // Section admin profil (legacy — on garde pour compatibilité mais vide)
-  if (estAdmin) document.getElementById('sectionAdmin').style.display = 'none';
-  if (estCellule && !estBureau) document.getElementById('sectionStats').style.display = 'none';
+  // Bouton créer session : cellule tifo+
+  if (hasCelluleTifo(membre)) {
+    document.getElementById('btnCreerSession').style.display = 'block';
+  }
 
   // Demandes inscription
   if (peutValiderInscriptions(membre)) {
     document.getElementById('demandesSection').style.display = 'block';
   }
+
+  // Cacher les sections legacy profil
+  document.getElementById('sectionAdmin').style.display = 'none';
+  document.getElementById('sectionStats').style.display = 'none';
 }
 
-function peutValiderInscriptions(membre) {
-  if (!membre) return false;
-  if (['admin', 'bureau'].includes(membre.statut)) return true;
-  // Membre cellule comité de passage
-  if (membre.statut === 'membre_cellule') {
-    const cellules = membre.membres_cellules || [];
-    return cellules.some(mc =>
-      mc.cellule?.nom?.toLowerCase().includes('comite') ||
-      mc.cellule?.nom?.toLowerCase().includes('passage')
-    );
-  }
-  return false;
-}
 
 // ─── Navigation ───────────────────────────────────────────────
 function showPage(pageId) {
@@ -2055,10 +2097,20 @@ function openEditMembre(id) {
   document.getElementById('editEmail').value = m.email||'';
   document.getElementById('editStatut').value = m.statut;
   document.getElementById('editEtoiles').value = m.etoiles||0;
+  // Pré-cocher les rôles fonctionnels
+  const roles = m.roles_app || [];
+  ['admin_app','bureau_app','cellule_tifo','cellule_depl','cellule_matos','cellule_sticks','cellule_comite'].forEach(r => {
+    const el = document.getElementById('role_' + r);
+    if (el) el.checked = roles.includes(r);
+  });
   showModal('modalEditMembre');
 }
+
 async function doSauvegarderMembre() {
   const id = document.getElementById('editMembreId').value;
+  // Récupérer les rôles cochés
+  const rolesApp = ['admin_app','bureau_app','cellule_tifo','cellule_depl','cellule_matos','cellule_sticks','cellule_comite']
+    .filter(r => document.getElementById('role_' + r)?.checked);
   try {
     await UL.updateMembre(id, {
       prenom: document.getElementById('editPrenom').value.trim(),
@@ -2067,6 +2119,7 @@ async function doSauvegarderMembre() {
       email: document.getElementById('editEmail').value.trim() || null,
       statut: document.getElementById('editStatut').value,
       etoiles: parseInt(document.getElementById('editEtoiles').value),
+      roles_app: rolesApp,
     });
     toast('Membre mis à jour ✅', 'success');
     closeModal('modalEditMembre');
