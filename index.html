@@ -110,9 +110,11 @@
       <label>Mot de passe</label>
       <input type="password" id="regPassword" placeholder="Minimum 8 caractères">
     </div>
-    <div class="form-group" style="display:flex;align-items:flex-start;gap:10px;">
-      <input type="checkbox" id="regRgpd" style="width:20px;margin-top:2px;flex-shrink:0;">
-      <label for="regRgpd" style="font-size:12px;text-transform:none;letter-spacing:0;">J'accepte que mes données soient utilisées pour la gestion des Ultras Lutetia (RGPD)</label>
+    <div class="form-group">
+      <div style="display:flex;align-items:flex-start;gap:12px;padding:12px 14px;background:rgba(255,255,255,.07);border:1.5px solid rgba(255,255,255,.12);border-radius:9px;cursor:pointer;" onclick="document.getElementById('regRgpd').click()">
+        <input type="checkbox" id="regRgpd" style="width:20px;height:20px;flex-shrink:0;margin-top:1px;cursor:pointer;accent-color:#1A56DB;" onclick="event.stopPropagation()">
+        <span style="font-size:13px;color:#CBD5E1;line-height:1.5;">J'accepte que mes données soient utilisées pour la gestion des Ultras Lutetia (RGPD)</span>
+      </div>
     </div>
     <button class="btn btn-primary" onclick="doInscription()">Créer mon compte</button>
     <div style="text-align:center;margin-top:12px;">
@@ -242,9 +244,11 @@
     <h2 style="font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:.05em;margin-bottom:8px;">Charte des Ultras Lutetia</h2>
     <p style="font-size:12px;color:var(--gris);margin-bottom:14px;">Lis attentivement jusqu'en bas avant de signer.</p>
     <div class="charte-content" id="charteTexte" onscroll="checkCharteScroll(this)"></div>
-    <div class="form-group" style="display:flex;align-items:flex-start;gap:10px;margin-top:16px;">
-      <input type="checkbox" id="charteAccept" style="width:20px;margin-top:2px;flex-shrink:0;" disabled>
-      <label for="charteAccept" style="font-size:13px;text-transform:none;letter-spacing:0;">J'ai lu et j'accepte la charte des Ultras Lutetia</label>
+    <div class="form-group" style="margin-top:16px;">
+      <div style="display:flex;align-items:flex-start;gap:12px;padding:12px 14px;background:rgba(255,255,255,.07);border:1.5px solid rgba(255,255,255,.12);border-radius:9px;" id="charteCheckWrap">
+        <input type="checkbox" id="charteAccept" style="width:20px;height:20px;flex-shrink:0;margin-top:1px;cursor:pointer;accent-color:#1A56DB;" disabled onclick="event.stopPropagation()">
+        <span style="font-size:13px;color:#CBD5E1;line-height:1.5;">J'ai lu et j'accepte la charte des Ultras Lutetia</span>
+      </div>
     </div>
     <button class="btn btn-primary" id="btnSignerCharte" onclick="signerCharte()" disabled>Signer la charte</button>
     <button class="btn btn-secondary" style="margin-top:8px;" onclick="showPage('pageAccueil')">Retour</button>
@@ -1504,6 +1508,12 @@ function checkCharteScroll(el) {
   if (el.scrollTop + el.clientHeight >= el.scrollHeight - 20) {
     const cb = document.getElementById('charteAccept');
     cb.disabled = false;
+    // Rendre le wrapper cliquable aussi
+    const wrap = document.getElementById('charteCheckWrap');
+    if (wrap) {
+      wrap.style.cursor = 'pointer';
+      wrap.onclick = () => { cb.checked = !cb.checked; document.getElementById('btnSignerCharte').disabled = !cb.checked; };
+    }
     cb.onchange = () => { document.getElementById('btnSignerCharte').disabled = !cb.checked; };
   }
 }
