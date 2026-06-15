@@ -6,6 +6,7 @@
 const SUPABASE_URL = 'https://ypsvdicatkckrxrcyxax.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inlwc3ZkaWNhdGtja3J4cmN5eGF4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE0NjI5NjUsImV4cCI6MjA5NzAzODk2NX0.qDWSmYYCB6_95rnwqXjOYqizMFG2VOfUmifw_h6bEmU';
 
+
 // ── Init client Supabase ──────────────────────────────────────
 const { createClient } = supabase;
 const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -504,13 +505,39 @@ async function getListeBusTelegram(deplacementId) {
 // MATOS
 // ============================================================
 
-async function getProduits(niveauAcces = 'tous') {
+async function getProduits() {
+  const membre = currentMembre;
+  if (!membre) return [];
+
+  const statut = membre.statut;
+  const sectionId = membre.section_id;
+
+  // Admin et Bureau voient tout
+  const isAdminBureau = ['admin', 'bureau', 'membre_cellule'].includes(statut);
+  const isConfirme = ['confirme', 'membre_cellule', 'bureau', 'admin'].includes(statut);
+
+  // Récupérer tous les produits disponibles avec leur section
   const { data } = await sb.from('produits')
-    .select('*').eq('statut', 'disponible').order('nom');
+    .select('*, section:sections(id, nom)')
+    .eq('statut', 'disponible')
+    .order('nom');
+
   return (data || []).filter(p => {
+    // Admin/Bureau voient tout
+    if (isAdminBureau) return true;
+
+    // Généraliste → tout le monde (Sympathisant inclus)
     if (p.niveau_acces === 'tous') return true;
-    if (p.niveau_acces === 'draft_et_plus') return ['draft','confirme','membre_cellule','bureau','admin'].includes(niveauAcces);
-    if (p.niveau_acces === 'confirme_et_plus') return ['confirme','membre_cellule','bureau','admin'].includes(niveauAcces);
+
+    // Section spécifique :
+    // ✅ Confirmé+ (toutes sections) OU Draft de la bonne section
+    if (p.niveau_acces === 'section') {
+      if (isConfirme) return true;
+      // Draft : uniquement si dans la bonne section
+      if (statut === 'draft' && sectionId && p.section_id === sectionId) return true;
+      return false;
+    }
+
     return false;
   });
 }
