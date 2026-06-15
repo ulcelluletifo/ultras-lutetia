@@ -969,6 +969,54 @@ async function getAllCotisations() {
 }
 
 // ============================================================
+// STORAGE — Upload photos
+// ============================================================
+
+async function uploadPhoto(file, bucket, fileName) {
+  // Sanitize filename
+  const ext = file.name.split('.').pop().toLowerCase();
+  const cleanName = fileName.normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')
+    .replace(/[^a-z0-9]/gi, '-')
+    .toLowerCase();
+  const path = `${cleanName}-${Date.now()}.${ext}`;
+
+  const { data, error } = await sb.storage
+    .from(bucket)
+    .upload(path, file, { cacheControl: '3600', upsert: false });
+
+  if (error) throw new Error('Erreur upload: ' + error.message);
+
+  // Récupérer l'URL publique
+  const { data: urlData } = sb.storage.from(bucket).getPublicUrl(path);
+  return urlData.publicUrl;
+}
+
+async function uploadPhotoMatos(file, produitNom) {
+  return uploadPhoto(file, 'matos', produitNom);
+}
+
+async function uploadPhotoStick(file, stickNom) {
+  return uploadPhoto(file, 'sticks', stickNom);
+}
+
+async function updatePhotoMatos(produitId, photoUrl) {
+  const { error } = await sb.from('produits')
+    .update({ photo_url: photoUrl })
+    .eq('id', produitId);
+  if (error) throw error;
+  return { success: true };
+}
+
+async function updatePhotoStick(stickId, visuelUrl) {
+  const { error } = await sb.from('sticks_catalogue')
+    .update({ visuel_url: visuelUrl })
+    .eq('id', stickId);
+  if (error) throw error;
+  return { success: true };
+}
+
+// ============================================================
 // EXPORT GLOBAL
 // ============================================================
 
@@ -1013,6 +1061,8 @@ window.UL = {
   // Cotisations
   getConfigCotisation, updateConfigCotisation, getMaCotisation,
   validerCotisationCash, validerCotisationHelloAsso, getAllCotisations,
+  // Storage / Upload
+  uploadPhotoMatos, uploadPhotoStick, updatePhotoMatos, updatePhotoStick,
   // Direct Supabase access
   sb, getCurrentUser: () => currentUser, getCurrentMembre: () => currentMembre,
 };
