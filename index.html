@@ -1048,6 +1048,21 @@ async function loadAccueil() {
   }
 }
 
+// ─── Helper logo club ─────────────────────────────────────────
+function logoClub(url, nom, size=38) {
+  const initiales = (nom||'?').split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,3);
+  const couleurs = ['#1A56DB','#10B981','#F59E0B','#EF4444','#8B5CF6','#06B6D4'];
+  const couleur = couleurs[initiales.charCodeAt(0) % couleurs.length];
+  const id = 'logo_' + Math.random().toString(36).slice(2,8);
+  return `<div style="width:${size}px;height:${size}px;flex-shrink:0;position:relative;">
+    <div id="${id}_fallback" style="display:none;width:${size}px;height:${size}px;border-radius:50%;background:${couleur};display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:${Math.round(size*0.35)}px;color:white;flex-shrink:0;">${initiales}</div>
+    ${url ? `<img src="${url}" style="width:${size}px;height:${size}px;object-fit:contain;position:absolute;top:0;left:0;"
+      onload="this.style.opacity=1;document.getElementById('${id}_fallback').style.display='none';"
+      onerror="this.style.display='none';document.getElementById('${id}_fallback').style.display='flex';"
+      style="opacity:0;transition:opacity .2s;">` : ''}
+  </div>`;
+}
+
 // ─── MINI MATCH CARD (accueil) ────────────────────────────────
 function renderMiniMatchCard(match, type) {
   const date = match.date ? new Date(match.date).toLocaleDateString('fr-FR', {day:'numeric', month:'short'}) : '';
@@ -1059,9 +1074,9 @@ function renderMiniMatchCard(match, type) {
     <div style="font-size:10px;color:var(--gris);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;">
       ${type === 'domicile' ? '🏠 Domicile' : '✈️ Extérieur'}
     </div>
-    ${logo ? `<img src="${logo}" style="width:32px;height:32px;object-fit:contain;margin-bottom:6px;" onerror="this.style.display='none'">` : ''}
-    <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;line-height:1.2;margin-bottom:4px;">${esc(adversaire||'')}</div>
-    <div style="font-size:11px;color:var(--gris);">📅 ${date}</div>
+    <div style="display:flex;justify-content:center;margin-bottom:6px;">${logoClub(logo, adversaire, 36)}</div>
+    <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;line-height:1.2;margin-bottom:4px;text-align:center;">${esc(adversaire||'')}</div>
+    <div style="font-size:11px;color:var(--gris);text-align:center;">📅 ${date}</div>
     ${deplacement ? `<button class="btn btn-sm btn-primary" style="margin-top:8px;width:100%;font-size:11px;" onclick="event.stopPropagation();showPage('pageDeplacements')">🚌 Voir le bus</button>` : ''}
   </div>`;
 }
@@ -1121,7 +1136,7 @@ function renderCalendrier() {
       <div style="display:flex;align-items:center;gap:8px;">
         <!-- Équipe domicile -->
         <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;">
-          ${logoD ? `<img src="${logoD}" style="width:38px;height:38px;object-fit:contain;" onerror="this.style.display='none'">` : '<div style="width:38px;height:38px;"></div>'}
+          <div style="display:flex;justify-content:center;">${logoClub(logoD, match.equipe_domicile, 38)}</div>
           <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:12px;text-align:center;line-height:1.2;">${esc(match.equipe_domicile||'')}</div>
         </div>
 
@@ -1137,7 +1152,7 @@ function renderCalendrier() {
 
         <!-- Équipe extérieur -->
         <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;">
-          ${logoE ? `<img src="${logoE}" style="width:38px;height:38px;object-fit:contain;" onerror="this.style.display='none'">` : '<div style="width:38px;height:38px;"></div>'}
+          <div style="display:flex;justify-content:center;">${logoClub(logoE, match.equipe_exterieur, 38)}</div>
           <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:12px;text-align:center;line-height:1.2;">${esc(match.equipe_exterieur||'')}</div>
         </div>
       </div>
