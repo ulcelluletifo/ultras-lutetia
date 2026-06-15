@@ -632,12 +632,15 @@
         <option value="admin">Admin</option>
       </select>
     </div>
-    <div class="form-group"><label>Étoiles (0-3)</label>
-      <select id="editEtoiles">
-        <option value="0">☆☆☆ Aucune</option>
-        <option value="1">⭐☆☆ 1 étoile</option>
-        <option value="2">⭐⭐☆ 2 étoiles</option>
-        <option value="3">⭐⭐⭐ 3 étoiles</option>
+    <div class="form-group"><label>Section UL</label>
+      <select id="editSection">
+        <option value="">— Aucune section —</option>
+        <option value="ultra-lutetia">Ultra Lutetia</option>
+        <option value="la-vieille-firme">La Vieille Firme</option>
+        <option value="oms">OMS</option>
+        <option value="jeunesse">Jeunesse</option>
+        <option value="very-bad-troup">Very Bad Troup</option>
+        <option value="mad-brigade">Mad Brigade</option>
       </select>
     </div>
     <div class="form-group">
@@ -2087,7 +2090,7 @@ function renderMembres(membres) {
       </div>
     </div>`).join('');
 }
-function openEditMembre(id) {
+async function openEditMembre(id) {
   const m = allMembres.find(x => x.id === id);
   if (!m) return;
   document.getElementById('editMembreId').value = m.id;
@@ -2096,7 +2099,13 @@ function openEditMembre(id) {
   document.getElementById('editTelegram').value = m.pseudo_telegram||'';
   document.getElementById('editEmail').value = m.email||'';
   document.getElementById('editStatut').value = m.statut;
-  document.getElementById('editEtoiles').value = m.etoiles||0;
+  // Charger les sections dynamiquement
+  try {
+    const sections = await UL.getSections();
+    const sel = document.getElementById('editSection');
+    sel.innerHTML = '<option value="">— Aucune section —</option>' +
+      sections.map(s => `<option value="${s.id}" ${m.section_id === s.id ? 'selected' : ''}>${esc(s.nom)}</option>`).join('');
+  } catch(e) {}
   // Pré-cocher les rôles fonctionnels
   const roles = m.roles_app || [];
   ['admin_app','bureau_app','cellule_tifo','cellule_depl','cellule_matos','cellule_sticks','cellule_comite'].forEach(r => {
@@ -2108,7 +2117,7 @@ function openEditMembre(id) {
 
 async function doSauvegarderMembre() {
   const id = document.getElementById('editMembreId').value;
-  // Récupérer les rôles cochés
+  const sectionId = document.getElementById('editSection').value || null;
   const rolesApp = ['admin_app','bureau_app','cellule_tifo','cellule_depl','cellule_matos','cellule_sticks','cellule_comite']
     .filter(r => document.getElementById('role_' + r)?.checked);
   try {
@@ -2118,7 +2127,7 @@ async function doSauvegarderMembre() {
       pseudo_telegram: document.getElementById('editTelegram').value.trim(),
       email: document.getElementById('editEmail').value.trim() || null,
       statut: document.getElementById('editStatut').value,
-      etoiles: parseInt(document.getElementById('editEtoiles').value),
+      section_id: sectionId,
       roles_app: rolesApp,
     });
     toast('Membre mis à jour ✅', 'success');
