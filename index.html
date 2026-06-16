@@ -1685,6 +1685,45 @@ async function refuserDemande(membreId) {
 }
 
 // ─── SESSIONS ─────────────────────────────────────────────────
+async function toggleParticipants(sessionId, e) {
+  e.stopPropagation();
+  const el = document.getElementById('participants_' + sessionId);
+  if (!el) return;
+  if (el.style.display !== 'none') {
+    el.style.display = 'none';
+    e.target.textContent = '👥 Voir les participants';
+    return;
+  }
+  e.target.textContent = '⏳ Chargement…';
+  try {
+    const { inscrits } = await UL.getSessionDetails(sessionId);
+    const statutLabel = { inscrit:'📋 Inscrit', present:'✅ Présent', absent:'❌ Absent' };
+    if (!inscrits.length) {
+      el.innerHTML = '<div style="font-size:13px;color:var(--gris);text-align:center;padding:8px 0;">Aucun participant</div>';
+    } else {
+      el.innerHTML = inscrits.map(i => `
+        <div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--border);font-size:12px;">
+          <div style="flex:1;min-width:0;">
+            <div style="font-weight:600;">@${i.membre?.pseudo_telegram||'?'}</div>
+            <div style="color:var(--gris);font-size:11px;">${i.membre?.prenom||''} ${i.membre?.nom||''}</div>
+          </div>
+          <div style="font-size:11px;color:var(--gris);flex-shrink:0;text-align:right;">
+            ${i.membre?.section?.nom ? `<div>🛡️ ${i.membre.section.nom}</div>` : ''}
+            <div style="margin-top:2px;">${i.membre?.statut ? `<span class="statut-${i.membre.statut}" style="font-size:11px;">${i.membre.statut}</span>` : ''}</div>
+          </div>
+          <span class="badge ${i.statut==='present'?'badge-vert':i.statut==='absent'?'badge-rouge':'badge-bleu'}" style="flex-shrink:0;font-size:11px;">
+            ${statutLabel[i.statut]||i.statut}
+          </span>
+        </div>`).join('');
+    }
+    el.style.display = 'block';
+    e.target.textContent = '👥 Masquer les participants';
+  } catch(err) {
+    toast('Erreur chargement participants', 'error');
+    e.target.textContent = '👥 Voir les participants';
+  }
+}
+
 async function loadSessions() {
   const m = UL.getCurrentMembre();
   try {
@@ -1708,42 +1747,28 @@ function renderSessionCard(s, withAdmin = false) {
   const isTerminee = s.statut === 'terminee';
   const showAdmin = withAdmin && isCellule(m);
 
-  // Côté droit de la carte : boutons admin OU badge statut
-  let rightSide = '';
-  if (showAdmin) {
-    rightSide = '<div style="display:flex;flex-direction:column;gap:5px;align-items:flex-end;flex-shrink:0;">';
-    if (isPlanned) {
-      rightSide += `<button class="btn btn-sm btn-success" onclick="doOuvrirSession('${s.id}',event)">▶ Ouvrir</button>`;
-    }
-    if (isOpen) {
-      rightSide += `<div class="session-code" style="font-size:22px;">${s.code_presence || '----'}</div>`;
-      rightSide += `<button class="btn btn-sm btn-danger" onclick="doFermerSession('${s.id}',event)">■ Fermer</button>`;
-    }
-    if (isOpen || isTerminee) {
-      rightSide += `<button class="btn btn-sm btn-secondary" onclick="voirInscrits('${s.id}','${esc(s.nom)}',event)">👥 Inscrits</button>`;
-    }
-    if (s.avec_pizza && isOpen) {
-      rightSide += `<button class="btn btn-sm" style="background:rgba(255,149,0,.15);color:var(--pizza);border:1px solid rgba(255,149,0,.3);" onclick="voirPizzas('${s.id}',event)">🍕 Pizzas</button>`;
-    }
-    if (isAdmin(m)) {
-      rightSide += `<button class="btn btn-sm btn-danger" onclick="doSupprimerSession('${s.id}',event)" style="padding:5px 8px;">🗑</button>`;
-    }
-    rightSide += '</div>';
-  } else {
-    rightSide = `<span class="badge ${isOpen ? 'badge-vert' : isPlanned ? 'badge-bleu' : 'badge-gris'}" style="flex-shrink:0;">
-      ${isOpen ? 'En cours' : isPlanned ? 'À venir' : isTerminee ? 'Terminée' : 'Annulée'}
-    </span>`;
-  }
+  // Badge statut (toujours affiché à droite)
+  const badgeStatut = `<span class="badge ${isOpen ? 'badge-vert' : isPlanned ? 'badge-bleu' : 'badge-gris'}" style="flex-shrink:0;">
+    ${isOpen ? 'En cours' : isPlanned ? 'À venir' : isTerminee ? 'Terminée' : 'Annulée'}
+  </span>`;
 
-  // Boutons inscrits visibles aussi sur accueil si admin (withAdmin=false)
-  const accueilAdminBar = (!withAdmin && isCellule(m) && (isOpen || isTerminee)) ? `
-    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:10px;padding-top:10px;border-top:1px solid var(--border);">
-      ${isOpen ? `<button class="btn btn-sm btn-success" onclick="doOuvrirSession('${s.id}',event)" style="display:none"></button>` : ''}
-      ${isOpen ? `<div class="session-code" style="font-size:22px;margin-right:8px;">${s.code_presence||'----'}</div>` : ''}
-      <button class="btn btn-sm btn-secondary" onclick="voirInscrits('${s.id}','${esc(s.nom)}',event)">👥 Inscrits</button>
+  // Barre admin sous la card (code présence + inscrits + pizzas uniquement — pas Ouvrir/Supprimer)
+  const adminBar = showAdmin ? `
+    <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-top:10px;padding-top:10px;border-top:1px solid var(--border);">
+      ${isOpen ? `<div class="session-code" style="font-size:20px;letter-spacing:.15em;margin-right:4px;">${s.code_presence || '----'}</div>` : ''}
+      ${(isOpen || isTerminee) ? `<button class="btn btn-sm btn-secondary" onclick="voirInscrits('${s.id}','${esc(s.nom)}',event)">👥 Inscrits</button>` : ''}
       ${s.avec_pizza && isOpen ? `<button class="btn btn-sm" style="background:rgba(255,149,0,.15);color:var(--pizza);border:1px solid rgba(255,149,0,.3);" onclick="voirPizzas('${s.id}',event)">🍕 Pizzas</button>` : ''}
-      ${isOpen ? `<button class="btn btn-sm btn-danger" onclick="doFermerSession('${s.id}',event)">■ Fermer</button>` : ''}
     </div>` : '';
+
+  // Liste participants inline (visible pour tous sur l'onglet Tifo)
+  const participantsId = `participants_${s.id}`;
+  const participantsToggle = `
+    <div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border);">
+      <button class="btn btn-sm btn-secondary" style="width:100%;" onclick="toggleParticipants('${s.id}', event)">
+        👥 Voir les participants
+      </button>
+      <div id="${participantsId}" style="display:none;margin-top:10px;"></div>
+    </div>`;
 
   return `<div class="session-card ${isOpen ? 'open' : ''}" onclick="openSession('${s.id}')">
     <div style="display:flex;align-items:flex-start;gap:10px;">
@@ -1753,9 +1778,10 @@ function renderSessionCard(s, withAdmin = false) {
         <div class="card-sub">${date}${s.heure ? ' · ' + s.heure.slice(0,5) : ''} · ${s.lieu}</div>
         ${s.avec_pizza ? '<div style="font-size:11px;color:var(--pizza);margin-top:4px;">🍕 Session pizza</div>' : ''}
       </div>
-      ${rightSide}
+      ${badgeStatut}
     </div>
-    ${accueilAdminBar}
+    ${adminBar}
+    ${participantsToggle}
   </div>`;
 }
 
