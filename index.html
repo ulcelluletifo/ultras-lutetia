@@ -1175,8 +1175,8 @@ function renderSessionCard(s) {
 
     <!-- Zone inscription / présence -->
     <div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border);" id="sessionActions_${s.id}">
-      <button class="btn btn-secondary" style="width:100%;padding:8px;" onclick="loadSessionActions('${s.id}', this)">
-        Je m inscris
+      <button class="btn btn-primary" style="width:100%;padding:8px;" onclick="showConfirmInscription('${s.id}')">
+        S'inscrire à cette session${s.avec_pizza?' 🍕':''}
       </button>
     </div>
 
@@ -1219,7 +1219,7 @@ if (!estInscrit && isPlanned) {
     if (el) el.innerHTML = html || `<div style="font-size:13px;color:var(--gris);text-align:center;">Aucune action disponible</div>`;
   } catch(e) {
     btn.disabled = false;
-    btn.textContent = 'Je m inscris';
+    // pas de fallback nécessaire
   }
 }
 
