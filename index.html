@@ -543,7 +543,40 @@
   </div>
 </div>
 
-<!-- Modal Changer MDP -->
+<!-- Modal Confirmation Inscription (engagement) -->
+<div class="modal-overlay" id="modalConfirmInscription" style="display:none;" onclick="closeModalOutside(event,'modalConfirmInscription')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-handle"></div>
+    <h3 class="modal-title">⚠️ Confirmer l'inscription</h3>
+    <div class="info-box" style="background:rgba(26,86,219,.12);border-color:rgba(26,86,219,.3);margin-bottom:16px;">
+      <div style="font-size:14px;line-height:1.7;">
+        En t'inscrivant à cette session, tu prends un <strong>engagement ferme</strong> d'être présent(e).<br><br>
+        Si tu ne peux plus venir, pense à te désinscrire au plus tôt pour libérer ta place.
+      </div>
+    </div>
+    <button class="btn btn-primary" onclick="confirmerInscription()">✅ Je confirme ma présence</button>
+    <button class="btn btn-secondary" style="margin-top:8px;" onclick="closeModal('modalConfirmInscription')">Annuler</button>
+  </div>
+</div>
+
+<!-- Modal Choix Pizza -->
+<div class="modal-overlay" id="modalChoixPizza" style="display:none;" onclick="closeModalOutside(event,'modalChoixPizza')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-handle"></div>
+    <h3 class="modal-title">🍕 Commande pizza</h3>
+    <p style="color:var(--gris);font-size:14px;margin-bottom:16px;">Choisis ta pizza pour cette session :</p>
+    <div id="pizzaOptions" style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px;">
+      <button class="btn btn-secondary" onclick="validerInscriptionAvecPizza('non')" style="justify-content:flex-start;padding:12px 16px;">🚫 Sans pizza</button>
+      <button class="btn btn-secondary" onclick="validerInscriptionAvecPizza('margherita')" style="justify-content:flex-start;padding:12px 16px;">🍕 Margherita</button>
+      <button class="btn btn-secondary" onclick="validerInscriptionAvecPizza('reine')" style="justify-content:flex-start;padding:12px 16px;">🍕 Reine</button>
+      <button class="btn btn-secondary" onclick="validerInscriptionAvecPizza('4 fromages')" style="justify-content:flex-start;padding:12px 16px;">🍕 4 Fromages</button>
+      <button class="btn btn-secondary" onclick="validerInscriptionAvecPizza('vegetarienne')" style="justify-content:flex-start;padding:12px 16px;">🍕 Végétarienne</button>
+    </div>
+    <button class="btn btn-secondary" style="margin-top:4px;" onclick="closeModal('modalChoixPizza')">Annuler</button>
+  </div>
+</div>
+
+<!-- Modal Valider Présence -->
 <div class="modal-overlay" id="modalMdp" style="display:none;" onclick="closeModalOutside(event,'modalMdp')">
   <div class="modal" onclick="event.stopPropagation()">
     <div class="modal-handle"></div>
@@ -578,10 +611,10 @@
     <div class="form-group"><label>Capacité max</label><input type="number" id="sCapacite" placeholder="25 (optionnel)"></div>
     <div class="form-group"><label>Lien Telegram</label><input type="url" id="sTelegram" placeholder="https://t.me/..."></div>
     <div class="form-group">
-      <div style="display:flex;align-items:center;gap:12px;padding:11px 14px;background:rgba(255,255,255,.07);border:1.5px solid var(--border);border-radius:9px;cursor:pointer;" onclick="document.getElementById('sPizza').click()">
-        <input type="checkbox" id="sPizza" style="width:20px;height:20px;flex-shrink:0;cursor:pointer;accent-color:var(--blue);" onclick="event.stopPropagation()">
+      <label for="sPizza" style="display:flex;align-items:center;gap:12px;padding:11px 14px;background:rgba(255,255,255,.07);border:1.5px solid var(--border);border-radius:9px;cursor:pointer;">
+        <input type="checkbox" id="sPizza" style="width:20px;height:20px;flex-shrink:0;cursor:pointer;accent-color:var(--blue);">
         <span style="font-size:14px;">🍕 Session avec pizza</span>
-      </div>
+      </label>
     </div>
     <div class="form-group"><label>Description</label><textarea id="sDesc" rows="2" placeholder="Optionnel"></textarea></div>
     <button class="btn btn-primary" onclick="doCreerSession()">Créer la session</button>
@@ -625,10 +658,10 @@
       <div class="form-group"><label>Capacité max</label><input type="number" id="msCapacite" placeholder="25 (optionnel)"></div>
       <div class="form-group"><label>Lien Telegram</label><input type="url" id="msTelegram" placeholder="https://t.me/..."></div>
       <div class="form-group">
-        <div style="display:flex;align-items:center;gap:12px;padding:11px 14px;background:rgba(255,255,255,.07);border:1.5px solid var(--border);border-radius:9px;cursor:pointer;" onclick="document.getElementById('msPizza').click()">
-          <input type="checkbox" id="msPizza" style="width:20px;height:20px;flex-shrink:0;cursor:pointer;accent-color:var(--blue);" onclick="event.stopPropagation()">
+        <label for="msPizza" style="display:flex;align-items:center;gap:12px;padding:11px 14px;background:rgba(255,255,255,.07);border:1.5px solid var(--border);border-radius:9px;cursor:pointer;">
+          <input type="checkbox" id="msPizza" style="width:20px;height:20px;flex-shrink:0;cursor:pointer;accent-color:var(--blue);">
           <span style="font-size:14px;">🍕 Session avec pizza</span>
-        </div>
+        </label>
       </div>
       <div class="form-group"><label>Description</label><textarea id="msDesc" rows="2" placeholder="Optionnel"></textarea></div>
       <button class="btn btn-primary" onclick="doModifierSession()">💾 Enregistrer</button>
@@ -1086,6 +1119,7 @@ function peutValiderInscriptions(membre) {
 
 // ─── State ───────────────────────────────────────────────────
 let currentSessionId = null;
+let currentSessionAvecPizza = false;
 let currentDeplId = null;
 let allMembres = [];
 
@@ -1763,7 +1797,7 @@ function renderSessionCard(s, withAdmin = false) {
   // Liste participants inline (visible pour tous sur l'onglet Tifo)
   const participantsId = `participants_${s.id}`;
   const participantsToggle = `
-    <div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border);">
+    <div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border);" onclick="event.stopPropagation()">
       <button class="btn btn-sm btn-secondary" style="width:100%;" onclick="toggleParticipants('${s.id}', event)">
         👥 Voir les participants
       </button>
@@ -1828,8 +1862,47 @@ async function openSession(sessionId) {
 }
 
 async function doInscrire(id) {
-  try { await UL.inscrire(id); toast('Inscription confirmée !', 'success'); closeModal('modalSession'); loadSessions(); }
-  catch(e) { toast(e.message, 'error'); }
+  // Récupérer si la session a pizza pour préparer le flux
+  currentSessionId = id;
+  try {
+    const { session: s } = await UL.getSessionDetails(id);
+    currentSessionAvecPizza = !!s.avec_pizza;
+  } catch(e) {
+    currentSessionAvecPizza = false;
+  }
+  // Fermer le modal session et ouvrir la confirmation d'engagement
+  closeModal('modalSession');
+  showModal('modalConfirmInscription');
+}
+
+async function confirmerInscription() {
+  closeModal('modalConfirmInscription');
+  if (currentSessionAvecPizza) {
+    // Ouvrir le choix pizza
+    showModal('modalChoixPizza');
+  } else {
+    // Inscription directe sans pizza
+    await _finaliserInscription(null);
+  }
+}
+
+async function validerInscriptionAvecPizza(choixPizza) {
+  closeModal('modalChoixPizza');
+  await _finaliserInscription(choixPizza);
+}
+
+async function _finaliserInscription(pizza) {
+  try {
+    await UL.inscrire(currentSessionId);
+    if (pizza && pizza !== 'non') {
+      await UL.savePizzaChoice(currentSessionId, pizza);
+    }
+    const msg = pizza && pizza !== 'non' ? `Inscription confirmée ! Pizza : ${pizza} 🍕` : 'Inscription confirmée ! ✅';
+    toast(msg, 'success');
+    loadSessions();
+  } catch(e) {
+    toast(e.message || 'Erreur inscription', 'error');
+  }
 }
 async function doDesinscrire(id) {
   try { await UL.desinscrire(id); toast('Désinscription effectuée', 'success'); closeModal('modalSession'); loadSessions(); }
