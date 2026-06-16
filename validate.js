@@ -8,22 +8,31 @@
 const fs = require('fs');
 const { execSync } = require('child_process');
 
-const file = process.argv[2] || 'index.html';
+const file = process.argv[2] || 'src/app.js';
 if (!fs.existsSync(file)) {
   console.error(`❌ Fichier introuvable : ${file}`);
   process.exit(1);
 }
 
-const html = fs.readFileSync(file, 'utf8');
+const raw = fs.readFileSync(file, 'utf8');
 
-// ── Extraire le bloc JS ─────────────────────────────────────────
-const jsStart = html.indexOf('<script>');
-const jsEnd   = html.lastIndexOf('</script>');
-if (jsStart === -1 || jsEnd === -1) {
-  console.error('❌ Pas de bloc <script> trouvé');
-  process.exit(1);
+// ── Supporter .js direct ou .html avec bloc <script> ───────────
+let js, htmlForIds;
+if (file.endsWith('.js')) {
+  js = raw;
+  // Pour la vérification des IDs, chercher index.html à côté
+  const htmlPath = file.replace('src/app.js','index.html').replace('app.js','index.html');
+  htmlForIds = fs.existsSync(htmlPath) ? fs.readFileSync(htmlPath, 'utf8') : raw;
+} else {
+  const jsStart = raw.indexOf('<script>');
+  const jsEnd   = raw.lastIndexOf('</script>');
+  if (jsStart === -1 || jsEnd === -1) {
+    console.error('❌ Pas de bloc <script> trouvé');
+    process.exit(1);
+  }
+  js = raw.slice(jsStart + 8, jsEnd);
+  htmlForIds = raw;
 }
-const js = html.slice(jsStart + 8, jsEnd);
 const tmpFile = '/tmp/_ul_validate.js';
 fs.writeFileSync(tmpFile, js);
 
@@ -132,12 +141,14 @@ if (aposErrors.length === 0) {
 // ── 5. IDs JS vs HTML ───────────────────────────────────────────
 console.log('\n── 5. IDs référencés en JS vs HTML ────────────');
 const jsIds   = new Set([...js.matchAll(/getElementById\('([^']+)'\)/g)].map(m => m[1]));
-const htmlIds = new Set([...html.matchAll(/id="([^"]+)"/g)].map(m => m[1]));
+const htmlIds = new Set([...htmlForIds.matchAll(/id="([^"]+)"/g)].map(m => m[1]));
 
 // IDs générés dynamiquement ou connus comme absents volontairement
 const KNOWN_DYNAMIC = new Set([
   'qrDepl', 'taillesContainer',
   'photoPreviewImgStick', 'photoPreviewStick', // guarded avec if(el)
+  'codePresence', 'cmdMode', 'cmdTaille',       // injectés dynamiquement dans modals
+  'pizzaChoixContainer', 'pinteChoixContainer', // injectés par ouvrirModalPresence
 ]);
 
 const missingIds = [...jsIds].filter(id =>
