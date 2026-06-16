@@ -2724,7 +2724,7 @@ async function ouvrirModifierEvenement(id) {
     const { data: ev } = await UL.sb.from('evenements').select('*').eq('id', id).single();
     if (!ev) return toast('Événement introuvable', 'error');
     document.getElementById('evId').value = ev.id;
-    document.getElementById('modalEvenementTitre').textContent = 'Modifier l'événement';
+    document.getElementById('modalEvenementTitre').textContent = "Modifier l'événement";
     document.getElementById('evNom').value = ev.nom || ev.titre || '';
     document.getElementById('evType').value = ev.type || 'autre';
     document.getElementById('evDate').value = ev.date || '';
