@@ -111,15 +111,9 @@
       <input type="password" id="regPassword" placeholder="Minimum 8 caractères">
     </div>
     <div class="form-group">
-      <div id="rgpdToggle" onclick="toggleRgpd()" style="display:flex;align-items:flex-start;gap:12px;padding:12px 14px;background:rgba(255,255,255,.07);border:1.5px solid rgba(255,255,255,.12);border-radius:9px;cursor:pointer;user-select:none;-webkit-user-select:none;">
-        <div id="rgpdBox" style="width:20px;height:20px;flex-shrink:0;margin-top:1px;border-radius:4px;border:2px solid #3B82F6;background:transparent;display:flex;align-items:center;justify-content:center;transition:background .15s;">
-          <svg id="rgpdCheck" viewBox="0 0 12 10" style="display:none;width:12px;height:10px;"><polyline points="1,5 4,9 11,1" style="fill:none;stroke:#fff;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"/></svg>
-        </div>
+      <div style="display:flex;align-items:flex-start;gap:12px;padding:12px 14px;background:rgba(255,255,255,.07);border:1.5px solid rgba(255,255,255,.12);border-radius:9px;cursor:pointer;" onclick="document.getElementById('regRgpd').click()">
+        <input type="checkbox" id="regRgpd" style="width:20px;height:20px;flex-shrink:0;margin-top:1px;cursor:pointer;accent-color:#1A56DB;" onclick="event.stopPropagation()">
         <span style="font-size:13px;color:#CBD5E1;line-height:1.5;">J'accepte que mes données soient utilisées pour la gestion des Ultras Lutetia (RGPD)</span>
-      </div>
-      <input type="checkbox" id="regRgpd" style="display:none;">
-      <div style="margin-top:6px;padding-left:4px;">
-        <span onclick="showModal('modalRgpd')" style="font-size:12px;color:#3B82F6;text-decoration:underline;cursor:pointer;">Consulter la politique de confidentialité →</span>
       </div>
     </div>
     <button class="btn btn-primary" onclick="doInscription()">Créer mon compte</button>
@@ -172,12 +166,6 @@
       <div id="demandesListe"></div>
     </div>
 
-    <!-- Prochains matchs -->
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:4px;">
-      <div id="prochainDomicile"></div>
-      <div id="prochainExterieur"></div>
-    </div>
-
     <div class="section-title">Prochaines sessions</div>
     <div id="sessionsAccueil"></div>
 
@@ -187,32 +175,28 @@
     <div class="section-title">Prochain événement</div>
     <div id="evenementAccueil"></div>
 
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:4px;">
+      <div id="prochainDomicile"></div>
+      <div id="prochainExterieur"></div>
+    </div>
+
     <div class="section-title">Mes stats</div>
     <div class="stats-grid" id="mesStats"></div>
   </div>
 
   <!-- ── PAGE SESSIONS ──────────────────────────────────────── -->
   <div id="pageSessions" class="page">
-
-    <!-- Bouton créer session (Bureau+ ou Membre Cellule) -->
-    <div id="btnCreerSession" style="display:none;margin-bottom:16px;">
-      <button class="btn btn-primary" onclick="showModal('modalCreerSession')">+ Nouvelle session</button>
-    </div>
-
     <div class="section-title">Sessions à venir</div>
     <div id="sessionsListe"></div>
-
     <div class="section-title" style="margin-top:24px;">Historique</div>
     <div id="sessionsHistorique"></div>
   </div>
 
   <!-- ── PAGE CALENDRIER ───────────────────────────────────── -->
   <div id="pageCalendrier" class="page">
-    <!-- Bouton créer événement (Bureau+) -->
     <div id="btnCreerEvenement" style="display:none;margin-bottom:12px;">
       <button class="btn btn-primary" onclick="showModal('modalCreerEvenement')">+ Nouvel événement</button>
     </div>
-    <!-- Filtres -->
     <div style="display:flex;gap:6px;margin-bottom:14px;overflow-x:auto;scrollbar-width:none;">
       <button class="filter-btn active" id="calFiltreAll" onclick="filtrerCalendrier('tous')">Tous</button>
       <button class="filter-btn" id="calFiltreHome" onclick="filtrerCalendrier('domicile')">🏠 Domicile</button>
@@ -220,6 +204,96 @@
       <button class="filter-btn" id="calFiltreEvt" onclick="filtrerCalendrier('evenement')">🎉 Événements</button>
     </div>
     <div id="calendrierListe"></div>
+  </div>
+
+  <!-- ── PAGE ADMIN ────────────────────────────────────────── -->
+  <div id="pageAdmin" class="page">
+    <h2 style="font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:.05em;margin-bottom:16px;">⚙️ Administration</h2>
+
+    <!-- TIFO — Admin + Bureau + Cellule Tifo -->
+    <div id="adminSectionTifo" style="display:none;">
+      <div class="section-title">🖌️ Sessions Tifo</div>
+      <div class="card" style="margin-bottom:10px;">
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <button class="btn btn-secondary" onclick="showModal('modalCreerSession')">➕ Créer une session</button>
+          <button class="btn btn-secondary" onclick="ouvrirModifierSession()">✏️ Modifier une session</button>
+          <button class="btn btn-secondary" style="color:#ef4444;border-color:rgba(239,68,68,.3);" onclick="ouvrirSupprimerSession()">🗑️ Supprimer une session</button>
+          <button class="btn btn-secondary" onclick="ouvrirGererMembresTifo()">👥 Gérer les membres tifo</button>
+        </div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;color:var(--gris);text-transform:uppercase;letter-spacing:.05em;margin-top:14px;margin-bottom:8px;">Sessions actives</div>
+        <div id="adminSessionsList"></div>
+      </div>
+    </div>
+
+    <!-- MEMBRES — Admin + Bureau -->
+    <div id="adminSectionMembres" style="display:none;">
+      <div class="section-title">👥 Membres</div>
+      <div class="card" style="margin-bottom:10px;">
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <button class="btn btn-secondary" onclick="showPage('pageMembres')">👤 Gérer les membres</button>
+          <button class="btn btn-secondary" onclick="showPage('pageCartage')">🪪 Gérer les cartages</button>
+          <button class="btn btn-secondary" onclick="showPage('pageAccueil')">🔔 Demandes d'inscription</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- CALENDRIER — Admin + Bureau -->
+    <div id="adminSectionCalendrier" style="display:none;">
+      <div class="section-title">📅 Calendrier</div>
+      <div class="card" style="margin-bottom:10px;">
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <button class="btn btn-secondary" onclick="showModal('modalMatchs')">⚽ Gérer les matchs</button>
+          <button class="btn btn-secondary" onclick="showModal('modalCreerEvenement')">🎉 Créer un événement</button>
+          <button class="btn btn-secondary" onclick="showModal('modalAnnonce')">📣 Publier une annonce</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- DÉPLACEMENTS — Admin + Bureau + Cellule Déplacement -->
+    <div id="adminSectionDepl" style="display:none;">
+      <div class="section-title">🚌 Déplacements</div>
+      <div class="card" style="margin-bottom:10px;">
+        <button class="btn btn-secondary" onclick="showModal('modalCreerDepl')">+ Créer un déplacement</button>
+      </div>
+    </div>
+
+    <!-- MATOS — Admin + Bureau + Cellule Matos -->
+    <div id="adminSectionMatos" style="display:none;">
+      <div class="section-title">🛍️ Matos</div>
+      <div class="card" style="margin-bottom:10px;">
+        <button class="btn btn-secondary" onclick="showModal('modalCreerProduit');loadSectionsForModal()">+ Ajouter un article matos</button>
+      </div>
+    </div>
+
+    <!-- STICKS — Admin + Bureau + Cellule Sticks -->
+    <div id="adminSectionSticks" style="display:none;">
+      <div class="section-title">🎟️ Sticks</div>
+      <div class="card" style="margin-bottom:10px;">
+        <button class="btn btn-secondary" onclick="showModal('modalDistribuer');loadDistribuerModal()">+ Enregistrer une distribution</button>
+      </div>
+    </div>
+
+    <!-- STATISTIQUES -->
+    <div id="adminSectionStats" style="display:none;">
+      <div class="section-title">📊 Statistiques</div>
+      <div class="card" style="margin-bottom:10px;">
+        <button class="btn btn-secondary" onclick="showPage('pageStats')">Voir les statistiques globales</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── PAGE CARTAGE ───────────────────────────────────────── -->
+  <div id="pageCartage" class="page">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+      <button class="btn btn-sm btn-secondary" onclick="showPage('pageAdmin')">← Retour</button>
+      <h2 style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:.05em;margin:0;">🪪 Cartage membres</h2>
+    </div>
+    <div style="display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap;">
+      <button class="filter-btn active" id="cartFiltreAll" onclick="filtrerCartage('tous')">Tous</button>
+      <button class="filter-btn" id="cartFiltreOk" onclick="filtrerCartage('carte')">✅ Cartés</button>
+      <button class="filter-btn" id="cartFiltreKo" onclick="filtrerCartage('incomplet')">⚠️ Incomplets</button>
+    </div>
+    <div id="cartageList"></div>
   </div>
 
   <!-- ── PAGE DÉPLACEMENTS ──────────────────────────────────── -->
@@ -268,96 +342,6 @@
       <div class="section-title" style="margin-top:24px;">📊 Stats cellule</div>
       <button class="btn btn-secondary" onclick="showPage('pageStats')">Voir les statistiques</button>
     </div>
-  </div>
-
-  <!-- ── PAGE ADMIN ────────────────────────────────────────── -->
-  <div id="pageAdmin" class="page">
-    <h2 style="font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:.05em;margin-bottom:16px;">⚙️ Administration</h2>
-
-    <!-- TIFO — Admin + Bureau + Cellule Tifo -->
-    <div id="adminSectionTifo" style="display:none;">
-      <div class="section-title">🖌️ Tifo</div>
-      <div class="card" style="margin-bottom:10px;">
-        <div style="display:flex;flex-direction:column;gap:8px;">
-          <button class="btn btn-secondary" onclick="ouvrirCreerSession()">➕ Créer une session</button>
-          <button class="btn btn-secondary" onclick="ouvrirModifierSession()">✏️ Modifier une session</button>
-          <button class="btn btn-secondary" style="color:#ef4444;border-color:rgba(239,68,68,.3);" onclick="ouvrirSupprimerSession()">🗑️ Supprimer une session</button>
-          <button class="btn btn-secondary" onclick="ouvrirGererMembresTifo()">👥 Gérer les membres</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- MEMBRES — Admin + Bureau -->
-    <div id="adminSectionMembres" style="display:none;">
-      <div class="section-title">👥 Membres</div>
-      <div class="card" style="margin-bottom:10px;">
-        <div style="display:flex;flex-direction:column;gap:8px;">
-          <button class="btn btn-secondary" onclick="showPage('pageMembres')">👤 Gérer les membres</button>
-          <button class="btn btn-secondary" onclick="showPage('pageCartage')">🪪 Gérer les cartages</button>
-          <div id="adminDemandesBtnWrap">
-            <button class="btn btn-secondary" onclick="showPage('pageAccueil')">🔔 Demandes d'inscription <span id="adminDemandesBadge" class="badge badge-orange" style="display:none;margin-left:6px;"></span></button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- CALENDRIER — Admin + Bureau -->
-    <div id="adminSectionCalendrier" style="display:none;">
-      <div class="section-title">📅 Calendrier</div>
-      <div class="card" style="margin-bottom:10px;">
-        <div style="display:flex;flex-direction:column;gap:8px;">
-          <button class="btn btn-secondary" onclick="showModal('modalMatchs')">⚽ Gérer les matchs</button>
-          <button class="btn btn-secondary" onclick="showModal('modalCreerEvenement')">🎉 Créer un événement</button>
-          <button class="btn btn-secondary" onclick="showModal('modalAnnonce')">📣 Publier une annonce</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- DÉPLACEMENTS — Admin + Bureau + Cellule Déplacement -->
-    <div id="adminSectionDepl" style="display:none;">
-      <div class="section-title">🚌 Déplacements</div>
-      <div class="card" style="margin-bottom:10px;">
-        <button class="btn btn-secondary" onclick="showPage('pageDeplacements');showModal('modalCreerDepl')">+ Créer un déplacement</button>
-      </div>
-    </div>
-
-    <!-- MATOS — Admin + Bureau + Cellule Matos -->
-    <div id="adminSectionMatos" style="display:none;">
-      <div class="section-title">🛍️ Matos</div>
-      <div class="card" style="margin-bottom:10px;">
-        <button class="btn btn-secondary" onclick="showModal('modalCreerProduit');loadSectionsForModal()">+ Ajouter un article matos</button>
-      </div>
-    </div>
-
-    <!-- STICKS — Admin + Bureau + Cellule Sticks -->
-    <div id="adminSectionSticks" style="display:none;">
-      <div class="section-title">🎟️ Sticks</div>
-      <div class="card" style="margin-bottom:10px;">
-        <button class="btn btn-secondary" onclick="showModal('modalDistribuer');loadDistribuerModal()">+ Enregistrer une distribution</button>
-      </div>
-    </div>
-
-    <!-- STATISTIQUES — Admin + Bureau + Tous Cellule -->
-    <div id="adminSectionStats" style="display:none;">
-      <div class="section-title">📊 Statistiques</div>
-      <div class="card" style="margin-bottom:10px;">
-        <button class="btn btn-secondary" onclick="showPage('pageStats')">Voir les statistiques globales</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- ── PAGE CARTAGE ───────────────────────────────────────── -->
-  <div id="pageCartage" class="page">
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
-      <button class="btn btn-sm btn-secondary" onclick="showPage('pageAdmin')">← Retour</button>
-      <h2 style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:.05em;margin:0;">🪪 Cartage membres</h2>
-    </div>
-    <div style="display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap;">
-      <button class="filter-btn active" id="cartFiltreAll" onclick="filtrerCartage('tous')">Tous</button>
-      <button class="filter-btn" id="cartFiltreOk" onclick="filtrerCartage('carte')">✅ Cartés</button>
-      <button class="filter-btn" id="cartFiltreKo" onclick="filtrerCartage('incomplet')">⚠️ Incomplets</button>
-    </div>
-    <div id="cartageList"></div>
   </div>
 
   <!-- ── PAGE CHARTE ────────────────────────────────────────── -->
@@ -579,11 +563,10 @@
     <div class="form-group"><label>Capacité max</label><input type="number" id="sCapacite" placeholder="25 (optionnel)"></div>
     <div class="form-group"><label>Lien Telegram</label><input type="url" id="sTelegram" placeholder="https://t.me/..."></div>
     <div class="form-group">
-      <div id="sPizzaToggle" onclick="togglePizzaCreate()" style="display:flex;align-items:center;gap:12px;padding:11px 14px;background:rgba(255,255,255,.07);border:1.5px solid var(--border);border-radius:9px;cursor:pointer;user-select:none;-webkit-user-select:none;">
-        <div id="sPizzaBox" style="width:20px;height:20px;flex-shrink:0;border-radius:4px;border:2px solid #3B82F6;background:transparent;display:flex;align-items:center;justify-content:center;transition:background .15s;pointer-events:none;"></div>
-        <span style="font-size:14px;pointer-events:none;">🍕 Session avec pizza</span>
+      <div style="display:flex;align-items:center;gap:12px;padding:11px 14px;background:rgba(255,255,255,.07);border:1.5px solid var(--border);border-radius:9px;cursor:pointer;" onclick="document.getElementById('sPizza').click()">
+        <input type="checkbox" id="sPizza" style="width:20px;height:20px;flex-shrink:0;cursor:pointer;accent-color:var(--blue);" onclick="event.stopPropagation()">
+        <span style="font-size:14px;">🍕 Session avec pizza</span>
       </div>
-      <input type="checkbox" id="sPizza" style="display:none;">
     </div>
     <div class="form-group"><label>Description</label><textarea id="sDesc" rows="2" placeholder="Optionnel"></textarea></div>
     <button class="btn btn-primary" onclick="doCreerSession()">Créer la session</button>
@@ -596,12 +579,6 @@
   <div class="modal" onclick="event.stopPropagation()">
     <div class="modal-handle"></div>
     <h3 class="modal-title">Nouveau déplacement</h3>
-    <div class="form-group">
-      <label>Rattacher à un match <span style="color:var(--gris);font-size:11px;">(optionnel — pré-remplit les infos)</span></label>
-      <select id="dMatchId" onchange="preRemplirDepuisMatch()">
-        <option value="">— Saisie manuelle —</option>
-      </select>
-    </div>
     <div class="form-group"><label>Adversaire</label><input type="text" id="dAdv" placeholder="OGC Nice"></div>
     <div class="form-group"><label>Date du match</label><input type="date" id="dDate"></div>
     <div class="form-group"><label>Stade</label><input type="text" id="dStade" placeholder="Allianz Riviera"></div>
@@ -636,50 +613,23 @@
     <div class="form-group"><label>Nom</label><input type="text" id="editNom"></div>
     <div class="form-group"><label>Pseudo Telegram</label><input type="text" id="editTelegram"></div>
     <div class="form-group"><label>Email</label><input type="email" id="editEmail" placeholder="email@exemple.fr"></div>
-    <div class="form-group"><label>Statut UL</label>
+    <div class="form-group"><label>Statut</label>
       <select id="editStatut">
         <option value="sympathisant">Sympathisant</option>
         <option value="draft">Draft</option>
         <option value="confirme">Confirmé</option>
+        <option value="membre_cellule">Membre Cellule</option>
+        <option value="bureau">Bureau</option>
+        <option value="admin">Admin</option>
       </select>
     </div>
-    <div class="form-group"><label>Groupe</label>
-      <select id="editSection">
-        <option value="">Ultra Lutetia (défaut)</option>
+    <div class="form-group"><label>Étoiles (0-3)</label>
+      <select id="editEtoiles">
+        <option value="0">☆☆☆ Aucune</option>
+        <option value="1">⭐☆☆ 1 étoile</option>
+        <option value="2">⭐⭐☆ 2 étoiles</option>
+        <option value="3">⭐⭐⭐ 3 étoiles</option>
       </select>
-    </div>
-    <div class="form-group">
-      <label>Rôles fonctionnels (accès outils)</label>
-      <div style="display:flex;flex-direction:column;gap:6px;margin-top:8px;" id="rolesContainer">
-        <div onclick="toggleRole('admin_app')" style="display:flex;align-items:center;gap:12px;padding:10px 12px;background:rgba(255,255,255,.05);border-radius:8px;cursor:pointer;border:1.5px solid transparent;transition:border .15s;" id="roleRow_admin_app">
-          <div id="chk_admin_app" style="width:20px;height:20px;border-radius:4px;border:2px solid #3B82F6;background:transparent;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:background .15s;"></div>
-          <span style="font-size:13px;color:#CBD5E1;">⚙️ Admin app — accès total</span>
-        </div>
-        <div onclick="toggleRole('bureau_app')" style="display:flex;align-items:center;gap:12px;padding:10px 12px;background:rgba(255,255,255,.05);border-radius:8px;cursor:pointer;border:1.5px solid transparent;transition:border .15s;" id="roleRow_bureau_app">
-          <div id="chk_bureau_app" style="width:20px;height:20px;border-radius:4px;border:2px solid #3B82F6;background:transparent;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:background .15s;"></div>
-          <span style="font-size:13px;color:#CBD5E1;">🏆 Bureau — gestion générale</span>
-        </div>
-        <div onclick="toggleRole('cellule_tifo')" style="display:flex;align-items:center;gap:12px;padding:10px 12px;background:rgba(255,255,255,.05);border-radius:8px;cursor:pointer;border:1.5px solid transparent;transition:border .15s;" id="roleRow_cellule_tifo">
-          <div id="chk_cellule_tifo" style="width:20px;height:20px;border-radius:4px;border:2px solid #3B82F6;background:transparent;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:background .15s;"></div>
-          <span style="font-size:13px;color:#CBD5E1;">🎨 Cellule Tifo</span>
-        </div>
-        <div onclick="toggleRole('cellule_depl')" style="display:flex;align-items:center;gap:12px;padding:10px 12px;background:rgba(255,255,255,.05);border-radius:8px;cursor:pointer;border:1.5px solid transparent;transition:border .15s;" id="roleRow_cellule_depl">
-          <div id="chk_cellule_depl" style="width:20px;height:20px;border-radius:4px;border:2px solid #3B82F6;background:transparent;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:background .15s;"></div>
-          <span style="font-size:13px;color:#CBD5E1;">🚌 Cellule Déplacement</span>
-        </div>
-        <div onclick="toggleRole('cellule_matos')" style="display:flex;align-items:center;gap:12px;padding:10px 12px;background:rgba(255,255,255,.05);border-radius:8px;cursor:pointer;border:1.5px solid transparent;transition:border .15s;" id="roleRow_cellule_matos">
-          <div id="chk_cellule_matos" style="width:20px;height:20px;border-radius:4px;border:2px solid #3B82F6;background:transparent;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:background .15s;"></div>
-          <span style="font-size:13px;color:#CBD5E1;">🛍️ Cellule Matos</span>
-        </div>
-        <div onclick="toggleRole('cellule_sticks')" style="display:flex;align-items:center;gap:12px;padding:10px 12px;background:rgba(255,255,255,.05);border-radius:8px;cursor:pointer;border:1.5px solid transparent;transition:border .15s;" id="roleRow_cellule_sticks">
-          <div id="chk_cellule_sticks" style="width:20px;height:20px;border-radius:4b;border:2px solid #3B82F6;background:transparent;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:background .15s;"></div>
-          <span style="font-size:13px;color:#CBD5E1;">🎟️ Cellule Sticks</span>
-        </div>
-        <div onclick="toggleRole('cellule_comite')" style="display:flex;align-items:center;gap:12px;padding:10px 12px;background:rgba(255,255,255,.05);border-radius:8px;cursor:pointer;border:1.5px solid transparent;transition:border .15s;" id="roleRow_cellule_comite">
-          <div id="chk_cellule_comite" style="width:20px;height:20px;border-radius:4px;border:2px solid #3B82F6;background:transparent;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:background .15s;"></div>
-          <span style="font-size:13px;color:#CBD5E1;">🔔 Comité de passage</span>
-        </div>
-      </div>
     </div>
     <button class="btn btn-primary" onclick="doSauvegarderMembre()">Enregistrer</button>
     <button class="btn btn-secondary" style="margin-top:8px;" onclick="closeModal('modalEditMembre')">Annuler</button>
@@ -823,73 +773,34 @@
   </div>
 </div>
 
-<!-- Modal RGPD -->
-<div class="modal-overlay" id="modalRgpd" style="display:none;" onclick="closeModalOutside(event,'modalRgpd')">
-  <div class="modal" onclick="event.stopPropagation()" style="max-height:85vh;overflow-y:auto;">
+<!-- Modal Score -->
+<div class="modal-overlay" id="modalScore" style="display:none;" onclick="closeModalOutside(event,'modalScore')">
+  <div class="modal" onclick="event.stopPropagation()">
     <div class="modal-handle"></div>
-    <h3 class="modal-title">🔒 Politique de confidentialité</h3>
-    <p style="font-size:11px;color:var(--gris);margin-bottom:16px;">Ultras Lutetia · Saison 2026/2027 · Version 1.0</p>
-
-    <div style="font-size:13px;color:#CBD5E1;line-height:1.7;">
-
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;color:#93C5FD;margin-bottom:6px;text-transform:uppercase;letter-spacing:.04em;">1. Responsable du traitement</div>
-      <p style="margin-bottom:12px;">Association <strong>Ultras Lutetia</strong> (loi 1901) — Contact RGPD : <span style="color:#3B82F6;">ultras.lutetia@gmail.com</span>. Aucun DPO désigné (association &lt; 250 personnes, art. 37 RGPD).</p>
-
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;color:#93C5FD;margin-bottom:6px;text-transform:uppercase;letter-spacing:.04em;">2. Données collectées &amp; finalités</div>
-      <div style="margin-bottom:12px;">
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px;">
-          <div style="background:var(--surface-2);border-radius:6px;padding:8px;">
-            <div style="font-weight:700;font-size:12px;color:#93C5FD;margin-bottom:3px;">Gestion adhésion</div>
-            <div style="font-size:11px;color:var(--gris);">Nom, prénom, email, pseudo — Base : contrat d'adhésion — Conservation : saison + 1 an</div>
-          </div>
-          <div style="background:var(--surface-2);border-radius:6px;padding:8px;">
-            <div style="font-weight:700;font-size:12px;color:#93C5FD;margin-bottom:3px;">Déplacements</div>
-            <div style="font-size:11px;color:var(--gris);">Nom, prénom, infos réservation — Base : exécution du contrat — Conservation : durée de la saison</div>
-          </div>
-          <div style="background:var(--surface-2);border-radius:6px;padding:8px;">
-            <div style="font-weight:700;font-size:12px;color:#93C5FD;margin-bottom:3px;">Application PWA</div>
-            <div style="font-size:11px;color:var(--gris);">Identifiant, statut, présences sessions — Base : consentement — Conservation : durée d'adhésion</div>
-          </div>
-          <div style="background:var(--surface-2);border-radius:6px;padding:8px;">
-            <div style="font-weight:700;font-size:12px;color:#93C5FD;margin-bottom:3px;">Comptabilité</div>
-            <div style="font-size:11px;color:var(--gris);">Nom, prénom, cotisation — Base : obligation légale (loi 1901) — Conservation : 10 ans</div>
-          </div>
-        </div>
-        <p style="font-size:11px;color:var(--gris);background:var(--surface-2);border-radius:6px;padding:8px;">ℹ️ Aucune donnée n'est vendue ou cédée à des tiers. Pas de transfert hors UE. Aucun profilage automatisé (art. 22 RGPD).</p>
+    <h3 class="modal-title" id="modalScoreTitre">Saisir le score</h3>
+    <input type="hidden" id="scoreMatchId">
+    <div style="display:flex;align-items:center;gap:12px;margin:20px 0;">
+      <div style="flex:1;text-align:center;">
+        <div style="font-size:11px;color:var(--gris);margin-bottom:6px;" id="scoreLabelDom">DOM</div>
+        <input type="number" id="scoreDom" min="0" max="20" placeholder="0" style="width:100%;text-align:center;font-family:'Bebas Neue',sans-serif;font-size:40px;background:var(--surface-2);border:2px solid var(--surface-4);border-radius:10px;color:white;padding:10px 0;">
       </div>
-
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;color:#93C5FD;margin-bottom:6px;text-transform:uppercase;letter-spacing:.04em;">3. Stockage des données</div>
-      <p style="margin-bottom:12px;">Tes données sont hébergées sur <strong>Supabase</strong> (PostgreSQL, région Europe de l'Ouest — Irlande), accessible uniquement aux membres du Bureau via identifiants nominatifs, en connexion HTTPS/TLS. Aucune donnée de paiement n'est stockée dans l'application.</p>
-
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;color:#93C5FD;margin-bottom:6px;text-transform:uppercase;letter-spacing:.04em;">4. Destinataires</div>
-      <p style="margin-bottom:12px;">Membres du Bureau · Responsables de cellules (dans la limite de leur mission) · Prestataires techniques (hébergeur) en qualité de sous-traitants (art. 28 RGPD). <br>Aucune transmission au Paris FC, à la LFP ou à tout autre tiers sans consentement exprès.</p>
-
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;color:#93C5FD;margin-bottom:6px;text-transform:uppercase;letter-spacing:.04em;">5. Tes droits (art. 15–22 RGPD)</div>
-      <div style="display:flex;flex-direction:column;gap:5px;margin-bottom:12px;">
-        <div style="background:var(--surface-2);border-radius:6px;padding:7px 10px;font-size:12px;"><span style="color:#93C5FD;font-weight:700;">Accès (art. 15)</span> — Obtenir une copie de tes données</div>
-        <div style="background:var(--surface-2);border-radius:6px;padding:7px 10px;font-size:12px;"><span style="color:#93C5FD;font-weight:700;">Rectification (art. 16)</span> — Corriger des données inexactes</div>
-        <div style="background:var(--surface-2);border-radius:6px;padding:7px 10px;font-size:12px;"><span style="color:#93C5FD;font-weight:700;">Effacement (art. 17)</span> — Supprimer tes données (sauf obligation légale)</div>
-        <div style="background:var(--surface-2);border-radius:6px;padding:7px 10px;font-size:12px;"><span style="color:#93C5FD;font-weight:700;">Portabilité (art. 20)</span> — Recevoir tes données en format structuré</div>
-        <div style="background:var(--surface-2);border-radius:6px;padding:7px 10px;font-size:12px;"><span style="color:#93C5FD;font-weight:700;">Opposition (art. 21)</span> — T'opposer à un traitement fondé sur intérêt légitime</div>
-        <div style="background:var(--surface-2);border-radius:6px;padding:7px 10px;font-size:12px;"><span style="color:#93C5FD;font-weight:700;">Retrait du consentement</span> — À tout moment, sans effet rétroactif</div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--gris);flex-shrink:0;">—</div>
+      <div style="flex:1;text-align:center;">
+        <div style="font-size:11px;color:var(--gris);margin-bottom:6px;" id="scoreLabelExt">EXT</div>
+        <input type="number" id="scoreExt" min="0" max="20" placeholder="0" style="width:100%;text-align:center;font-family:'Bebas Neue',sans-serif;font-size:40px;background:var(--surface-2);border:2px solid var(--surface-4);border-radius:10px;color:white;padding:10px 0;">
       </div>
-      <p style="margin-bottom:12px;font-size:12px;">Pour exercer tes droits : <span style="color:#3B82F6;">ultras.lutetia@gmail.com</span> — Réponse sous 30 jours max (art. 12 RGPD).<br>Réclamation possible auprès de la <strong>CNIL</strong> — <span style="color:#3B82F6;">cnil.fr</span> — 3 Place de Fontenoy, 75007 Paris.</p>
-
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;color:#93C5FD;margin-bottom:6px;text-transform:uppercase;letter-spacing:.04em;">6. Sécurité</div>
-      <p style="margin-bottom:16px;font-size:12px;">Accès aux fichiers membres protégés par mot de passe · Communications via canaux chiffrés (Telegram) · Application accessible uniquement en HTTPS · Destruction sécurisée des documents papier à l'issue de leur durée de conservation.</p>
     </div>
-
-    <button class="btn btn-primary" onclick="closeModal('modalRgpd')">J'ai compris — Fermer</button>
+    <button class="btn btn-primary" onclick="doSaisirScore()">Enregistrer le score</button>
+    <button class="btn btn-secondary" style="margin-top:8px;" onclick="closeModal('modalScore')">Annuler</button>
   </div>
 </div>
 
-<!-- Modal Créer Événement (Bureau+) -->
+<!-- Modal Créer Événement -->
 <div class="modal-overlay" id="modalCreerEvenement" style="display:none;" onclick="closeModalOutside(event,'modalCreerEvenement')">
   <div class="modal" onclick="event.stopPropagation()">
     <div class="modal-handle"></div>
     <h3 class="modal-title">Nouvel événement</h3>
-    <div class="form-group">
-      <label>Type</label>
+    <div class="form-group"><label>Type</label>
       <select id="evtType">
         <option value="reunion">🤝 Réunion UL</option>
         <option value="bbq">🍖 BBQ</option>
@@ -899,146 +810,35 @@
     </div>
     <div class="form-group"><label>Nom</label><input type="text" id="evtNom" placeholder="Ex: Réunion de rentrée"></div>
     <div class="form-group"><label>Date</label><input type="date" id="evtDate"></div>
-    <div class="form-group">
-      <label>Horaires</label>
+    <div class="form-group"><label>Horaires</label>
       <div style="display:flex;gap:8px;">
-        <input type="time" id="evtHeureDebut" placeholder="Début" style="flex:1;">
-        <input type="time" id="evtHeureFin" placeholder="Fin" style="flex:1;">
+        <input type="time" id="evtHeureDebut" style="flex:1;">
+        <input type="time" id="evtHeureFin" style="flex:1;">
       </div>
     </div>
     <div class="form-group"><label>Lieu</label><input type="text" id="evtLieu" placeholder="Ex: Bar des Supporters"></div>
     <div class="form-group"><label>Description</label><textarea id="evtDesc" rows="2" placeholder="Optionnel"></textarea></div>
-    <div class="form-group">
-      <label>Lien HelloAsso <span style="color:var(--gris);font-size:11px;">(optionnel — si événement payant)</span></label>
-      <input type="url" id="evtHelloasso" placeholder="https://www.helloasso.com/...">
-    </div>
+    <div class="form-group"><label>Lien HelloAsso <span style="color:var(--gris);font-size:11px;">(si payant)</span></label><input type="url" id="evtHelloasso" placeholder="https://www.helloasso.com/..."></div>
     <button class="btn btn-primary" onclick="doCreerEvenement()">Créer l'événement</button>
     <button class="btn btn-secondary" style="margin-top:8px;" onclick="closeModal('modalCreerEvenement')">Annuler</button>
   </div>
 </div>
 
-<!-- Modal Confirmation Inscription -->
-<div class="modal-overlay" id="modalConfirmInscription" style="display:none;" onclick="closeModalOutside(event,'modalConfirmInscription')">
-  <div class="modal" onclick="event.stopPropagation()">
+<!-- Modal RGPD -->
+<div class="modal-overlay" id="modalRgpd" style="display:none;" onclick="closeModalOutside(event,'modalRgpd')">
+  <div class="modal" onclick="event.stopPropagation()" style="max-height:85vh;overflow-y:auto;">
     <div class="modal-handle"></div>
-    <h3 class="modal-title">⚠️ Confirmer l'inscription</h3>
-    <div class="info-box" style="background:rgba(26,86,219,.12);border-color:rgba(26,86,219,.3);margin-bottom:16px;">
-      <div style="font-size:14px;line-height:1.7;">
-        En t'inscrivant à cette session, tu prends un <strong>engagement ferme</strong> d'être présent(e).<br><br>
-        Si tu ne peux plus venir, pense à te désinscrire au plus tôt pour libérer ta place.
-      </div>
+    <h3 class="modal-title">🔒 Politique de confidentialité</h3>
+    <p style="font-size:11px;color:var(--gris);margin-bottom:16px;">Ultras Lutetia · Saison 2026/2027 · Version 1.0</p>
+    <div style="font-size:13px;color:#CBD5E1;line-height:1.7;">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;color:#93C5FD;margin-bottom:6px;text-transform:uppercase;">1. Responsable du traitement</div>
+      <p style="margin-bottom:12px;">Association <strong>Ultras Lutetia</strong> (loi 1901) — Contact RGPD : <span style="color:#3B82F6;">ultras.lutetia@gmail.com</span>. Aucun DPO désigné (association &lt; 250 personnes, art. 37 RGPD).</p>
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;color:#93C5FD;margin-bottom:6px;text-transform:uppercase;">2. Données & finalités</div>
+      <p style="margin-bottom:12px;font-size:12px;">Nom, prénom, email, pseudo Telegram, présences sessions — Conservation : durée de la saison + 1 an. Aucune donnée vendue ou transférée hors UE.</p>
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;color:#93C5FD;margin-bottom:6px;text-transform:uppercase;">3. Tes droits (art. 15–22 RGPD)</div>
+      <p style="margin-bottom:16px;font-size:12px;">Accès, rectification, effacement, portabilité, opposition. Contact : <span style="color:#3B82F6;">ultras.lutetia@gmail.com</span> — Réponse sous 30 jours. Réclamation possible auprès de la CNIL — cnil.fr</p>
     </div>
-    <button class="btn btn-primary" onclick="confirmerInscription()">✅ Je confirme ma présence</button>
-    <button class="btn btn-secondary" style="margin-top:8px;" onclick="closeModal('modalConfirmInscription')">Annuler</button>
-  </div>
-</div>
-
-<!-- Modal Choix Pizza -->
-<div class="modal-overlay" id="modalChoixPizza" style="display:none;" onclick="closeModalOutside(event,'modalChoixPizza')">
-  <div class="modal" onclick="event.stopPropagation()">
-    <div class="modal-handle"></div>
-    <h3 class="modal-title">🍕 Commande pizza</h3>
-    <p style="color:var(--gris);font-size:14px;margin-bottom:16px;">Choisis ta pizza pour cette session :</p>
-    <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px;">
-      <button class="btn btn-secondary" onclick="validerInscriptionAvecPizza('non')" style="justify-content:flex-start;padding:12px 16px;">🚫 Sans pizza</button>
-      <button class="btn btn-secondary" onclick="validerInscriptionAvecPizza('margherita')" style="justify-content:flex-start;padding:12px 16px;">🍕 Margherita</button>
-      <button class="btn btn-secondary" onclick="validerInscriptionAvecPizza('reine')" style="justify-content:flex-start;padding:12px 16px;">🍕 Reine</button>
-      <button class="btn btn-secondary" onclick="validerInscriptionAvecPizza('4 fromages')" style="justify-content:flex-start;padding:12px 16px;">🍕 4 Fromages</button>
-      <button class="btn btn-secondary" onclick="validerInscriptionAvecPizza('vegetarienne')" style="justify-content:flex-start;padding:12px 16px;">🍕 Végétarienne</button>
-    </div>
-    <button class="btn btn-secondary" onclick="closeModal('modalChoixPizza')">Annuler</button>
-  </div>
-</div>
-
-<!-- Modal Supprimer Session -->
-<div class="modal-overlay" id="modalSupprimerSession" style="display:none;" onclick="closeModalOutside(event,'modalSupprimerSession')">
-  <div class="modal" onclick="event.stopPropagation()">
-    <div class="modal-handle"></div>
-    <h3 class="modal-title">🗑️ Supprimer une session</h3>
-    <div class="form-group">
-      <label>Choisir la session à supprimer</label>
-      <select id="delSelectSession"><option value="">-- Sélectionner --</option></select>
-    </div>
-    <div id="delSessionInfo" style="display:none;margin-bottom:14px;">
-      <div class="info-box" style="background:rgba(239,68,68,.1);border-color:rgba(239,68,68,.3);color:#ef4444;font-size:13px;">
-        ⚠️ Action irréversible. Toutes les inscriptions liées seront supprimées.
-      </div>
-    </div>
-    <button class="btn btn-primary" style="background:#ef4444;border-color:#ef4444;" onclick="doSupprimerSessionAdmin()">🗑️ Supprimer définitivement</button>
-    <button class="btn btn-secondary" style="margin-top:8px;" onclick="closeModal('modalSupprimerSession')">Annuler</button>
-  </div>
-</div>
-
-<!-- Modal Modifier Session -->
-<div class="modal-overlay" id="modalModifierSession" style="display:none;" onclick="closeModalOutside(event,'modalModifierSession')">
-  <div class="modal" onclick="event.stopPropagation()">
-    <div class="modal-handle"></div>
-    <h3 class="modal-title">✏️ Modifier une session</h3>
-    <div class="form-group">
-      <label>Choisir la session</label>
-      <select id="msSelectSession" onchange="chargerSessionAModifier(this.value)">
-        <option value="">-- Sélectionner --</option>
-      </select>
-    </div>
-    <div id="msFormFields" style="display:none;">
-      <div class="form-group"><label>Nom</label><input type="text" id="msNom"></div>
-      <div class="form-group"><label>Date</label><input type="date" id="msDate"></div>
-      <div class="form-group"><label>Heure</label><input type="time" id="msHeure"></div>
-      <div class="form-group"><label>Lieu</label>
-        <select id="msLieu"><option>Paris Sud</option><option>Paris Intra Muros</option><option>Autre</option></select>
-      </div>
-      <div class="form-group"><label>Type</label>
-        <select id="msType"><option>Peinture</option><option>Tracage</option><option>Assemblage</option></select>
-      </div>
-      <div class="form-group"><label>Capacité max</label><input type="number" id="msCapacite" placeholder="25 (optionnel)"></div>
-      <div class="form-group"><label>Lien Telegram</label><input type="url" id="msTelegram" placeholder="https://t.me/..."></div>
-      <div class="form-group">
-        <div id="msPizzaToggle" onclick="togglePizzaModify()" style="display:flex;align-items:center;gap:12px;padding:11px 14px;background:rgba(255,255,255,.07);border:1.5px solid var(--border);border-radius:9px;cursor:pointer;user-select:none;-webkit-user-select:none;">
-          <div id="msPizzaBox" style="width:20px;height:20px;flex-shrink:0;border-radius:4px;border:2px solid #3B82F6;background:transparent;display:flex;align-items:center;justify-content:center;transition:background .15s;pointer-events:none;"></div>
-          <span style="font-size:14px;pointer-events:none;">🍕 Session avec pizza</span>
-        </div>
-        <input type="checkbox" id="msPizza" style="display:none;">
-      </div>
-      <div class="form-group"><label>Description</label><textarea id="msDesc" rows="2" placeholder="Optionnel"></textarea></div>
-      <button class="btn btn-primary" onclick="doModifierSession()">💾 Enregistrer</button>
-    </div>
-    <button class="btn btn-secondary" style="margin-top:8px;" onclick="closeModal('modalModifierSession')">Annuler</button>
-  </div>
-</div>
-
-<!-- Modal Gérer Membres Tifo -->
-<div class="modal-overlay" id="modalGererMembresTifo" style="display:none;" onclick="closeModalOutside(event,'modalGererMembresTifo')">
-  <div class="modal" onclick="event.stopPropagation()">
-    <div class="modal-handle"></div>
-    <h3 class="modal-title">👥 Membres — Cellule Tifo</h3>
-    <p style="font-size:12px;color:var(--gris);margin-bottom:4px;">🖌️ 1re session ou peu autonome</p>
-    <p style="font-size:12px;color:var(--gris);margin-bottom:4px;">🖌️🖌️ Autonome sur tâche manuelle</p>
-    <p style="font-size:12px;color:var(--gris);margin-bottom:16px;">🖌️🖌️🖌️ Tâches précises en totale autonomie</p>
-    <div id="membresTifoListe"></div>
-  </div>
-</div>
-
-<!-- Modal Saisir Score (Bureau+) -->
-<div class="modal-overlay" id="modalScore" style="display:none;" onclick="closeModalOutside(event,'modalScore')">
-  <div class="modal" onclick="event.stopPropagation()">
-    <div class="modal-handle"></div>
-    <h3 class="modal-title" id="modalScoreTitre">Saisir le score</h3>
-    <input type="hidden" id="scoreMatchId">
-    <div style="display:flex;align-items:center;gap:12px;margin:20px 0;">
-      <div style="flex:1;text-align:center;">
-        <div style="font-size:11px;color:var(--gris);margin-bottom:6px;" id="scoreLabelDom">DOM</div>
-        <input type="number" id="scoreDom" min="0" max="20" placeholder="0"
-          style="width:100%;text-align:center;font-family:'Bebas Neue',sans-serif;font-size:40px;background:var(--surface-2);border:2px solid var(--surface-4);border-radius:10px;color:white;padding:10px 0;">
-      </div>
-      <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--gris);flex-shrink:0;">—</div>
-      <div style="flex:1;text-align:center;">
-        <div style="font-size:11px;color:var(--gris);margin-bottom:6px;" id="scoreLabelExt">EXT</div>
-        <input type="number" id="scoreExt" min="0" max="20" placeholder="0"
-          style="width:100%;text-align:center;font-family:'Bebas Neue',sans-serif;font-size:40px;background:var(--surface-2);border:2px solid var(--surface-4);border-radius:10px;color:white;padding:10px 0;">
-      </div>
-    </div>
-    <button class="btn btn-primary" onclick="doSaisirScore()">Enregistrer le score</button>
-    <button class="btn btn-secondary" style="margin-top:8px;" onclick="closeModal('modalScore')">Annuler</button>
+    <button class="btn btn-primary" onclick="closeModal('modalRgpd')">J'ai compris — Fermer</button>
   </div>
 </div>
 
@@ -1083,44 +883,21 @@ const NIVEAUX = ['sympathisant','draft','confirme','membre_cellule','bureau','ad
 function hasRole(membre, minRole) {
   return NIVEAUX.indexOf(membre?.statut) >= NIVEAUX.indexOf(minRole);
 }
-
-// ── Rôles fonctionnels (indépendants du statut UL) ────────────
+// ── Rôles fonctionnels (roles_app) ───────────────────────────
 function hasAppRole(membre, ...roles) {
   const r = membre?.roles_app || [];
   return roles.some(role => r.includes(role));
 }
-function isAdmin(membre) {
-  return hasAppRole(membre, 'admin_app');
-}
-function isBureau(membre) {
-  return hasAppRole(membre, 'admin_app', 'bureau_app');
-}
-function isCellule(membre) {
-  return hasAppRole(membre, 'admin_app', 'bureau_app',
-    'cellule_tifo', 'cellule_depl', 'cellule_matos', 'cellule_sticks', 'cellule_comite');
-}
-function hasCelluleTifo(membre) {
-  return hasAppRole(membre, 'admin_app', 'bureau_app', 'cellule_tifo');
-}
-function hasCelluleDepl(membre) {
-  return hasAppRole(membre, 'admin_app', 'bureau_app', 'cellule_depl');
-}
-function hasCelluleMatos(membre) {
-  return hasAppRole(membre, 'admin_app', 'bureau_app', 'cellule_matos');
-}
-function hasCelluleSticks(membre) {
-  return hasAppRole(membre, 'admin_app', 'bureau_app', 'cellule_sticks');
-}
-function hasCelluleComite(membre) {
-  return hasAppRole(membre, 'admin_app', 'bureau_app', 'cellule_comite');
-}
-function peutValiderInscriptions(membre) {
-  return hasAppRole(membre, 'admin_app', 'bureau_app', 'cellule_comite');
-}
+function isAdmin(membre)        { return hasAppRole(membre, 'admin_app'); }
+function isBureau(membre)       { return hasAppRole(membre, 'admin_app', 'bureau_app'); }
+function isCellule(membre)      { return hasAppRole(membre, 'admin_app', 'bureau_app', 'cellule_tifo', 'cellule_depl', 'cellule_matos', 'cellule_sticks', 'cellule_comite'); }
+function hasCelluleTifo(membre) { return hasAppRole(membre, 'admin_app', 'bureau_app', 'cellule_tifo'); }
+function hasCelluleDepl(membre) { return hasAppRole(membre, 'admin_app', 'bureau_app', 'cellule_depl'); }
+function hasCelluleMatos(membre){ return hasAppRole(membre, 'admin_app', 'bureau_app', 'cellule_matos'); }
+function hasCelluleSticks(membre){ return hasAppRole(membre, 'admin_app', 'bureau_app', 'cellule_sticks'); }
 
 // ─── State ───────────────────────────────────────────────────
 let currentSessionId = null;
-let currentSessionAvecPizza = false;
 let currentDeplId = null;
 let allMembres = [];
 
@@ -1157,24 +934,6 @@ async function doLogin() {
     showApp(membre);
   } catch(e) { hideLoading(); toast(e.message || 'Erreur de connexion', 'error'); }
 }
-// ─── RGPD toggle custom ──────────────────────────────────────
-let rgpdAccepte = false;
-
-function toggleRgpd() {
-  rgpdAccepte = !rgpdAccepte;
-  const box = document.getElementById('rgpdBox');
-  const check = document.getElementById('rgpdCheck');
-  if (rgpdAccepte) {
-    box.style.background = '#1A56DB';
-    box.style.borderColor = '#1A56DB';
-    check.style.display = 'block';
-  } else {
-    box.style.background = 'transparent';
-    box.style.borderColor = '#3B82F6';
-    check.style.display = 'none';
-  }
-}
-
 async function doInscription() {
   const prenom = document.getElementById('regPrenom').value.trim();
   const nom = document.getElementById('regNom').value.trim();
@@ -1182,9 +941,10 @@ async function doInscription() {
   const email = document.getElementById('regEmail').value.trim();
   const ville = document.getElementById('regVille').value.trim();
   const pwd = document.getElementById('regPassword').value;
+  const rgpd = document.getElementById('regRgpd').checked;
   if (!prenom || !nom || !pseudo || !pwd) return toast('Champs obligatoires manquants', 'error');
   if (pwd.length < 8) return toast('Mot de passe trop court (8 min)', 'error');
-  if (!rgpdAccepte) return toast('Accepte les conditions RGPD', 'error');
+  if (!rgpd) return toast('Accepte les conditions RGPD', 'error');
   try {
     showLoading();
     await UL.inscription({ prenom, nom, pseudoTelegram: pseudo, email, ville, password: pwd });
@@ -1217,50 +977,297 @@ async function showApp(membre) {
 }
 
 function applyRights(membre) {
-  const estAdmin = isAdmin(membre);
   const estBureau = isBureau(membre);
   const estCellule = isCellule(membre);
 
-  // Onglet Admin visible si au moins un rôle fonctionnel
-  if (estCellule) {
-    document.getElementById('nav6').style.display = 'flex';
-  }
+  // Onglet Admin visible si rôle fonctionnel
+  if (estCellule) document.getElementById('nav6').style.display = 'flex';
 
-  // Sections Admin selon rôles
+  // Sections Admin
   if (estBureau) {
     document.getElementById('adminSectionMembres').style.display = 'block';
     document.getElementById('adminSectionCalendrier').style.display = 'block';
     document.getElementById('btnPublierAnnonce').style.display = 'block';
-    document.getElementById('btnCreerEvenement').style.display = 'block';
-  }
-  if (hasCelluleDepl(membre)) {
-    document.getElementById('adminSectionDepl').style.display = 'block';
+    document.getElementById('btnCreerEvenement') && (document.getElementById('btnCreerEvenement').style.display = 'block');
     document.getElementById('btnCreerDepl').style.display = 'block';
   }
-  if (hasCelluleMatos(membre)) {
-    document.getElementById('adminSectionMatos').style.display = 'block';
-  }
-  if (hasCelluleSticks(membre)) {
-    document.getElementById('adminSectionSticks').style.display = 'block';
-  }
-  if (estCellule) {
-    document.getElementById('adminSectionStats').style.display = 'block';
-  }
-
-  if (hasCelluleTifo(membre)) {
-    document.getElementById('adminSectionTifo').style.display = 'block';
-  }
+  if (hasCelluleTifo(membre)) document.getElementById('adminSectionTifo').style.display = 'block';
+  if (hasCelluleDepl(membre)) { document.getElementById('adminSectionDepl').style.display = 'block'; document.getElementById('btnCreerDepl').style.display = 'block'; }
+  if (hasCelluleMatos(membre)) document.getElementById('adminSectionMatos').style.display = 'block';
+  if (hasCelluleSticks(membre)) document.getElementById('adminSectionSticks').style.display = 'block';
+  if (estCellule) document.getElementById('adminSectionStats').style.display = 'block';
 
   // Demandes inscription
-  if (peutValiderInscriptions(membre)) {
-    document.getElementById('demandesSection').style.display = 'block';
-  }
+  if (peutValiderInscriptions(membre)) document.getElementById('demandesSection').style.display = 'block';
 
-  // Cacher les sections legacy profil
+  // Legacy sections profil → cachées
   document.getElementById('sectionAdmin').style.display = 'none';
   document.getElementById('sectionStats').style.display = 'none';
 }
 
+function peutValiderInscriptions(membre) {
+  return hasAppRole(membre, 'admin_app', 'bureau_app', 'cellule_comite');
+}
+
+// ─── Admin Sessions ───────────────────────────────────────────
+async function loadAdminSessions() {
+  const el = document.getElementById('adminSessionsList');
+  if (!el) return;
+  try {
+    const { data } = await UL.sb.from('sessions_tifo')
+      .select('*').order('date', { ascending: false }).limit(15);
+    if (!data?.length) { el.innerHTML = '<p style="color:var(--gris);font-size:12px;">Aucune session</p>'; return; }
+    el.innerHTML = data.map(s => {
+      const isOpen = s.statut === 'en_cours';
+      const isPlanned = s.statut === 'a_venir';
+      const date = new Date(s.date).toLocaleDateString('fr-FR', {day:'numeric', month:'short'});
+      return `<div style="padding:10px 0;border-bottom:1px solid var(--border);">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;">
+          <div>
+            <div style="font-size:13px;font-weight:600;">${esc(s.nom)}</div>
+            <div style="font-size:11px;color:var(--gris);">${date}${s.heure?' · '+s.heure.slice(0,5):''}${isOpen?` · Code: <strong style="color:#10B981;">${s.code_presence}</strong>`:''}</div>
+          </div>
+          <span class="badge ${isOpen?'badge-vert':isPlanned?'badge-bleu':'badge-gris'}" style="font-size:10px;">${isOpen?'🟢':isPlanned?'🔵':'⚫'}</span>
+        </div>
+        <div style="display:flex;gap:5px;margin-top:8px;flex-wrap:wrap;">
+          ${isPlanned?`<button class="btn btn-sm btn-success" onclick="doOuvrirSession('${s.id}',event)">▶ Ouvrir</button>`:''}
+          ${isOpen?`<button class="btn btn-sm btn-danger" onclick="doFermerSession('${s.id}',event)">■ Fermer</button>`:''}
+          ${(isOpen||s.statut==='terminee')?`<button class="btn btn-sm btn-secondary" onclick="voirInscrits('${s.id}','${esc(s.nom)}',event)">👥 Inscrits</button>`:''}
+          ${(s.avec_pizza&&isOpen)?`<button class="btn btn-sm" style="background:rgba(255,149,0,.15);color:var(--pizza);border:1px solid rgba(255,149,0,.3);" onclick="voirPizzas('${s.id}',event)">🍕 Pizzas</button>`:''}
+        </div>
+      </div>`;
+    }).join('');
+  } catch(e) {}
+}
+
+// ─── CALENDRIER ───────────────────────────────────────────────
+let allMatchs = [], allEvenements = [], filtreCalendrier = 'tous';
+
+async function loadCalendrier() {
+  try {
+    const [mr, er] = await Promise.all([
+      UL.sb.from('matchs').select('*, deplacements(id,statut)').order('date', { ascending: true }),
+      UL.sb.from('evenements').select('*').order('date', { ascending: true })
+    ]);
+    allMatchs = mr.data || [];
+    allEvenements = er.data || [];
+    renderCalendrier();
+    await chargerMatchsExtSelect();
+  } catch(e) { toast('Erreur calendrier', 'error'); }
+}
+
+function filtrerCalendrier(filtre) {
+  filtreCalendrier = filtre;
+  document.querySelectorAll('#pageCalendrier .filter-btn').forEach(b => b.classList.remove('active'));
+  const ids = { tous:'calFiltreAll', domicile:'calFiltreHome', exterieur:'calFiltreAway', evenement:'calFiltreEvt' };
+  document.getElementById(ids[filtre])?.classList.add('active');
+  renderCalendrier();
+}
+
+const EVT_CONFIG = {
+  reunion: { emoji: '🤝', label: 'Réunion UL',        couleur: '#1A56DB' },
+  bbq:     { emoji: '🍖', label: 'BBQ',                couleur: '#F59E0B' },
+  fete:    { emoji: '🎊', label: 'Fête Fin de Saison', couleur: '#F59E0B' },
+  autre:   { emoji: '🎉', label: 'Événement',          couleur: '#10B981' },
+};
+
+function renderEvenementCard(evt) {
+  const cfg = EVT_CONFIG[evt.type] || EVT_CONFIG.autre;
+  const date = evt.date ? new Date(evt.date+'T12:00:00').toLocaleDateString('fr-FR', {weekday:'short', day:'numeric', month:'long'}) : '';
+  const heures = [evt.horaire_debut, evt.horaire_fin].filter(Boolean).map(h => h.slice(0,5)).join(' → ');
+  return `<div class="card" style="margin-bottom:10px;padding:14px;border-left:3px solid ${cfg.couleur};">
+    <div style="display:flex;align-items:center;gap:12px;">
+      <div style="width:44px;height:44px;border-radius:12px;background:${cfg.couleur}22;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;">${cfg.emoji}</div>
+      <div style="flex:1;min-width:0;">
+        <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:16px;">${esc(evt.nom||cfg.label)}</div>
+        <div style="font-size:12px;color:var(--gris);">📅 ${date}${heures ? ' · ⏰ '+heures : ''}</div>
+        ${evt.lieu ? `<div style="font-size:12px;color:var(--gris);">📍 ${esc(evt.lieu)}</div>` : ''}
+        ${evt.description ? `<div style="font-size:12px;color:#CBD5E1;margin-top:4px;">${esc(evt.description)}</div>` : ''}
+        ${evt.lien_helloasso ? `<a href="${esc(evt.lien_helloasso)}" target="_blank"><button class="btn btn-sm btn-primary" style="margin-top:8px;">💳 S'inscrire</button></a>` : ''}
+      </div>
+      <span class="badge" style="background:${cfg.couleur}33;color:${cfg.couleur};flex-shrink:0;font-size:10px;">${cfg.label}</span>
+    </div>
+  </div>`;
+}
+
+function logoClub(url, nom, size=38) {
+  const initiales = (nom||'?').split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,3);
+  const couleurs = ['#1A56DB','#10B981','#F59E0B','#EF4444','#8B5CF6','#06B6D4'];
+  const couleur = couleurs[initiales.charCodeAt(0) % couleurs.length];
+  const id = 'logo_' + Math.random().toString(36).slice(2,8);
+  return `<div style="width:${size}px;height:${size}px;flex-shrink:0;position:relative;">
+    <div id="${id}_fb" style="display:flex;width:${size}px;height:${size}px;border-radius:50%;background:${couleur};align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:${Math.round(size*0.35)}px;color:white;">${initiales}</div>
+    ${url ? `<img src="${url}" style="width:${size}px;height:${size}px;object-fit:contain;position:absolute;top:0;left:0;"
+      onload="this.style.opacity=1;document.getElementById('${id}_fb').style.display='none';"
+      onerror="this.style.display='none';"
+      style="opacity:0;transition:opacity .2s;">` : ''}
+  </div>`;
+}
+
+function renderCalendrier() {
+  const m = UL.getCurrentMembre();
+  const today = new Date().toISOString().split('T')[0];
+  let items = [];
+  if (filtreCalendrier === 'evenement') {
+    items = allEvenements.map(e => ({ ...e, _kind: 'evenement', _sortDate: e.date }));
+  } else {
+    const mf = filtreCalendrier === 'tous' ? allMatchs : allMatchs.filter(mm => mm.type === filtreCalendrier);
+    items = mf.map(mm => ({ ...mm, _kind: 'match', _sortDate: mm.date }));
+    if (filtreCalendrier === 'tous') items = items.concat(allEvenements.map(e => ({ ...e, _kind: 'evenement', _sortDate: e.date })));
+    items.sort((a, b) => (a._sortDate||'').localeCompare(b._sortDate||''));
+  }
+  const el = document.getElementById('calendrierListe');
+  if (!el) return;
+  if (!items.length) { el.innerHTML = '<div class="empty-state"><div>📅</div>Rien à afficher</div>'; return; }
+  el.innerHTML = items.map(item => {
+    if (item._kind === 'evenement') return renderEvenementCard(item);
+    const match = item;
+    const passe = match.date < today;
+    const dateStr = match.date ? new Date(match.date+'T12:00:00').toLocaleDateString('fr-FR', {weekday:'short', day:'numeric', month:'long', year:'numeric'}) : '';
+    const aScore = match.score_domicile !== null && match.score_exterieur !== null;
+    const depl = (match.deplacements||[]).find(d => d.statut === 'ouvert');
+    return `<div class="card" style="margin-bottom:10px;padding:14px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+        <span style="font-size:10px;color:var(--gris);text-transform:uppercase;">J${match.journee||'?'} · ${match.competition||''}</span>
+        <span class="badge ${match.type==='domicile'?'badge-bleu':'badge-gris'}" style="font-size:10px;">${match.type==='domicile'?'🏠 Dom.':'✈️ Ext.'}</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;">
+          <div style="display:flex;justify-content:center;">${logoClub(match.logo_domicile, match.equipe_domicile, 38)}</div>
+          <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:12px;text-align:center;">${esc(match.equipe_domicile||'')}</div>
+        </div>
+        <div style="flex-shrink:0;text-align:center;min-width:70px;">
+          ${aScore ? `<div style="font-family:'Bebas Neue',sans-serif;font-size:28px;">${match.score_domicile} — ${match.score_exterieur}</div>` 
+            : `<div style="font-size:12px;color:var(--bleu-clair);font-weight:700;">${dateStr.split(' ').slice(0,3).join(' ')}</div>
+               <div style="font-size:11px;color:var(--gris);">${match.horaire ? match.horaire.slice(0,5) : 'TBC'}</div>`}
+        </div>
+        <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;">
+          <div style="display:flex;justify-content:center;">${logoClub(match.logo_exterieur, match.equipe_exterieur, 38)}</div>
+          <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:12px;text-align:center;">${esc(match.equipe_exterieur||'')}</div>
+        </div>
+      </div>
+      <div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border);font-size:11px;color:var(--gris);">📍 ${esc(match.stade||'')} · ${dateStr}</div>
+      <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;">
+        ${depl ? `<button class="btn btn-sm btn-primary" onclick="showPage('pageDeplacements')">🚌 Bus dispo</button>` : ''}
+        ${passe && isBureau(m) ? `<button class="btn btn-sm btn-secondary" onclick="ouvrirModalScore('${match.id}','${esc(match.equipe_domicile)}','${esc(match.equipe_exterieur)}',${match.score_domicile??'null'},${match.score_exterieur??'null'})">⚽ ${aScore?'Modifier':'Saisir'} score</button>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function chargerMatchsExtSelect() {
+  try {
+    const today = new Date().toISOString().split('T')[0];
+    const { data } = await UL.sb.from('matchs').select('*').eq('type','exterieur').gte('date',today).order('date');
+    const sel = document.getElementById('dMatchId'); if (!sel) return;
+    sel.innerHTML = '<option value="">— Saisie manuelle —</option>';
+    (data||[]).forEach(m => {
+      const date = new Date(m.date+'T12:00:00').toLocaleDateString('fr-FR', {day:'numeric', month:'short'});
+      sel.innerHTML += `<option value="${m.id}" data-adv="${esc(m.equipe_domicile)}" data-date="${m.date}" data-stade="${esc(m.stade||'')}" data-ville="">${date} — ${m.equipe_domicile}</option>`;
+    });
+  } catch(e) {}
+}
+function preRemplirDepuisMatch() {
+  const sel = document.getElementById('dMatchId');
+  const opt = sel.options[sel.selectedIndex];
+  if (!opt?.value) return;
+  document.getElementById('dAdv').value = opt.dataset.adv || '';
+  document.getElementById('dDate').value = opt.dataset.date || '';
+  document.getElementById('dStade').value = opt.dataset.stade || '';
+  document.getElementById('dVille').value = opt.dataset.ville || '';
+}
+
+function ouvrirModalScore(matchId, dom, ext, scoreDom, scoreExt) {
+  document.getElementById('scoreMatchId').value = matchId;
+  document.getElementById('modalScoreTitre').textContent = dom + ' — ' + ext;
+  document.getElementById('scoreLabelDom').textContent = dom;
+  document.getElementById('scoreLabelExt').textContent = ext;
+  document.getElementById('scoreDom').value = scoreDom !== null ? scoreDom : '';
+  document.getElementById('scoreExt').value = scoreExt !== null ? scoreExt : '';
+  showModal('modalScore');
+}
+async function doSaisirScore() {
+  const matchId = document.getElementById('scoreMatchId').value;
+  const dom = document.getElementById('scoreDom').value;
+  const ext = document.getElementById('scoreExt').value;
+  if (dom === '' || ext === '') return toast('Saisis les deux scores', 'error');
+  try {
+    const { error } = await UL.sb.from('matchs').update({ score_domicile: parseInt(dom), score_exterieur: parseInt(ext) }).eq('id', matchId);
+    if (error) throw error;
+    toast('Score enregistré ✅', 'success');
+    closeModal('modalScore');
+    loadCalendrier();
+  } catch(e) { toast('Erreur sauvegarde score', 'error'); }
+}
+
+async function doCreerEvenement() {
+  const nom = document.getElementById('evtNom').value.trim();
+  const date = document.getElementById('evtDate').value;
+  if (!nom) return toast('Nom requis', 'error');
+  if (!date) return toast('Date requise', 'error');
+  try {
+    const { error } = await UL.sb.from('evenements').insert({
+      nom, date,
+      type: document.getElementById('evtType').value,
+      horaire_debut: document.getElementById('evtHeureDebut').value || null,
+      horaire_fin: document.getElementById('evtHeureFin').value || null,
+      lieu: document.getElementById('evtLieu').value.trim() || null,
+      description: document.getElementById('evtDesc').value.trim() || null,
+      lien_helloasso: document.getElementById('evtHelloasso').value.trim() || null,
+    });
+    if (error) throw error;
+    toast('Événement créé ✅', 'success');
+    closeModal('modalCreerEvenement');
+    loadCalendrier();
+  } catch(e) { toast(e.message || 'Erreur création', 'error'); }
+}
+
+// ─── CARTAGE ──────────────────────────────────────────────────
+let allCartage = [], filtreCartage = 'tous';
+
+async function loadCartage() {
+  try {
+    const { data } = await UL.sb.from('membres').select('*, section:sections(nom)').order('nom');
+    allCartage = data || [];
+    renderCartage();
+  } catch(e) { toast('Erreur chargement cartage', 'error'); }
+}
+function filtrerCartage(filtre) {
+  filtreCartage = filtre;
+  document.querySelectorAll('#pageCartage .filter-btn').forEach(b => b.classList.remove('active'));
+  const ids = { tous:'cartFiltreAll', carte:'cartFiltreOk', incomplet:'cartFiltreKo' };
+  document.getElementById(ids[filtre])?.classList.add('active');
+  renderCartage();
+}
+function renderCartage() {
+  let membres = allCartage;
+  if (filtreCartage === 'carte') membres = membres.filter(m => m.cotisation_a_jour && m.charte_signee);
+  if (filtreCartage === 'incomplet') membres = membres.filter(m => !m.cotisation_a_jour || !m.charte_signee);
+  const el = document.getElementById('cartageList');
+  if (!membres.length) { el.innerHTML = '<div class="empty-state"><div>🪪</div>Aucun membre</div>'; return; }
+  el.innerHTML = membres.map(m => {
+    const initiales = ((m.prenom||'?')[0]+(m.nom||'?')[0]).toUpperCase();
+    const carte = m.cotisation_a_jour && m.charte_signee;
+    return `<div class="card" style="margin-bottom:8px;padding:12px;">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div class="avatar" style="width:36px;height:36px;font-size:13px;">${initiales}</div>
+        <div style="flex:1;min-width:0;">
+          <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;">${esc(m.prenom)} ${esc(m.nom)}</div>
+          <div style="font-size:11px;color:var(--gris);">@${esc(m.pseudo_telegram)} ${m.section ? '· '+esc(m.section.nom) : ''}</div>
+        </div>
+        <span class="badge ${carte ? 'badge-vert' : 'badge-orange'}">${carte ? '🪪 Carté' : '⚠️ Incomplet'}</span>
+      </div>
+      <div style="display:flex;gap:12px;margin-top:10px;padding-top:8px;border-top:1px solid var(--border);font-size:12px;">
+        <span>${m.charte_signee ? '✅' : '❌'} Charte</span>
+        <span>${m.cotisation_a_jour ? '✅' : '❌'} Cotisation</span>
+      </div>
+      ${!m.cotisation_a_jour ? `<div style="display:flex;gap:6px;margin-top:8px;">
+        <button class="btn btn-sm btn-success" onclick="doValiderCotisationCash('${m.id}');setTimeout(loadCartage,800)">💵 Cash</button>
+        <button class="btn btn-sm btn-primary" onclick="doValiderCotisationHA('${m.id}');setTimeout(loadCartage,800)">💳 HelloAsso</button>
+      </div>` : ''}
+    </div>`;
+  }).join('');
+}
 
 // ─── Navigation ───────────────────────────────────────────────
 function showPage(pageId) {
@@ -1284,27 +1291,11 @@ function showPage(pageId) {
   if (pageId === 'pageStats') loadStats();
   if (pageId === 'pageCharte') loadCharte();
   if (pageId === 'pageCartage') loadCartage();
+  if (pageId === 'pageAdmin') loadAdminSessions();
 }
 
 // ─── ACCUEIL ──────────────────────────────────────────────────
 async function loadAccueil() {
-  // Prochains matchs (domicile + extérieur)
-  try {
-    const today = new Date().toISOString().split('T')[0];
-    const { data: matchs } = await UL.sb.from('matchs')
-      .select('*, deplacements(id,statut)')
-      .gte('date', today)
-      .order('date')
-      .limit(20);
-    const domicile = (matchs||[]).find(m => m.type === 'domicile');
-    const exterieur = (matchs||[]).find(m => m.type === 'exterieur');
-    document.getElementById('prochainDomicile').innerHTML = domicile
-      ? renderMiniMatchCard(domicile, 'domicile')
-      : `<div class="card" style="padding:12px;text-align:center;"><div style="font-size:11px;color:var(--gris);">🏠 Domicile</div><div style="font-size:12px;color:var(--gris);margin-top:4px;">Aucun match</div></div>`;
-    document.getElementById('prochainExterieur').innerHTML = exterieur
-      ? renderMiniMatchCard(exterieur, 'exterieur')
-      : `<div class="card" style="padding:12px;text-align:center;"><div style="font-size:11px;color:var(--gris);">✈️ Extérieur</div><div style="font-size:12px;color:var(--gris);margin-top:4px;">Aucun match</div></div>`;
-  } catch(e) {}
   // Annonces
   try {
     const annonces = await UL.getAnnonces();
@@ -1330,16 +1321,6 @@ async function loadAccueil() {
       ? renderDeplCard(depls[0])
       : '<p style="color:var(--gris);font-size:14px;">Aucun déplacement à venir</p>';
   } catch(e) {}
-  // Prochain événement
-  try {
-    const today = new Date().toISOString().split('T')[0];
-    const { data: evts } = await UL.sb.from('evenements')
-      .select('*').gte('date', today).order('date').limit(1);
-    const el = document.getElementById('evenementAccueil');
-    el.innerHTML = evts && evts.length
-      ? renderEvenementCard(evts[0])
-      : '<p style="color:var(--gris);font-size:14px;">Aucun événement à venir</p>';
-  } catch(e) {}
   // Stats perso
   try {
     const stats = await UL.getMesStats();
@@ -1355,307 +1336,6 @@ async function loadAccueil() {
   if (peutValiderInscriptions(m)) {
     await loadDemandes();
   }
-}
-
-// ─── Helper logo club ─────────────────────────────────────────
-function logoClub(url, nom, size=38) {
-  const initiales = (nom||'?').split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,3);
-  const couleurs = ['#1A56DB','#10B981','#F59E0B','#EF4444','#8B5CF6','#06B6D4'];
-  const couleur = couleurs[initiales.charCodeAt(0) % couleurs.length];
-  const id = 'logo_' + Math.random().toString(36).slice(2,8);
-  return `<div style="width:${size}px;height:${size}px;flex-shrink:0;position:relative;">
-    <div id="${id}_fallback" style="display:none;width:${size}px;height:${size}px;border-radius:50%;background:${couleur};display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:${Math.round(size*0.35)}px;color:white;flex-shrink:0;">${initiales}</div>
-    ${url ? `<img src="${url}" style="width:${size}px;height:${size}px;object-fit:contain;position:absolute;top:0;left:0;"
-      onload="this.style.opacity=1;document.getElementById('${id}_fallback').style.display='none';"
-      onerror="this.style.display='none';document.getElementById('${id}_fallback').style.display='flex';"
-      style="opacity:0;transition:opacity .2s;">` : ''}
-  </div>`;
-}
-
-// ─── MINI MATCH CARD (accueil) ────────────────────────────────
-function renderMiniMatchCard(match, type) {
-  const date = match.date ? new Date(match.date).toLocaleDateString('fr-FR', {day:'numeric', month:'short'}) : '';
-  const adversaire = type === 'domicile' ? match.equipe_exterieur : match.equipe_domicile;
-  const logo = type === 'domicile' ? match.logo_exterieur : match.logo_domicile;
-  const deplacement = (match.deplacements||[]).find(d => d.statut === 'ouvert');
-
-  return `<div class="card" style="padding:12px;cursor:pointer;" onclick="showPage('pageCalendrier')">
-    <div style="font-size:10px;color:var(--gris);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;">
-      ${type === 'domicile' ? '🏠 Domicile' : '✈️ Extérieur'}
-    </div>
-    <div style="display:flex;justify-content:center;margin-bottom:6px;">${logoClub(logo, adversaire, 36)}</div>
-    <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;line-height:1.2;margin-bottom:4px;text-align:center;">${esc(adversaire||'')}</div>
-    <div style="font-size:11px;color:var(--gris);text-align:center;">📅 ${date}</div>
-    ${deplacement ? `<button class="btn btn-sm btn-primary" style="margin-top:8px;width:100%;font-size:11px;" onclick="event.stopPropagation();showPage('pageDeplacements')">🚌 Voir le bus</button>` : ''}
-  </div>`;
-}
-
-// ─── CALENDRIER ───────────────────────────────────────────────
-let allMatchs = [];
-let allEvenements = [];
-let filtreCalendrier = 'tous';
-
-async function loadCalendrier() {
-  try {
-    const [matchsRes, evtsRes] = await Promise.all([
-      UL.sb.from('matchs').select('*, deplacements(id,statut)').order('date', { ascending: true }),
-      UL.sb.from('evenements').select('*').order('date', { ascending: true })
-    ]);
-    allMatchs = matchsRes.data || [];
-    allEvenements = evtsRes.data || [];
-    renderCalendrier();
-    await chargerMatchsExtSelect();
-  } catch(e) { toast('Erreur calendrier', 'error'); }
-}
-
-function filtrerCalendrier(filtre) {
-  filtreCalendrier = filtre;
-  document.querySelectorAll('#pageCalendrier .filter-btn').forEach(b => b.classList.remove('active'));
-  const ids = { tous:'calFiltreAll', domicile:'calFiltreHome', exterieur:'calFiltreAway', evenement:'calFiltreEvt' };
-  document.getElementById(ids[filtre])?.classList.add('active');
-  renderCalendrier();
-}
-
-// Config visuelles événements
-const EVT_CONFIG = {
-  reunion: { emoji: '🤝', label: 'Réunion UL',         couleur: '#1A56DB' },
-  bbq:     { emoji: '🍖', label: 'BBQ',                 couleur: '#F59E0B' },
-  fete:    { emoji: '🎊', label: 'Fête Fin de Saison',  couleur: '#F59E0B' },
-  autre:   { emoji: '🎉', label: 'Événement',           couleur: '#10B981' },
-};
-
-function renderEvenementCard(evt) {
-  const cfg = EVT_CONFIG[evt.type] || EVT_CONFIG.autre;
-  const date = evt.date ? new Date(evt.date+'T12:00:00').toLocaleDateString('fr-FR', {weekday:'short', day:'numeric', month:'long'}) : '';
-  const heures = [evt.horaire_debut, evt.horaire_fin].filter(Boolean).map(h => h.slice(0,5)).join(' → ');
-  return `<div class="card" style="margin-bottom:10px;padding:14px;border-left:3px solid ${cfg.couleur};">
-    <div style="display:flex;align-items:center;gap:12px;">
-      <div style="width:44px;height:44px;border-radius:12px;background:${cfg.couleur}22;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;">${cfg.emoji}</div>
-      <div style="flex:1;min-width:0;">
-        <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:16px;">${esc(evt.nom||cfg.label)}</div>
-        <div style="font-size:12px;color:var(--gris);margin-top:2px;">
-          📅 ${date}${heures ? ' · ⏰ '+heures : ''}
-        </div>
-        ${evt.lieu ? `<div style="font-size:12px;color:var(--gris);">📍 ${esc(evt.lieu)}</div>` : ''}
-        ${evt.description ? `<div style="font-size:12px;color:#CBD5E1;margin-top:4px;">${esc(evt.description)}</div>` : ''}
-        ${evt.lien_helloasso ? `<a href="${esc(evt.lien_helloasso)}" target="_blank"><button class="btn btn-sm btn-primary" style="margin-top:8px;">💳 S'inscrire / Payer</button></a>` : ''}
-      </div>
-      <span class="badge" style="background:${cfg.couleur}33;color:${cfg.couleur};flex-shrink:0;font-size:10px;">${cfg.label}</span>
-    </div>
-  </div>`;
-}
-
-function renderCalendrier() {
-  const m = UL.getCurrentMembre();
-  const peutScore = isBureau(m);
-  const today = new Date().toISOString().split('T')[0];
-
-  // Construire liste combinée selon filtre
-  let items = [];
-  if (filtreCalendrier === 'evenement') {
-    items = allEvenements.map(e => ({ ...e, _kind: 'evenement', _sortDate: e.date }));
-  } else {
-    const matchsFiltres = filtreCalendrier === 'tous'
-      ? allMatchs
-      : allMatchs.filter(mm => mm.type === filtreCalendrier);
-    items = matchsFiltres.map(mm => ({ ...mm, _kind: 'match', _sortDate: mm.date }));
-    if (filtreCalendrier === 'tous') {
-      items = items.concat(allEvenements.map(e => ({ ...e, _kind: 'evenement', _sortDate: e.date })));
-    }
-    items.sort((a, b) => a._sortDate?.localeCompare(b._sortDate));
-  }
-
-  const el = document.getElementById('calendrierListe');
-  if (!items.length) { el.innerHTML = '<div class="empty-state"><div>📅</div>Rien à afficher</div>'; return; }
-
-  el.innerHTML = items.map(item => {
-    if (item._kind === 'evenement') return renderEvenementCard(item);
-
-    // --- MATCH ---
-    const match = item;
-    const passe = match.date < today;
-    const dateStr = match.date ? new Date(match.date+'T12:00:00').toLocaleDateString('fr-FR', {weekday:'short', day:'numeric', month:'long', year:'numeric'}) : '';
-    const logoD = match.logo_domicile;
-    const logoE = match.logo_exterieur;
-    const aScore = match.score_domicile !== null && match.score_exterieur !== null;
-    const deplacement = (match.deplacements||[]).find(d => d.statut === 'ouvert');
-
-    return `<div class="card" style="margin-bottom:10px;padding:14px;">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-        <span style="font-size:10px;color:var(--gris);text-transform:uppercase;letter-spacing:.05em;">
-          J${match.journee||'?'} · ${match.competition||''}
-        </span>
-        <span class="badge ${match.type==='domicile'?'badge-bleu':'badge-gris'}" style="font-size:10px;">
-          ${match.type==='domicile'?'🏠 Dom.':'✈️ Ext.'}
-        </span>
-      </div>
-      <div style="display:flex;align-items:center;gap:8px;">
-        <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;">
-          <div style="display:flex;justify-content:center;">${logoClub(logoD, match.equipe_domicile, 38)}</div>
-          <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:12px;text-align:center;line-height:1.2;">${esc(match.equipe_domicile||'')}</div>
-        </div>
-        <div style="flex-shrink:0;text-align:center;min-width:70px;">
-          ${aScore
-            ? `<div style="font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:.05em;line-height:1;">${match.score_domicile} — ${match.score_exterieur}</div>
-               <div style="font-size:10px;color:var(--gris);margin-top:2px;">Score final</div>`
-            : `<div style="font-size:12px;color:var(--bleu-clair);font-weight:700;">${dateStr.split(' ').slice(0,3).join(' ')}</div>
-               <div style="font-size:11px;color:var(--gris);">${match.horaire ? match.horaire.slice(0,5) : 'TBC'}</div>`
-          }
-        </div>
-        <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;">
-          <div style="display:flex;justify-content:center;">${logoClub(logoE, match.equipe_exterieur, 38)}</div>
-          <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:12px;text-align:center;line-height:1.2;">${esc(match.equipe_exterieur||'')}</div>
-        </div>
-      </div>
-      <div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border);font-size:11px;color:var(--gris);">
-        📍 ${esc(match.stade||'')} · ${dateStr}
-      </div>
-      <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;">
-        ${deplacement ? `<button class="btn btn-sm btn-primary" onclick="showPage('pageDeplacements')">🚌 Bus dispo</button>` : ''}
-        ${passe && peutScore ? `<button class="btn btn-sm btn-secondary" onclick="ouvrirModalScore('${match.id}','${esc(match.equipe_domicile)}','${esc(match.equipe_exterieur)}',${match.score_domicile??'null'},${match.score_exterieur??'null'})">⚽ ${aScore?'Modifier':'Saisir'} le score</button>` : ''}
-      </div>
-    </div>`;
-  }).join('');
-}
-
-function ouvrirModalScore(matchId, dom, ext, scoreDom, scoreExt) {
-  document.getElementById('scoreMatchId').value = matchId;
-  document.getElementById('modalScoreTitre').textContent = dom + ' — ' + ext;
-  document.getElementById('scoreLabelDom').textContent = dom;
-  document.getElementById('scoreLabelExt').textContent = ext;
-  document.getElementById('scoreDom').value = scoreDom !== null ? scoreDom : '';
-  document.getElementById('scoreExt').value = scoreExt !== null ? scoreExt : '';
-  showModal('modalScore');
-}
-
-async function doSaisirScore() {
-  const matchId = document.getElementById('scoreMatchId').value;
-  const dom = document.getElementById('scoreDom').value;
-  const ext = document.getElementById('scoreExt').value;
-  if (dom === '' || ext === '') return toast('Saisis les deux scores', 'error');
-  try {
-    const { error } = await UL.sb.from('matchs')
-      .update({ score_domicile: parseInt(dom), score_exterieur: parseInt(ext) })
-      .eq('id', matchId);
-    if (error) throw error;
-    toast('Score enregistré ✅', 'success');
-    closeModal('modalScore');
-    loadCalendrier();
-  } catch(e) { toast('Erreur sauvegarde score', 'error'); }
-}
-
-async function doCreerEvenement() {
-  const nom = document.getElementById('evtNom').value.trim();
-  const date = document.getElementById('evtDate').value;
-  const type = document.getElementById('evtType').value;
-  const heureDebut = document.getElementById('evtHeureDebut').value || null;
-  const heureFin = document.getElementById('evtHeureFin').value || null;
-  const lieu = document.getElementById('evtLieu').value.trim() || null;
-  const description = document.getElementById('evtDesc').value.trim() || null;
-  const lienHelloasso = document.getElementById('evtHelloasso').value.trim() || null;
-  if (!nom) return toast('Nom requis', 'error');
-  if (!date) return toast('Date requise', 'error');
-  try {
-    const { error } = await UL.sb.from('evenements').insert({
-      nom, date, type,
-      horaire_debut: heureDebut,
-      horaire_fin: heureFin,
-      lieu, description,
-      lien_helloasso: lienHelloasso,
-    });
-    if (error) throw error;
-    toast('Événement créé ✅', 'success');
-    closeModal('modalCreerEvenement');
-    ['evtNom','evtDate','evtHeureDebut','evtHeureFin','evtLieu','evtDesc','evtHelloasso'].forEach(id => {
-      document.getElementById(id).value = '';
-    });
-    loadCalendrier();
-    loadAccueil();
-  } catch(e) { toast(e.message || 'Erreur création', 'error'); }
-}
-
-// ─── CARTAGE ──────────────────────────────────────────────────
-let allCartage = [];
-let filtreCartage = 'tous';
-
-async function loadCartage() {
-  try {
-    const { data } = await UL.sb.from('membres')
-      .select('*, section:sections(nom), cotisations(statut, saison)')
-      .order('nom');
-    allCartage = data || [];
-    renderCartage();
-  } catch(e) { toast('Erreur chargement cartage', 'error'); }
-}
-
-function filtrerCartage(filtre) {
-  filtreCartage = filtre;
-  document.querySelectorAll('#pageCartage .filter-btn').forEach(b => b.classList.remove('active'));
-  const ids = { tous:'cartFiltreAll', carte:'cartFiltreOk', incomplet:'cartFiltreKo' };
-  document.getElementById(ids[filtre])?.classList.add('active');
-  renderCartage();
-}
-
-function renderCartage() {
-  let membres = allCartage;
-  if (filtreCartage === 'carte') membres = membres.filter(m => m.cotisation_a_jour && m.charte_signee);
-  if (filtreCartage === 'incomplet') membres = membres.filter(m => !m.cotisation_a_jour || !m.charte_signee);
-
-  const el = document.getElementById('cartageList');
-  if (!membres.length) { el.innerHTML = '<div class="empty-state"><div>🪪</div>Aucun membre</div>'; return; }
-
-  el.innerHTML = membres.map(m => {
-    const initiales = ((m.prenom||'?')[0]+(m.nom||'?')[0]).toUpperCase();
-    const carte = m.cotisation_a_jour && m.charte_signee;
-    return `<div class="card" style="margin-bottom:8px;padding:12px;">
-      <div style="display:flex;align-items:center;gap:10px;">
-        <div class="avatar" style="width:36px;height:36px;font-size:13px;">${initiales}</div>
-        <div style="flex:1;min-width:0;">
-          <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;">${esc(m.prenom)} ${esc(m.nom)}</div>
-          <div style="font-size:11px;color:var(--gris);">@${esc(m.pseudo_telegram)} ${m.section ? '· '+esc(m.section.nom) : ''}</div>
-        </div>
-        <span class="badge ${carte ? 'badge-vert' : 'badge-orange'}">${carte ? '🪪 Carté' : '⚠️ Incomplet'}</span>
-      </div>
-      <div style="display:flex;gap:12px;margin-top:10px;padding-top:8px;border-top:1px solid var(--border);font-size:12px;">
-        <span>${m.charte_signee ? '✅' : '❌'} Charte</span>
-        <span>${m.cotisation_a_jour ? '✅' : '❌'} Cotisation</span>
-      </div>
-      ${!m.cotisation_a_jour ? `
-      <div style="display:flex;gap:6px;margin-top:8px;">
-        <button class="btn btn-sm btn-success" onclick="doValiderCotisationCash('${m.id}');setTimeout(loadCartage,500)">💵 Cash</button>
-        <button class="btn btn-sm btn-primary" onclick="doValiderCotisationHA('${m.id}');setTimeout(loadCartage,500)">💳 HelloAsso</button>
-      </div>` : ''}
-    </div>`;
-  }).join('');
-}
-
-// ─── Pré-remplissage déplacement depuis match ─────────────────
-async function chargerMatchsExtSelect() {
-  try {
-    const today = new Date().toISOString().split('T')[0];
-    const { data } = await UL.sb.from('matchs')
-      .select('*')
-      .eq('type', 'exterieur')
-      .gte('date', today)
-      .order('date');
-    const sel = document.getElementById('dMatchId');
-    if (!sel) return;
-    sel.innerHTML = '<option value="">— Saisie manuelle —</option>';
-    (data||[]).forEach(m => {
-      const date = new Date(m.date+'T12:00:00').toLocaleDateString('fr-FR', {day:'numeric', month:'short'});
-      sel.innerHTML += `<option value="${m.id}" data-adv="${esc(m.equipe_domicile)}" data-date="${m.date}" data-stade="${esc(m.stade||'')}" data-ville="">${date} — ${m.equipe_domicile} (${m.stade||''})</option>`;
-    });
-  } catch(e) {}
-}
-
-function preRemplirDepuisMatch() {
-  const sel = document.getElementById('dMatchId');
-  const opt = sel.options[sel.selectedIndex];
-  if (!opt || !opt.value) return;
-  document.getElementById('dAdv').value = opt.dataset.adv || '';
-  document.getElementById('dDate').value = opt.dataset.date || '';
-  document.getElementById('dStade').value = opt.dataset.stade || '';
-  document.getElementById('dVille').value = opt.dataset.ville || '';
 }
 
 async function loadDemandes() {
@@ -1722,11 +1402,10 @@ async function refuserDemande(membreId) {
 
 // ─── SESSIONS ─────────────────────────────────────────────────
 async function loadSessions() {
-  const m = UL.getCurrentMembre();
   try {
     const sessions = await UL.getUpcomingSessions();
     document.getElementById('sessionsListe').innerHTML = sessions.length
-      ? sessions.map(s => renderSessionCard(s, true)).join('')
+      ? sessions.map(s => renderSessionCard(s)).join('')
       : '<div class="empty-state"><div>📋</div>Aucune session à venir</div>';
     const past = await UL.getPastSessions();
     document.getElementById('sessionsHistorique').innerHTML = past.length
@@ -1735,49 +1414,36 @@ async function loadSessions() {
   } catch(e) { toast('Erreur chargement sessions', 'error'); }
 }
 
-function renderSessionCard(s, withAdmin = false) {
-  const m = UL.getCurrentMembre();
+function renderSessionCard(s) {
   const date = new Date(s.date).toLocaleDateString('fr-FR', { weekday:'short', day:'numeric', month:'short' });
   const types = { Tracage:'🖊️', Assemblage:'🔧', Peinture:'🖌️' };
   const isOpen = s.statut === 'en_cours';
   const isPlanned = s.statut === 'a_venir';
   const isTerminee = s.statut === 'terminee';
-  const showAdmin = withAdmin && isCellule(m);
 
-  const badgeStatut = `<span class="badge ${isOpen ? 'badge-vert' : isPlanned ? 'badge-bleu' : 'badge-gris'}" style="flex-shrink:0;">
-    ${isOpen ? 'En cours' : isPlanned ? 'À venir' : isTerminee ? 'Terminée' : 'Annulée'}
+  const badge = `<span class="badge ${isOpen ? 'badge-vert' : isPlanned ? 'badge-bleu' : 'badge-gris'}" style="flex-shrink:0;">
+    ${isOpen ? '🟢 En cours' : isPlanned ? '🔵 À venir' : '⚫ Terminée'}
   </span>`;
 
-  // Barre admin : code présence + inscrits + pizzas (sans Ouvrir / Supprimer / Fermer)
-  const adminBar = showAdmin ? `
-    <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-top:10px;padding-top:10px;border-top:1px solid var(--border);">
-      ${isOpen ? `<div class="session-code" style="font-size:20px;letter-spacing:.15em;margin-right:4px;">${s.code_presence || '----'}</div>` : ''}
-      ${(isOpen || isTerminee) ? `<button class="btn btn-sm btn-secondary" onclick="voirInscrits('${s.id}','${esc(s.nom)}',event)">👥 Inscrits</button>` : ''}
-      ${s.avec_pizza && isOpen ? `<button class="btn btn-sm" style="background:rgba(255,149,0,.15);color:var(--pizza);border:1px solid rgba(255,149,0,.3);" onclick="voirPizzas('${s.id}',event)">🍕 Pizzas</button>` : ''}
-    </div>` : '';
+  const pid = 'participants_' + s.id;
 
-  // Liste participants (visible pour tous, lazy)
-  const pid = `participants_${s.id}`;
-  const participantsToggle = `
+  return `<div class="session-card ${isOpen ? 'open' : ''}">
+    <div style="display:flex;align-items:flex-start;gap:10px;" onclick="openSession('${s.id}')">
+      <div class="status-dot ${isOpen ? 'open' : isPlanned ? 'planned' : 'closed'}" style="margin-top:5px;"></div>
+      <div style="flex:1;min-width:0;">
+        <div class="card-title">${types[s.type_session] || '📋'} ${esc(s.nom)}</div>
+        <div class="card-sub">${date}${s.heure ? ' · ' + s.heure.slice(0,5) : ''} · ${esc(s.lieu)}</div>
+        ${s.avec_pizza ? '<div style="font-size:11px;color:var(--pizza);margin-top:4px;">🍕 Session pizza</div>' : ''}
+        ${s.capacite_max ? `<div style="font-size:11px;color:var(--gris);margin-top:2px;">👥 ${s._nb_inscrits||0} / ${s.capacite_max} places</div>` : ''}
+      </div>
+      ${badge}
+    </div>
     <div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border);" onclick="event.stopPropagation()">
-      <button class="btn btn-sm btn-secondary" style="width:100%;" onclick="toggleParticipants('${s.id}', event)">
+      <button class="btn btn-secondary" style="width:100%;padding:8px;" onclick="toggleParticipants('${s.id}', event)">
         👥 Voir les participants
       </button>
       <div id="${pid}" style="display:none;margin-top:10px;"></div>
-    </div>`;
-
-  return `<div class="session-card ${isOpen ? 'open' : ''}" onclick="openSession('${s.id}')">
-    <div style="display:flex;align-items:flex-start;gap:10px;">
-      <div class="status-dot ${isOpen ? 'open' : isPlanned ? 'planned' : 'closed'}" style="margin-top:5px;"></div>
-      <div style="flex:1;min-width:0;">
-        <div class="card-title">${types[s.type_session] || '📋'} ${s.nom}</div>
-        <div class="card-sub">${date}${s.heure ? ' · ' + s.heure.slice(0,5) : ''} · ${s.lieu}</div>
-        ${s.avec_pizza ? '<div style="font-size:11px;color:var(--pizza);margin-top:4px;">🍕 Session pizza</div>' : ''}
-      </div>
-      ${badgeStatut}
     </div>
-    ${adminBar}
-    ${participantsToggle}
   </div>`;
 }
 
@@ -1799,14 +1465,10 @@ async function toggleParticipants(sessionId, e) {
     el.innerHTML = inscrits.length ? inscrits.map(i => `
       <div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--border);font-size:12px;">
         <div style="flex:1;min-width:0;">
-          <div style="font-weight:600;">@${i.membre?.pseudo_telegram||'?'}</div>
-          <div style="color:var(--gris);font-size:11px;">${i.membre?.prenom||''} ${i.membre?.nom||''}</div>
+          <div style="font-weight:600;">@${esc(i.membre?.pseudo_telegram||'?')}</div>
+          <div style="color:var(--gris);font-size:11px;">${esc(i.membre?.prenom||'')} ${esc(i.membre?.nom||'')}</div>
         </div>
-        <div style="font-size:11px;color:var(--gris);flex-shrink:0;text-align:right;">
-          ${i.membre?.section?.nom ? `<div>🛡️ ${i.membre.section.nom}</div>` : ''}
-          ${i.membre?.statut ? `<div style="margin-top:2px;">${i.membre.statut}</div>` : ''}
-        </div>
-        <span class="badge ${i.statut==='present'?'badge-vert':i.statut==='absent'?'badge-rouge':'badge-bleu'}" style="flex-shrink:0;font-size:11px;">
+        <span class="badge ${i.statut==='present'?'badge-vert':i.statut==='absent'?'badge-rouge':'badge-bleu'}" style="font-size:11px;">
           ${statutLabel[i.statut]||i.statut}
         </span>
       </div>`).join('')
@@ -1839,7 +1501,7 @@ async function openSession(sessionId) {
       </div>
       <div style="font-size:14px;margin-bottom:16px;font-weight:600;">👥 ${inscrits.length} inscrit${inscrits.length>1?'s':''}${s.capacite_max?' / '+s.capacite_max:''}</div>
       ${!estInscrit && s.statut==='a_venir' ? `<button class="btn btn-primary" onclick="doInscrire('${s.id}')">S'inscrire</button>` : ''}
-      ${estInscrit && !estPresent && s.statut==='a_venir' ? `<button class="btn btn-secondary" style="margin-top:8px;" onclick="doDesinscrire('${s.id}')">Se désinscrire</button>` : ''}
+      ${estInscrit && s.statut==='a_venir' ? `<div class="info-box" style="text-align:center;margin-top:8px;">✅ Tu es inscrit(e)</div>` : ''}
       ${estInscrit && s.statut==='en_cours' && !estPresent ? `<button class="btn btn-success" onclick="showModal('modalPresence')">✅ Valider ma présence</button>` : ''}
       ${estPresent ? `<div class="info-box success" style="text-align:center;">✅ Présence validée</div>` : ''}
       ${s.avec_pizza && estInscrit && s.statut==='a_venir' ? `
@@ -1863,45 +1525,8 @@ async function openSession(sessionId) {
 }
 
 async function doInscrire(id) {
-  currentSessionId = id;
-  try {
-    const { session: s } = await UL.getSessionDetails(id);
-    currentSessionAvecPizza = !!s.avec_pizza;
-  } catch(e) {
-    currentSessionAvecPizza = false;
-  }
-  closeModal('modalSession');
-  showModal('modalConfirmInscription');
-}
-
-async function confirmerInscription() {
-  closeModal('modalConfirmInscription');
-  if (currentSessionAvecPizza) {
-    showModal('modalChoixPizza');
-  } else {
-    await _finaliserInscription(null);
-  }
-}
-
-async function validerInscriptionAvecPizza(choixPizza) {
-  closeModal('modalChoixPizza');
-  await _finaliserInscription(choixPizza);
-}
-
-async function _finaliserInscription(pizza) {
-  try {
-    await UL.inscrire(currentSessionId);
-    if (pizza && pizza !== 'non') {
-      await UL.savePizzaChoice(currentSessionId, pizza);
-    }
-    const msg = pizza && pizza !== 'non'
-      ? `Inscription confirmée ! Pizza : ${pizza} 🍕`
-      : 'Inscription confirmée ! ✅';
-    toast(msg, 'success');
-    loadSessions();
-  } catch(e) {
-    toast(e.message || 'Erreur inscription', 'error');
-  }
+  try { await UL.inscrire(id); toast('Inscription confirmée !', 'success'); closeModal('modalSession'); loadSessions(); }
+  catch(e) { toast(e.message, 'error'); }
 }
 async function doDesinscrire(id) {
   try { await UL.desinscrire(id); toast('Désinscription effectuée', 'success'); closeModal('modalSession'); loadSessions(); }
@@ -1945,30 +1570,37 @@ async function doSupprimerSession(id, e) {
   catch(e) { toast('Erreur', 'error'); }
 }
 async function voirInscrits(id, nom, e) {
-  e.stopPropagation();
+  if (e) e.stopPropagation();
   try {
     const { inscrits } = await UL.getSessionDetails(id);
     const presents = inscrits.filter(i => i.statut === 'present');
     const inscritsListe = inscrits.filter(i => i.statut === 'inscrit');
+    const statutLabel = { inscrit:'📋 Inscrit', present:'✅ Présent', absent:'❌ Absent' };
     document.getElementById('modalAdminSessionContent').innerHTML = `
-      <h3 class="modal-title">Inscrits — ${nom}</h3>
-      <div style="font-size:13px;color:var(--gris);margin-bottom:14px;">
-        ✅ ${presents.length} présents · 📋 ${inscritsListe.length} inscrits · Total: ${inscrits.length}
-      </div>
-      <button class="btn btn-sm btn-secondary" style="margin-bottom:14px;" onclick="copierInscrits(${JSON.stringify(inscrits.map(i=>i.membre?.pseudo_telegram||'?'))})">📋 Copier liste Telegram</button>
+      <h3 class="modal-title">👥 ${esc(nom)}</h3>
+      <div style="font-size:13px;color:var(--gris);margin-bottom:12px;">✅ ${presents.length} présents · 📋 ${inscritsListe.length} inscrits · Total: ${inscrits.length}</div>
+      <button class="btn btn-sm btn-secondary" style="width:100%;margin-bottom:12px;" onclick="copierInscrits(${JSON.stringify(inscrits.map(i=>i.membre?.pseudo_telegram||'?'))})">📋 Copier liste Telegram</button>
       ${inscrits.map(i => `
-        <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px;">
+        <div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border);">
           <div class="avatar" style="width:32px;height:32px;font-size:12px;">${(i.membre?.prenom||'?')[0]}</div>
-          <div style="flex:1;">
-            <div style="font-weight:600;">${i.membre?.prenom||''} ${i.membre?.nom||''}</div>
-            <div style="color:var(--gris);">@${i.membre?.pseudo_telegram||'?'}</div>
+          <div style="flex:1;min-width:0;">
+            <div style="font-size:13px;font-weight:600;">${esc(i.membre?.prenom||'')} ${esc(i.membre?.nom||'')}</div>
+            <div style="font-size:11px;color:var(--gris);">@${esc(i.membre?.pseudo_telegram||'?')}</div>
           </div>
-          <span class="badge ${i.statut==='present'?'badge-vert':i.statut==='absent'?'badge-rouge':'badge-bleu'}">
-            ${i.statut}
-          </span>
-        </div>`).join('')}
-    `;
+          <span class="badge ${i.statut==='present'?'badge-vert':i.statut==='absent'?'badge-rouge':'badge-bleu'}" style="font-size:10px;">${statutLabel[i.statut]||i.statut}</span>
+          <button class="btn btn-sm btn-danger" style="padding:4px 8px;font-size:11px;flex-shrink:0;" onclick="doDesinscrireAdmin('${id}','${i.membre_id}','${esc(nom)}')">✕</button>
+        </div>`).join('')}`;
     showModal('modalAdminSession');
+  } catch(e) { toast('Erreur', 'error'); }
+}
+
+async function doDesinscrireAdmin(sessionId, membreId, nom) {
+  if (!confirm('Désinscrire ce membre ?')) return;
+  try {
+    await UL.sb.from('inscriptions_session').delete().eq('session_id', sessionId).eq('membre_id', membreId);
+    toast('Membre désinscrit ✅', 'success');
+    voirInscrits(sessionId, nom, null);
+    loadAdminSessions();
   } catch(e) { toast('Erreur', 'error'); }
 }
 async function voirPizzas(id, e) {
@@ -1990,226 +1622,6 @@ async function voirPizzas(id, e) {
 function copierInscrits(pseudos) {
   const texte = pseudos.map((p,i) => `${i+1}. @${p}`).join('\n');
   navigator.clipboard.writeText(texte).then(() => toast('Liste copiée !', 'success'));
-}
-
-// ─── Toggle pizza custom ──────────────────────────────────────
-let _sPizzaActif = false;
-function togglePizzaCreate() {
-  _sPizzaActif = !_sPizzaActif;
-  const box = document.getElementById('sPizzaBox');
-  const cb = document.getElementById('sPizza');
-  box.style.background = _sPizzaActif ? '#1A56DB' : 'transparent';
-  box.style.borderColor = _sPizzaActif ? '#1A56DB' : '#3B82F6';
-  box.innerHTML = _sPizzaActif
-    ? '<svg viewBox="0 0 10 8" style="width:10px;height:8px;pointer-events:none"><polyline points="1,4 3.5,7 9,1" style="fill:none;stroke:white;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round"/></svg>'
-    : '';
-  if (cb) cb.checked = _sPizzaActif;
-}
-
-// ─── Créer session (reset form) ───────────────────────────────
-function ouvrirCreerSession() {
-  ['sNom','sDate','sHeure','sCapacite','sTelegram','sDesc'].forEach(id => {
-    const el = document.getElementById(id); if (el) el.value = '';
-  });
-  // Reset toggle pizza
-  _sPizzaActif = false;
-  const box = document.getElementById('sPizzaBox');
-  if (box) { box.style.background = 'transparent'; box.style.borderColor = '#3B82F6'; box.innerHTML = ''; }
-  const cb = document.getElementById('sPizza'); if (cb) cb.checked = false;
-  const lieu = document.getElementById('sLieu'); if (lieu) lieu.value = 'Paris Sud';
-  const type = document.getElementById('sType'); if (type) type.value = 'Peinture';
-  showModal('modalCreerSession');
-}
-
-// ─── Supprimer session ────────────────────────────────────────
-async function ouvrirSupprimerSession() {
-  try {
-    const sessions = await UL.getSessionsWithStats();
-    const sel = document.getElementById('delSelectSession');
-    sel.innerHTML = '<option value="">-- Sélectionner --</option>' +
-      sessions.map(s => {
-        const d = new Date(s.date).toLocaleDateString('fr-FR', { day:'numeric', month:'short' });
-        return `<option value="${s.id}">${s.nom} — ${d}</option>`;
-      }).join('');
-    sel.onchange = () => {
-      document.getElementById('delSessionInfo').style.display = sel.value ? 'block' : 'none';
-    };
-    document.getElementById('delSessionInfo').style.display = 'none';
-    showModal('modalSupprimerSession');
-  } catch(e) { toast('Erreur chargement sessions', 'error'); }
-}
-
-async function doSupprimerSessionAdmin() {
-  const id = document.getElementById('delSelectSession').value;
-  if (!id) return toast('Sélectionne une session', 'error');
-  const nom = document.getElementById('delSelectSession').selectedOptions[0]?.text || '';
-  if (!confirm(`Supprimer "${nom}" définitivement ?\n\nToutes les inscriptions seront perdues.`)) return;
-  try {
-    await UL.deleteSession(id);
-    toast('Session supprimée ✅', 'success');
-    closeModal('modalSupprimerSession');
-    loadSessions();
-  } catch(e) { toast(e.message || 'Erreur suppression', 'error'); }
-}
-
-// ─── Modifier session ─────────────────────────────────────────
-async function ouvrirModifierSession() {
-  try {
-    const sessions = await UL.getSessionsWithStats();
-    const sel = document.getElementById('msSelectSession');
-    sel.innerHTML = '<option value="">-- Sélectionner --</option>' +
-      sessions.map(s => {
-        const d = new Date(s.date).toLocaleDateString('fr-FR', { day:'numeric', month:'short' });
-        return `<option value="${s.id}">${s.nom} — ${d}</option>`;
-      }).join('');
-    document.getElementById('msFormFields').style.display = 'none';
-    showModal('modalModifierSession');
-  } catch(e) { toast('Erreur chargement sessions', 'error'); }
-}
-
-async function chargerSessionAModifier(id) {
-  if (!id) { document.getElementById('msFormFields').style.display = 'none'; return; }
-  try {
-    const { session: s } = await UL.getSessionDetails(id);
-    document.getElementById('msNom').value = s.nom || '';
-    document.getElementById('msDate').value = s.date || '';
-    document.getElementById('msHeure').value = s.heure ? s.heure.slice(0,5) : '';
-    document.getElementById('msLieu').value = s.lieu || 'Paris Sud';
-    document.getElementById('msType').value = s.type_session || 'Peinture';
-    document.getElementById('msCapacite').value = s.capacite_max || '';
-    document.getElementById('msTelegram').value = s.lien_telegram || '';
-    // Toggle pizza modifier
-    const actif = !!s.avec_pizza;
-    document.getElementById('msPizza').checked = actif;
-    const box = document.getElementById('msPizzaBox');
-    if (box) {
-      box.style.background = actif ? '#1A56DB' : 'transparent';
-      box.style.borderColor = actif ? '#1A56DB' : '#3B82F6';
-      box.innerHTML = actif ? '<svg viewBox="0 0 10 8" style="width:10px;height:8px;pointer-events:none"><polyline points="1,4 3.5,7 9,1" style="fill:none;stroke:white;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round"/></svg>' : '';
-    }
-    document.getElementById('msDesc').value = s.description || '';
-    document.getElementById('msFormFields').style.display = 'block';
-  } catch(e) { toast('Erreur chargement session', 'error'); }
-}
-
-let _msPizzaActif = false;
-function togglePizzaModify() {
-  _msPizzaActif = !_msPizzaActif;
-  const box = document.getElementById('msPizzaBox');
-  const cb = document.getElementById('msPizza');
-  box.style.background = _msPizzaActif ? '#1A56DB' : 'transparent';
-  box.style.borderColor = _msPizzaActif ? '#1A56DB' : '#3B82F6';
-  box.innerHTML = _msPizzaActif
-    ? '<svg viewBox="0 0 10 8" style="width:10px;height:8px;pointer-events:none"><polyline points="1,4 3.5,7 9,1" style="fill:none;stroke:white;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round"/></svg>'
-    : '';
-  if (cb) cb.checked = _msPizzaActif;
-}
-
-async function doModifierSession() {
-  const id = document.getElementById('msSelectSession').value;
-  if (!id) return toast('Sélectionne une session', 'error');
-  const data = {
-    nom: document.getElementById('msNom').value,
-    date: document.getElementById('msDate').value,
-    heure: document.getElementById('msHeure').value || null,
-    lieu: document.getElementById('msLieu').value,
-    type_session: document.getElementById('msType').value,
-    capacite_max: parseInt(document.getElementById('msCapacite').value) || null,
-    lien_telegram: document.getElementById('msTelegram').value || null,
-    avec_pizza: document.getElementById('msPizza').checked,
-    description: document.getElementById('msDesc').value || null,
-  };
-  if (!data.nom || !data.date) return toast('Nom et date requis', 'error');
-  try {
-    await UL.updateSession(id, data);
-    toast('Session modifiée ✅', 'success');
-    closeModal('modalModifierSession');
-    loadSessions();
-  } catch(e) { toast(e.message || 'Erreur modification', 'error'); }
-}
-
-// ─── Gérer membres tifo ───────────────────────────────────────
-async function ouvrirGererMembresTifo() {
-  try {
-    const membres = await UL.getAllMembres();
-    const tifo = membres.filter(m =>
-      m.roles_app && (m.roles_app.includes('cellule_tifo') ||
-        m.roles_app.includes('admin_app') || m.roles_app.includes('bureau_app'))
-    );
-    const el = document.getElementById('membresTifoListe');
-    el.innerHTML = !tifo.length
-      ? '<div class="empty-state"><div>👥</div>Aucun membre cellule tifo</div>'
-      : tifo.map(m => {
-          const nb = m.etoiles || 0;
-          const pinceaux = [1,2,3].map(n =>
-            `<button onclick="doNoterMembre('${m.id}',${n})"
-              style="background:none;border:none;cursor:pointer;font-size:20px;padding:2px;line-height:1;opacity:${nb>=n?1:0.3};">🖌️</button>`
-          ).join('');
-          return `<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);">
-            <div class="avatar" style="width:36px;height:36px;font-size:13px;flex-shrink:0;">${((m.prenom||'?')[0]+(m.nom||'?')[0]).toUpperCase()}</div>
-            <div style="flex:1;min-width:0;">
-              <div style="font-weight:600;font-size:13px;">${m.prenom||''} ${m.nom||''}</div>
-              <div style="font-size:12px;color:var(--gris);">@${m.pseudo_telegram||'?'}</div>
-            </div>
-            <div id="notationRow_${m.id}" style="display:flex;align-items:center;gap:2px;">${pinceaux}</div>
-          </div>`;
-        }).join('');
-    showModal('modalGererMembresTifo');
-  } catch(e) { toast('Erreur chargement membres', 'error'); }
-}
-
-async function doNoterMembre(membreId, etoiles) {
-  try {
-    await UL.setEtoilesMembre(membreId, etoiles);
-    const row = document.getElementById('notationRow_' + membreId);
-    if (row) row.querySelectorAll('button').forEach((btn, i) => { btn.style.opacity = (i < etoiles) ? '1' : '0.3'; });
-    const labels = ['','🖌️ Débutant','🖌️🖌️ Autonome','🖌️🖌️🖌️ Expert'];
-    toast(`Notation : ${labels[etoiles]}`, 'success');
-  } catch(e) { toast('Erreur notation', 'error'); }
-}
-
-async function voirInscrits(id, nom, e) {
-  e.stopPropagation();
-  const m = UL.getCurrentMembre();
-  const peutNoter = hasCelluleTifo(m);
-  try {
-    const { session: s, inscrits } = await UL.getSessionDetails(id);
-    const presents = inscrits.filter(i => i.statut === 'present');
-    const inscritsListe = inscrits.filter(i => i.statut === 'inscrit');
-    const statutLabel = { inscrit:'📋 Inscrit', present:'✅ Présent', absent:'❌ Absent' };
-    document.getElementById('modalAdminSessionContent').innerHTML = `
-      <h3 class="modal-title">Inscrits — ${nom}</h3>
-      <div style="font-size:13px;color:var(--gris);margin-bottom:14px;">
-        ✅ ${presents.length} présents · 📋 ${inscritsListe.length} inscrits · Total: ${inscrits.length}
-      </div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;">
-        <button class="btn btn-sm btn-secondary" onclick="copierInscrits(${JSON.stringify(inscrits.map(i=>i.membre?.pseudo_telegram||'?'))})">📋 Liste complète</button>
-        <button class="btn btn-sm btn-secondary" onclick="copierPresents(${JSON.stringify(presents.map(i=>i.membre?.pseudo_telegram||'?'))})">✅ Présents (${presents.length})</button>
-        ${s?.avec_pizza ? `<button class="btn btn-sm" style="background:rgba(255,149,0,.15);color:var(--pizza);border:1px solid rgba(255,149,0,.3);" onclick="voirPizzas('${id}',{stopPropagation:()=>{}})">🍕 Pizzas</button>` : ''}
-      </div>
-      ${inscrits.map(i => {
-        const nb = i.membre?.etoiles || 0;
-        const pinceaux = peutNoter
-          ? [1,2,3].map(n => `<button onclick="doNoterMembre('${i.membre_id}',${n})" style="background:none;border:none;cursor:pointer;font-size:17px;padding:1px;line-height:1;opacity:${nb>=n?1:0.28};">🖌️</button>`).join('')
-          : `<span style="font-size:15px;opacity:.7;">${'🖌️'.repeat(nb)||'—'}</span>`;
-        return `<div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border);font-size:13px;">
-          <div class="avatar" style="width:32px;height:32px;font-size:12px;">${(i.membre?.prenom||'?')[0]}</div>
-          <div style="flex:1;min-width:0;">
-            <div style="font-weight:600;">${i.membre?.prenom||''} ${i.membre?.nom||''}</div>
-            <div style="color:var(--gris);font-size:12px;">@${i.membre?.pseudo_telegram||'?'}</div>
-          </div>
-          <div id="notationRow_${i.membre_id}" style="display:flex;align-items:center;gap:1px;">${pinceaux}</div>
-          <span class="badge ${i.statut==='present'?'badge-vert':i.statut==='absent'?'badge-rouge':'badge-bleu'}" style="flex-shrink:0;">${statutLabel[i.statut]||i.statut}</span>
-        </div>`;
-      }).join('')}`;
-    showModal('modalAdminSession');
-  } catch(e) { toast('Erreur', 'error'); }
-}
-
-function copierPresents(pseudos) {
-  if (!pseudos.length) return toast('Aucun présent', 'error');
-  const texte = `✅ Présents (${pseudos.length}) :\n` + pseudos.map((p,i) => `${i+1}. @${p}`).join('\n');
-  navigator.clipboard.writeText(texte).then(() => toast(`${pseudos.length} présent(s) copié(s) !`, 'success'));
 }
 
 async function doCreerSession() {
@@ -2372,9 +1784,7 @@ async function copierListeBus(deplId) {
   } catch(e) { toast('Erreur copie', 'error'); }
 }
 async function doCreerDepl() {
-  const matchId = document.getElementById('dMatchId').value || null;
   const data = {
-    match_id: matchId || null,
     adversaire: document.getElementById('dAdv').value,
     date_match: document.getElementById('dDate').value,
     stade: document.getElementById('dStade').value || null,
@@ -2478,37 +1888,7 @@ function renderMembres(membres) {
       </div>
     </div>`).join('');
 }
-// ─── Toggle rôle custom checkbox ─────────────────────────────
-const _rolesActifs = new Set();
-
-function toggleRole(role) {
-  if (_rolesActifs.has(role)) {
-    _rolesActifs.delete(role);
-  } else {
-    _rolesActifs.add(role);
-  }
-  renderRoleCheckbox(role);
-}
-
-function renderRoleCheckbox(role) {
-  const chk = document.getElementById('chk_' + role);
-  const row = document.getElementById('roleRow_' + role);
-  if (!chk) return;
-  const actif = _rolesActifs.has(role);
-  chk.style.background = actif ? '#1A56DB' : 'transparent';
-  chk.style.borderColor = actif ? '#1A56DB' : '#3B82F6';
-  chk.innerHTML = actif ? '<svg viewBox="0 0 10 8" style="width:10px;height:8px;"><polyline points="1,4 3.5,7 9,1" style="fill:none;stroke:white;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;"/></svg>' : '';
-  if (row) row.style.borderColor = actif ? '#1A56DB' : 'transparent';
-}
-
-function setRolesActifs(roles) {
-  _rolesActifs.clear();
-  (roles || []).forEach(r => _rolesActifs.add(r));
-  ['admin_app','bureau_app','cellule_tifo','cellule_depl','cellule_matos','cellule_sticks','cellule_comite']
-    .forEach(r => renderRoleCheckbox(r));
-}
-
-async function openEditMembre(id) {
+function openEditMembre(id) {
   const m = allMembres.find(x => x.id === id);
   if (!m) return;
   document.getElementById('editMembreId').value = m.id;
@@ -2516,23 +1896,12 @@ async function openEditMembre(id) {
   document.getElementById('editNom').value = m.nom||'';
   document.getElementById('editTelegram').value = m.pseudo_telegram||'';
   document.getElementById('editEmail').value = m.email||'';
-  document.getElementById('editStatut').value = ['sympathisant','draft','confirme'].includes(m.statut) ? m.statut : 'confirme';
-  // Charger les sections dynamiquement
-  try {
-    const sections = await UL.getSections();
-    const sel = document.getElementById('editSection');
-    sel.innerHTML = '<option value="">Ultra Lutetia (défaut)</option>' +
-      sections.map(s => `<option value="${s.id}" ${m.section_id === s.id ? 'selected' : ''}>${esc(s.nom)}</option>`).join('');
-  } catch(e) {}
-  // Pré-cocher les rôles fonctionnels
-  setRolesActifs(m.roles_app || []);
+  document.getElementById('editStatut').value = m.statut;
+  document.getElementById('editEtoiles').value = m.etoiles||0;
   showModal('modalEditMembre');
 }
-
 async function doSauvegarderMembre() {
   const id = document.getElementById('editMembreId').value;
-  const sectionId = document.getElementById('editSection').value || null;
-  const rolesApp = Array.from(_rolesActifs);
   try {
     await UL.updateMembre(id, {
       prenom: document.getElementById('editPrenom').value.trim(),
@@ -2540,8 +1909,7 @@ async function doSauvegarderMembre() {
       pseudo_telegram: document.getElementById('editTelegram').value.trim(),
       email: document.getElementById('editEmail').value.trim() || null,
       statut: document.getElementById('editStatut').value,
-      section_id: sectionId,
-      roles_app: rolesApp,
+      etoiles: parseInt(document.getElementById('editEtoiles').value),
     });
     toast('Membre mis à jour ✅', 'success');
     closeModal('modalEditMembre');
