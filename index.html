@@ -797,6 +797,21 @@
   </div>
 </div>
 
+<!-- Modal Confirmer Inscription -->
+<div class="modal-overlay" id="modalConfirmInscription" style="display:none;" onclick="closeModalOutside(event,'modalConfirmInscription')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-handle"></div>
+    <h3 class="modal-title">Confirmer l'inscription</h3>
+    <div class="info-box" style="margin-bottom:16px;">
+      ⚠️ Toute inscription est un engagement de présence. Vérifie ta disponibilité avant de confirmer.
+    </div>
+    <button class="btn btn-primary" style="width:100%;" onclick="doInscrire(currentSessionId, this); closeModal('modalConfirmInscription');">
+      ✅ Confirmer mon inscription
+    </button>
+    <button class="btn btn-secondary" style="margin-top:8px;" onclick="closeModal('modalConfirmInscription')">Annuler</button>
+  </div>
+</div>
+
 <!-- Styles inline complémentaires -->
 <style>
 .btn-logout {
@@ -2655,22 +2670,6 @@ function showLoading() {
 }
 function hideLoading() { if (loadingEl) { loadingEl.remove(); loadingEl = null; } }
 </script>
-  
-  <div id="modalConfirmInscription" class="modal" style="display:none;">
-  <div class="modal-content">
-    <div class="modal-header">
-      <h3>Confirmer l'inscription</h3>
-      <button class="modal-close" onclick="closeModal('modalConfirmInscription')">✕</button>
-    </div>
-    <div class="modal-body">
-      <div class="info-box" style="margin-bottom:16px;">
-        ⚠️ Toute inscription est considérée comme un engagement de présence. Merci de vérifier votre disponibilité avant de vous inscrire.
-      </div>
-      <button class="btn btn-primary" style="width:100%;" onclick="doInscrire(currentSessionId, this); closeModal('modalConfirmInscription');">
-        Confirmer mon inscription
-      </button>
-    </div>
-  </div>
-</div>
+
 </body>
 </html>
