@@ -76,7 +76,7 @@
       <label>Mot de passe</label>
       <input type="password" id="loginPassword" placeholder="••••••••" autocomplete="current-password">
     </div>
-    <button class="btn btn-primary" onclick="doLogin()">Connexion</button>
+   <button class="btn btn-primary" id="btnLogin">Connexion</button>
     <div style="text-align:center;margin-top:16px;">
       <span style="font-size:13px;color:var(--gris);cursor:pointer;" onclick="showInscription()">
         Pas encore membre ? S'inscrire
@@ -1038,7 +1038,7 @@ function renderSessionCard(s) {
     <!-- Zone inscription / présence -->
     <div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border);" id="sessionActions_${s.id}">
       <button class="btn btn-secondary" style="width:100%;padding:8px;" onclick="loadSessionActions('${s.id}', this)">
-        Je m'inscris
+        Je m inscris
       </button>
     </div>
 
@@ -1081,7 +1081,7 @@ async function loadSessionActions(sessionId, btn) {
     if (el) el.innerHTML = html || `<div style="font-size:13px;color:var(--gris);text-align:center;">Aucune action disponible</div>`;
   } catch(e) {
     btn.disabled = false;
-    btn.textContent = 'Je m'inscris';
+    btn.textContent = 'Je m inscris';
   }
 }
 
