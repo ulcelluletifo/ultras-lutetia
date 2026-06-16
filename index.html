@@ -1274,7 +1274,7 @@ async function openSession(sessionId) {
         ${(estInscrit && s.lien_telegram) ? `<br><a href="${esc(s.lien_telegram)}" style="color:var(--blue-light);">📲 Groupe Telegram</a>` : ''}
       </div>
       <div style="font-size:14px;margin-bottom:16px;font-weight:600;">👥 ${inscrits.length} inscrit${inscrits.length>1?'s':''}${s.capacite_max?' / '+s.capacite_max:''}</div>
-      ${!estInscrit && s.statut==='a_venir' ? `<button class="btn btn-primary" onclick="doInscrire('${s.id}', this)">S'inscrire${s.avec_pizza?' 🍕':''}</button>` : ''}
+      ${!estInscrit && s.statut==='a_venir' ? `<button class="btn btn-primary" onclick="closeModal('modalSession');showConfirmInscription('${s.id}')">S'inscrire${s.avec_pizza?' 🍕':''}</button>` : ''}
       ${estInscrit && s.statut==='a_venir' ? `<div class="info-box" style="text-align:center;">✅ Tu es inscrit(e)</div>` : ''}
       ${estInscrit && s.statut==='en_cours' && !estPresent ? `<button class="btn btn-success" onclick="showModal('modalPresence')">✅ Valider ma présence</button>` : ''}
       ${estPresent ? `<div class="info-box success" style="text-align:center;">✅ Présence validée</div>` : ''}
