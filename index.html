@@ -365,9 +365,9 @@
       <div class="section-title">👥 Membres</div>
       <div class="card" style="margin-bottom:12px;">
         <div style="display:flex;flex-direction:column;gap:8px;">
-          <button class="btn btn-secondary" onclick="showPage('pageMembres')">Gérer les membres</button>
-          <button class="btn btn-secondary" onclick="showPage('pageCartage')">🗂️ Cartage membres</button>
-          <button class="btn btn-secondary" onclick="showPage('pageAccueil');document.getElementById('demandesSection').scrollIntoView()">🔔 Demandes inscription</button>
+          <button class="btn btn-secondary" onclick="showPage('pageMembres')">👤 Gérer les membres</button>
+          <button class="btn btn-secondary" onclick="showPage('pageDemandesAdmin')">🔔 Demandes d'inscription en attente</button>
+          <button class="btn btn-secondary" onclick="showPage('pageCartage')">🗂️ Cartage</button>
         </div>
       </div>
     </div>
@@ -377,7 +377,8 @@
       <div class="section-title">📅 Calendrier</div>
       <div class="card" style="margin-bottom:12px;">
         <div style="display:flex;flex-direction:column;gap:8px;">
-          <button class="btn btn-secondary" onclick="showModal('modalMatchs');loadMatchsList()">Gérer les matchs</button>
+          <button class="btn btn-secondary" onclick="showModal('modalMatchs');loadMatchsList()">⚽ Gérer le calendrier (matchs)</button>
+          <button class="btn btn-secondary" onclick="ouvrirCreerEvenement()">🎉 Créer un événement</button>
           <button class="btn btn-secondary" onclick="showModal('modalAnnonce')">📣 Publier une annonce</button>
         </div>
       </div>
@@ -387,7 +388,10 @@
     <div id="adminSectionDepl" style="display:none;">
       <div class="section-title">🚌 Déplacements</div>
       <div class="card" style="margin-bottom:12px;">
-        <button class="btn btn-secondary" onclick="showModal('modalCreerDepl')">+ Créer un déplacement</button>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <button class="btn btn-secondary" onclick="showPage('pageDeplacements')">📋 Gérer les déplacements</button>
+          <button class="btn btn-secondary" onclick="showModal('modalCreerDepl')">+ Créer un déplacement</button>
+        </div>
       </div>
     </div>
 
@@ -396,6 +400,7 @@
       <div class="section-title">🎨 Sessions Tifo</div>
       <div class="card" style="margin-bottom:12px;">
         <div style="display:flex;flex-direction:column;gap:8px;">
+          <button class="btn btn-secondary" onclick="showPage('pageSessions')">📋 Gérer les sessions</button>
           <button class="btn btn-secondary" onclick="showModal('modalCreerSession')">+ Nouvelle session</button>
           <button class="btn btn-secondary" onclick="ouvrirModifierSession()">✏️ Modifier une session</button>
         </div>
@@ -406,7 +411,10 @@
     <div id="adminSectionMatos" style="display:none;">
       <div class="section-title">🛍️ Matos</div>
       <div class="card" style="margin-bottom:12px;">
-        <button class="btn btn-secondary" onclick="showModal('modalCreerProduit');loadSectionsForModal()">+ Ajouter un article</button>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <button class="btn btn-secondary" onclick="showPage('pageBoutique')">📋 Gérer la boutique matos</button>
+          <button class="btn btn-secondary" onclick="showModal('modalCreerProduit');loadSectionsForModal()">+ Ajouter un article</button>
+        </div>
       </div>
     </div>
 
@@ -414,17 +422,30 @@
     <div id="adminSectionSticks" style="display:none;">
       <div class="section-title">🎟️ Sticks</div>
       <div class="card" style="margin-bottom:12px;">
-        <button class="btn btn-secondary" onclick="showModal('modalDistribuer');loadDistribuerModal()">+ Enregistrer une distribution</button>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <button class="btn btn-secondary" onclick="showPage('pageBoutique');setTimeout(()=>switchBoutiqueTab('sticks'),100)">📋 Gérer la boutique sticks</button>
+          <button class="btn btn-secondary" onclick="showModal('modalDistribuer');loadDistribuerModal()">+ Enregistrer une distribution</button>
+        </div>
       </div>
     </div>
 
-    <!-- Stats (tous rôles) -->
+    <!-- Stats (Admin + Bureau + Cellule) -->
     <div id="adminSectionStats" style="display:none;">
       <div class="section-title">📊 Statistiques</div>
       <div class="card" style="margin-bottom:12px;">
         <button class="btn btn-secondary" onclick="showPage('pageStats')">Voir les stats globales</button>
       </div>
     </div>
+  </div>
+
+  <!-- ── PAGE DEMANDES ADMIN ──────────────────────────────────── -->
+  <div id="pageDemandesAdmin" class="page">
+    <div style="display:flex;gap:8px;margin-bottom:14px;align-items:center;">
+      <button class="btn btn-sm btn-secondary" onclick="showPage('pageAdmin')">← Retour</button>
+      <span style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:.05em;">🔔 Demandes d'inscription</span>
+      <span id="demandesBadge2" class="badge badge-orange" style="display:none;"></span>
+    </div>
+    <div id="demandesListeAdmin"></div>
   </div>
 
   <!-- ── PAGE CARTAGE ────────────────────────────────────────── -->
@@ -640,12 +661,10 @@
       </select>
     </div>
 
-    <div class="form-group"><label>Étoiles (0-3)</label>
-      <select id="editEtoiles">
-        <option value="0">☆☆☆ Aucune</option>
-        <option value="1">⭐☆☆ 1 étoile</option>
-        <option value="2">⭐⭐☆ 2 étoiles</option>
-        <option value="3">⭐⭐⭐ 3 étoiles</option>
+    <div class="form-group">
+      <label>Section</label>
+      <select id="editSection">
+        <option value="">Chargement...</option>
       </select>
     </div>
 
@@ -794,6 +813,31 @@
     </div>
     <button class="btn btn-primary" onclick="doDistribuerStick()">Enregistrer</button>
     <button class="btn btn-secondary" style="margin-top:8px;" onclick="closeModal('modalDistribuer')">Annuler</button>
+  </div>
+</div>
+
+<!-- Modal Créer/Modifier Événement (Bureau+) -->
+<div class="modal-overlay" id="modalEvenement" style="display:none;" onclick="closeModalOutside(event,'modalEvenement')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-handle"></div>
+    <h3 class="modal-title" id="modalEvenementTitre">Créer un événement</h3>
+    <input type="hidden" id="evId">
+    <div class="form-group"><label>Nom</label><input type="text" id="evNom" placeholder="ex: BBQ de fin d'année"></div>
+    <div class="form-group"><label>Type</label>
+      <select id="evType">
+        <option value="reunion">🤝 Réunion UL</option>
+        <option value="bbq">🍖 BBQ</option>
+        <option value="fete">🎊 Fête Fin de Saison</option>
+        <option value="autre">🎉 Événement</option>
+      </select>
+    </div>
+    <div class="form-group"><label>Date</label><input type="date" id="evDate"></div>
+    <div class="form-group"><label>Heure</label><input type="time" id="evHeure"></div>
+    <div class="form-group"><label>Lieu</label><input type="text" id="evLieu" placeholder="Paris, Parc des Princes..."></div>
+    <div class="form-group"><label>Description</label><textarea id="evDesc" rows="2" placeholder="Optionnel"></textarea></div>
+    <div class="form-group"><label>Lien HelloAsso (inscriptions)</label><input type="url" id="evHelloasso" placeholder="https://www.helloasso.com/..."></div>
+    <button class="btn btn-primary" onclick="doSauvegarderEvenement()">Enregistrer</button>
+    <button class="btn btn-secondary" style="margin-top:8px;" onclick="closeModal('modalEvenement')">Annuler</button>
   </div>
 </div>
 
@@ -1004,7 +1048,7 @@ function showPage(pageId) {
     pageAccueil:0, pageCalendrier:1, pageDeplacements:2,
     pageSessions:3, pageBoutique:4, pageProfil:5, pageAdmin:6,
     // pages secondaires → highlight parent
-    pageMembres:5, pageStats:5, pageCharte:5, pageCartage:6
+    pageMembres:6, pageStats:6, pageCharte:5, pageCartage:6, pageDemandesAdmin:6
   };
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   const idx = map[pageId];
@@ -1022,6 +1066,7 @@ function showPage(pageId) {
   if (pageId === 'pageStats') loadStats();
   if (pageId === 'pageCharte') loadCharte();
   if (pageId === 'pageCartage') loadCartage();
+  if (pageId === 'pageDemandesAdmin') loadDemandesAdmin();
   // Scroll top
   window.scrollTo(0,0);
 }
@@ -1721,7 +1766,7 @@ function renderMembres(membres) {
           ${m.section ? `<div style="font-size:11px;color:var(--bleu-clair);margin-top:1px;">🛡️ ${esc(m.section.nom)}</div>` : ''}
           ${Array.isArray(m.roles_app) && m.roles_app.length ? `<div style="font-size:10px;color:#818CF8;margin-top:2px;">🔑 ${m.roles_app.map(r=>r.replace('_',' ')).join(' · ')}</div>` : ''}
         </div>
-        <span style="font-size:14px;">${'⭐'.repeat(m.etoiles||0)}</span>
+        <span style="font-size:12px;color:var(--bleu-clair);">${m.section?.nom||'Ultra Lutetia'}</span>
       </div>
       <div class="membre-card-actions">
         <button class="btn btn-sm btn-secondary" onclick="openEditMembre('${m.id}')">✏️ Modifier</button>
@@ -1755,6 +1800,19 @@ function openEditMembre(id) {
   const statutUL = ['sympathisant','draft','confirme'].includes(m.statut) ? m.statut : 'confirme';
   document.getElementById('editStatut').value = statutUL;
   document.getElementById('editEtoiles').value = m.etoiles||0;
+
+  // Section (charger la liste + sélectionner la section du membre)
+  try {
+    const sections = await UL.getSections ? await UL.getSections() : [];
+    const selSec = document.getElementById('editSection');
+    selSec.innerHTML = sections.map(s =>
+      `<option value="${s.id}">${s.nom}</option>`
+    ).join('');
+    // Défaut = Ultra Lutetia ou section du membre
+    const membreSectionId = m.section?.id || m.section_id || '';
+    const ulOption = sections.find(s => s.nom?.toLowerCase().includes('ultra lutetia'));
+    selSec.value = membreSectionId || (ulOption ? ulOption.id : (sections[0]?.id || ''));
+  } catch(e) { document.getElementById('editSection').innerHTML = '<option value="">Ultra Lutetia</option>'; }
 
   // Rôles fonctionnels
   _rolesActifs = new Set(Array.isArray(m.roles_app) ? m.roles_app : []);
@@ -1808,7 +1866,7 @@ async function doSauvegarderMembre() {
       pseudo_telegram: document.getElementById('editTelegram').value.trim(),
       email: document.getElementById('editEmail').value.trim() || null,
       statut: document.getElementById('editStatut').value,
-      etoiles: parseInt(document.getElementById('editEtoiles').value),
+      section_id: document.getElementById('editSection').value || null,
       roles_app: Array.from(_rolesActifs),
     });
     toast('Membre mis à jour ✅', 'success');
@@ -2562,6 +2620,8 @@ function renderEvenementCard(ev) {
   const types = { reunion:'🤝', bbq:'🍖', fete:'🎊', autre:'🎉' };
   const couleurs = { reunion:'badge-bleu', bbq:'badge-orange', fete:'badge-orange', autre:'badge-vert' };
   const date = ev.date ? new Date(ev.date).toLocaleDateString('fr-FR', {weekday:'short',day:'numeric',month:'short'}) : '—';
+  const m = UL.getCurrentMembre();
+  const canEdit = isBureau(m);
   return `<div class="card" style="margin-bottom:10px;border-left:3px solid #1A56DB;">
     <div style="display:flex;align-items:center;gap:10px;">
       <div style="font-size:28px;">${types[ev.type]||'🎉'}</div>
@@ -2572,7 +2632,11 @@ function renderEvenementCard(ev) {
       </div>
       <span class="badge ${couleurs[ev.type]||'badge-vert'}" style="font-size:10px;flex-shrink:0;">${types[ev.type]||'🎉'} ${ev.type||'événement'}</span>
     </div>
-    ${ev.lien_helloasso ? `<a href="${esc(ev.lien_helloasso)}" target="_blank"><button class="btn btn-sm btn-primary" style="margin-top:10px;">Inscriptions →</button></a>` : ''}
+    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:10px;">
+      ${ev.lien_helloasso ? `<a href="${esc(ev.lien_helloasso)}" target="_blank"><button class="btn btn-sm btn-primary">Inscriptions →</button></a>` : ''}
+      ${canEdit ? `<button class="btn btn-sm btn-secondary" onclick="ouvrirModifierEvenement('${ev.id}')">✏️ Modifier</button>` : ''}
+      ${canEdit ? `<button class="btn btn-sm btn-danger" onclick="doSupprimerEvenement('${ev.id}')">🗑</button>` : ''}
+    </div>
   </div>`;
 }
 
@@ -2642,6 +2706,128 @@ function filtrerCartage(filtre) {
       </div>` : ''}
     </div>`;
   }).join('');
+}
+
+// ─── ÉVÉNEMENTS ──────────────────────────────────────────────
+function ouvrirCreerEvenement() {
+  document.getElementById('evId').value = '';
+  document.getElementById('modalEvenementTitre').textContent = 'Créer un événement';
+  ['evNom','evLieu','evDesc','evHelloasso'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('evType').value = 'reunion';
+  document.getElementById('evDate').value = '';
+  document.getElementById('evHeure').value = '';
+  showModal('modalEvenement');
+}
+
+async function ouvrirModifierEvenement(id) {
+  try {
+    const { data: ev } = await UL.sb.from('evenements').select('*').eq('id', id).single();
+    if (!ev) return toast('Événement introuvable', 'error');
+    document.getElementById('evId').value = ev.id;
+    document.getElementById('modalEvenementTitre').textContent = 'Modifier l'événement';
+    document.getElementById('evNom').value = ev.nom || ev.titre || '';
+    document.getElementById('evType').value = ev.type || 'autre';
+    document.getElementById('evDate').value = ev.date || '';
+    document.getElementById('evHeure').value = ev.heure ? ev.heure.slice(0,5) : '';
+    document.getElementById('evLieu').value = ev.lieu || '';
+    document.getElementById('evDesc').value = ev.description || '';
+    document.getElementById('evHelloasso').value = ev.lien_helloasso || '';
+    showModal('modalEvenement');
+  } catch(e) { toast('Erreur chargement événement', 'error'); }
+}
+
+async function doSauvegarderEvenement() {
+  const nom = document.getElementById('evNom').value.trim();
+  const date = document.getElementById('evDate').value;
+  if (!nom || !date) return toast('Nom et date requis', 'error');
+  const data = {
+    nom, type: document.getElementById('evType').value,
+    date, heure: document.getElementById('evHeure').value || null,
+    lieu: document.getElementById('evLieu').value.trim() || null,
+    description: document.getElementById('evDesc').value.trim() || null,
+    lien_helloasso: document.getElementById('evHelloasso').value.trim() || null,
+  };
+  const id = document.getElementById('evId').value;
+  try {
+    if (id) {
+      await UL.sb.from('evenements').update(data).eq('id', id);
+      toast('Événement modifié ✅', 'success');
+    } else {
+      await UL.sb.from('evenements').insert(data);
+      toast('Événement créé ✅', 'success');
+    }
+    closeModal('modalEvenement');
+    if (document.getElementById('pageCalendrier')?.classList.contains('active')) loadCalendrier();
+  } catch(e) { toast(e.message || 'Erreur', 'error'); }
+}
+
+async function doSupprimerEvenement(id) {
+  if (!confirm('Supprimer cet événement ?')) return;
+  try {
+    await UL.sb.from('evenements').delete().eq('id', id);
+    toast('Événement supprimé', 'success');
+    loadCalendrier();
+  } catch(e) { toast('Erreur', 'error'); }
+}
+
+// ─── DEMANDES ADMIN (page dédiée) ────────────────────────────
+async function loadDemandesAdmin() {
+  try {
+    const { data } = await UL.sb.from('membres')
+      .select('*, section:sections(nom)')
+      .eq('statut', 'sympathisant')
+      .eq('actif', true)
+      .order('created_at', { ascending: true });
+
+    const demandes = data || [];
+    const badge = document.getElementById('demandesBadge2');
+    if (badge) {
+      badge.textContent = demandes.length + ' en attente';
+      badge.style.display = demandes.length ? 'inline-flex' : 'none';
+    }
+
+    const el = document.getElementById('demandesListeAdmin');
+    if (!el) return;
+    if (!demandes.length) {
+      el.innerHTML = '<div class="empty-state"><div>✅</div>Aucune demande en attente</div>';
+      return;
+    }
+
+    el.innerHTML = demandes.map(m => `
+      <div class="card" style="margin-bottom:8px;padding:14px;">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+          <div class="avatar" style="width:38px;height:38px;font-size:14px;">${((m.prenom||'?')[0]+(m.nom||'?')[0]).toUpperCase()}</div>
+          <div style="flex:1;min-width:0;">
+            <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;">${esc(m.prenom)} ${esc(m.nom)}</div>
+            <div style="font-size:12px;color:var(--gris);">@${esc(m.pseudo_telegram)}</div>
+            ${m.email ? `<div style="font-size:11px;color:var(--gris);">✉️ ${esc(m.email)}</div>` : ''}
+            <div style="font-size:11px;color:var(--gris);">📅 ${new Date(m.created_at).toLocaleDateString('fr-FR')}</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;">
+          <button class="btn btn-sm btn-success" onclick="validerDemandeAdmin('${m.id}','draft')">✅ Draft</button>
+          <button class="btn btn-sm btn-secondary" onclick="validerDemandeAdmin('${m.id}','confirme')">⭐ Confirmé</button>
+          <button class="btn btn-sm btn-danger" onclick="refuserDemandeAdmin('${m.id}')">❌ Refuser</button>
+        </div>
+      </div>`).join('');
+  } catch(e) { console.error('Erreur demandes admin:', e); }
+}
+
+async function validerDemandeAdmin(membreId, statut) {
+  try {
+    await UL.updateStatutMembre(membreId, statut);
+    toast(`Membre accepté → ${statut} ✅`, 'success');
+    loadDemandesAdmin();
+  } catch(e) { toast('Erreur', 'error'); }
+}
+
+async function refuserDemandeAdmin(membreId) {
+  if (!confirm('Refuser et désactiver ce compte ?')) return;
+  try {
+    await UL.toggleBlocageMembre(membreId, false);
+    toast('Demande refusée', 'success');
+    loadDemandesAdmin();
+  } catch(e) { toast('Erreur', 'error'); }
 }
 
 // ─── UTILS ────────────────────────────────────────────────────
