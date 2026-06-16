@@ -193,10 +193,11 @@
 
   <!-- ── PAGE SESSIONS ──────────────────────────────────────── -->
   <div id="pageSessions" class="page">
-    <h2 style="font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:.05em;margin-bottom:16px;">🖌️ Tifo</h2>
 
-    <!-- btnCreerSession gardé hidden pour compatibilité applyRights -->
-    <div id="btnCreerSession" style="display:none;"></div>
+    <!-- Bouton créer session (Bureau+ ou Membre Cellule) -->
+    <div id="btnCreerSession" style="display:none;margin-bottom:16px;">
+      <button class="btn btn-primary" onclick="showModal('modalCreerSession')">+ Nouvelle session</button>
+    </div>
 
     <div class="section-title">Sessions à venir</div>
     <div id="sessionsListe"></div>
@@ -493,7 +494,7 @@
     </div>
     <div class="nav-item" onclick="showPage('pageSessions')" id="nav1">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
-      <span>Tifo</span>
+      <span>Sessions</span>
     </div>
     <div class="nav-item" onclick="showPage('pageBoutique')" id="nav4">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
@@ -543,40 +544,7 @@
   </div>
 </div>
 
-<!-- Modal Confirmation Inscription (engagement) -->
-<div class="modal-overlay" id="modalConfirmInscription" style="display:none;" onclick="closeModalOutside(event,'modalConfirmInscription')">
-  <div class="modal" onclick="event.stopPropagation()">
-    <div class="modal-handle"></div>
-    <h3 class="modal-title">⚠️ Confirmer l'inscription</h3>
-    <div class="info-box" style="background:rgba(26,86,219,.12);border-color:rgba(26,86,219,.3);margin-bottom:16px;">
-      <div style="font-size:14px;line-height:1.7;">
-        En t'inscrivant à cette session, tu prends un <strong>engagement ferme</strong> d'être présent(e).<br><br>
-        Si tu ne peux plus venir, pense à te désinscrire au plus tôt pour libérer ta place.
-      </div>
-    </div>
-    <button class="btn btn-primary" onclick="confirmerInscription()">✅ Je confirme ma présence</button>
-    <button class="btn btn-secondary" style="margin-top:8px;" onclick="closeModal('modalConfirmInscription')">Annuler</button>
-  </div>
-</div>
-
-<!-- Modal Choix Pizza -->
-<div class="modal-overlay" id="modalChoixPizza" style="display:none;" onclick="closeModalOutside(event,'modalChoixPizza')">
-  <div class="modal" onclick="event.stopPropagation()">
-    <div class="modal-handle"></div>
-    <h3 class="modal-title">🍕 Commande pizza</h3>
-    <p style="color:var(--gris);font-size:14px;margin-bottom:16px;">Choisis ta pizza pour cette session :</p>
-    <div id="pizzaOptions" style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px;">
-      <button class="btn btn-secondary" onclick="validerInscriptionAvecPizza('non')" style="justify-content:flex-start;padding:12px 16px;">🚫 Sans pizza</button>
-      <button class="btn btn-secondary" onclick="validerInscriptionAvecPizza('margherita')" style="justify-content:flex-start;padding:12px 16px;">🍕 Margherita</button>
-      <button class="btn btn-secondary" onclick="validerInscriptionAvecPizza('reine')" style="justify-content:flex-start;padding:12px 16px;">🍕 Reine</button>
-      <button class="btn btn-secondary" onclick="validerInscriptionAvecPizza('4 fromages')" style="justify-content:flex-start;padding:12px 16px;">🍕 4 Fromages</button>
-      <button class="btn btn-secondary" onclick="validerInscriptionAvecPizza('vegetarienne')" style="justify-content:flex-start;padding:12px 16px;">🍕 Végétarienne</button>
-    </div>
-    <button class="btn btn-secondary" style="margin-top:4px;" onclick="closeModal('modalChoixPizza')">Annuler</button>
-  </div>
-</div>
-
-<!-- Modal Valider Présence -->
+<!-- Modal Changer MDP -->
 <div class="modal-overlay" id="modalMdp" style="display:none;" onclick="closeModalOutside(event,'modalMdp')">
   <div class="modal" onclick="event.stopPropagation()">
     <div class="modal-handle"></div>
@@ -611,83 +579,15 @@
     <div class="form-group"><label>Capacité max</label><input type="number" id="sCapacite" placeholder="25 (optionnel)"></div>
     <div class="form-group"><label>Lien Telegram</label><input type="url" id="sTelegram" placeholder="https://t.me/..."></div>
     <div class="form-group">
-      <label for="sPizza" style="display:flex;align-items:center;gap:12px;padding:11px 14px;background:rgba(255,255,255,.07);border:1.5px solid var(--border);border-radius:9px;cursor:pointer;">
-        <input type="checkbox" id="sPizza" style="width:20px;height:20px;flex-shrink:0;cursor:pointer;accent-color:var(--blue);">
-        <span style="font-size:14px;">🍕 Session avec pizza</span>
-      </label>
+      <div id="sPizzaToggle" onclick="togglePizzaCreate()" style="display:flex;align-items:center;gap:12px;padding:11px 14px;background:rgba(255,255,255,.07);border:1.5px solid var(--border);border-radius:9px;cursor:pointer;user-select:none;-webkit-user-select:none;">
+        <div id="sPizzaBox" style="width:20px;height:20px;flex-shrink:0;border-radius:4px;border:2px solid #3B82F6;background:transparent;display:flex;align-items:center;justify-content:center;transition:background .15s;pointer-events:none;"></div>
+        <span style="font-size:14px;pointer-events:none;">🍕 Session avec pizza</span>
+      </div>
+      <input type="checkbox" id="sPizza" style="display:none;">
     </div>
     <div class="form-group"><label>Description</label><textarea id="sDesc" rows="2" placeholder="Optionnel"></textarea></div>
     <button class="btn btn-primary" onclick="doCreerSession()">Créer la session</button>
     <button class="btn btn-secondary" style="margin-top:8px;" onclick="closeModal('modalCreerSession')">Annuler</button>
-  </div>
-</div>
-
-<!-- Modal Gérer Membres Tifo (notation) -->
-<div class="modal-overlay" id="modalGererMembresTifo" style="display:none;" onclick="closeModalOutside(event,'modalGererMembresTifo')">
-  <div class="modal" onclick="event.stopPropagation()">
-    <div class="modal-handle"></div>
-    <h3 class="modal-title">👥 Membres — Cellule Tifo</h3>
-    <p style="font-size:12px;color:var(--gris);margin-bottom:4px;">🖌️ 1re session ou peu autonome</p>
-    <p style="font-size:12px;color:var(--gris);margin-bottom:4px;">🖌️🖌️ Autonome sur tâche manuelle</p>
-    <p style="font-size:12px;color:var(--gris);margin-bottom:16px;">🖌️🖌️🖌️ Tâches précises en totale autonomie</p>
-    <div id="membresTifoListe"></div>
-  </div>
-</div>
-
-<!-- Modal Modifier Session (Cellule Tifo+) -->
-<div class="modal-overlay" id="modalModifierSession" style="display:none;" onclick="closeModalOutside(event,'modalModifierSession')">
-  <div class="modal" onclick="event.stopPropagation()">
-    <div class="modal-handle"></div>
-    <h3 class="modal-title">✏️ Modifier une session</h3>
-    <div class="form-group">
-      <label>Choisir la session</label>
-      <select id="msSelectSession" onchange="chargerSessionAModifier(this.value)">
-        <option value="">-- Sélectionner --</option>
-      </select>
-    </div>
-    <div id="msFormFields" style="display:none;">
-      <div class="form-group"><label>Nom</label><input type="text" id="msNom"></div>
-      <div class="form-group"><label>Date</label><input type="date" id="msDate"></div>
-      <div class="form-group"><label>Heure</label><input type="time" id="msHeure"></div>
-      <div class="form-group"><label>Lieu</label>
-        <select id="msLieu"><option>Paris Sud</option><option>Paris Intra Muros</option><option>Autre</option></select>
-      </div>
-      <div class="form-group"><label>Type</label>
-        <select id="msType"><option>Peinture</option><option>Tracage</option><option>Assemblage</option></select>
-      </div>
-      <div class="form-group"><label>Capacité max</label><input type="number" id="msCapacite" placeholder="25 (optionnel)"></div>
-      <div class="form-group"><label>Lien Telegram</label><input type="url" id="msTelegram" placeholder="https://t.me/..."></div>
-      <div class="form-group">
-        <label for="msPizza" style="display:flex;align-items:center;gap:12px;padding:11px 14px;background:rgba(255,255,255,.07);border:1.5px solid var(--border);border-radius:9px;cursor:pointer;">
-          <input type="checkbox" id="msPizza" style="width:20px;height:20px;flex-shrink:0;cursor:pointer;accent-color:var(--blue);">
-          <span style="font-size:14px;">🍕 Session avec pizza</span>
-        </label>
-      </div>
-      <div class="form-group"><label>Description</label><textarea id="msDesc" rows="2" placeholder="Optionnel"></textarea></div>
-      <button class="btn btn-primary" onclick="doModifierSession()">💾 Enregistrer</button>
-    </div>
-    <button class="btn btn-secondary" style="margin-top:8px;" onclick="closeModal('modalModifierSession')">Annuler</button>
-  </div>
-</div>
-
-<!-- Modal Supprimer Session -->
-<div class="modal-overlay" id="modalSupprimerSession" style="display:none;" onclick="closeModalOutside(event,'modalSupprimerSession')">
-  <div class="modal" onclick="event.stopPropagation()">
-    <div class="modal-handle"></div>
-    <h3 class="modal-title">🗑️ Supprimer une session</h3>
-    <div class="form-group">
-      <label>Choisir la session à supprimer</label>
-      <select id="delSelectSession">
-        <option value="">-- Sélectionner --</option>
-      </select>
-    </div>
-    <div id="delSessionInfo" style="display:none;margin-bottom:14px;">
-      <div class="info-box" style="background:rgba(239,68,68,.1);border-color:rgba(239,68,68,.3);color:#ef4444;font-size:13px;">
-        ⚠️ Cette action est irréversible. Toutes les inscriptions liées seront supprimées.
-      </div>
-    </div>
-    <button class="btn btn-primary" style="background:#ef4444;border-color:#ef4444;" onclick="doSupprimerSessionAdmin()">🗑️ Supprimer définitivement</button>
-    <button class="btn btn-secondary" style="margin-top:8px;" onclick="closeModal('modalSupprimerSession')">Annuler</button>
   </div>
 </div>
 
@@ -1017,6 +917,107 @@
   </div>
 </div>
 
+<!-- Modal Confirmation Inscription -->
+<div class="modal-overlay" id="modalConfirmInscription" style="display:none;" onclick="closeModalOutside(event,'modalConfirmInscription')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-handle"></div>
+    <h3 class="modal-title">⚠️ Confirmer l'inscription</h3>
+    <div class="info-box" style="background:rgba(26,86,219,.12);border-color:rgba(26,86,219,.3);margin-bottom:16px;">
+      <div style="font-size:14px;line-height:1.7;">
+        En t'inscrivant à cette session, tu prends un <strong>engagement ferme</strong> d'être présent(e).<br><br>
+        Si tu ne peux plus venir, pense à te désinscrire au plus tôt pour libérer ta place.
+      </div>
+    </div>
+    <button class="btn btn-primary" onclick="confirmerInscription()">✅ Je confirme ma présence</button>
+    <button class="btn btn-secondary" style="margin-top:8px;" onclick="closeModal('modalConfirmInscription')">Annuler</button>
+  </div>
+</div>
+
+<!-- Modal Choix Pizza -->
+<div class="modal-overlay" id="modalChoixPizza" style="display:none;" onclick="closeModalOutside(event,'modalChoixPizza')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-handle"></div>
+    <h3 class="modal-title">🍕 Commande pizza</h3>
+    <p style="color:var(--gris);font-size:14px;margin-bottom:16px;">Choisis ta pizza pour cette session :</p>
+    <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px;">
+      <button class="btn btn-secondary" onclick="validerInscriptionAvecPizza('non')" style="justify-content:flex-start;padding:12px 16px;">🚫 Sans pizza</button>
+      <button class="btn btn-secondary" onclick="validerInscriptionAvecPizza('margherita')" style="justify-content:flex-start;padding:12px 16px;">🍕 Margherita</button>
+      <button class="btn btn-secondary" onclick="validerInscriptionAvecPizza('reine')" style="justify-content:flex-start;padding:12px 16px;">🍕 Reine</button>
+      <button class="btn btn-secondary" onclick="validerInscriptionAvecPizza('4 fromages')" style="justify-content:flex-start;padding:12px 16px;">🍕 4 Fromages</button>
+      <button class="btn btn-secondary" onclick="validerInscriptionAvecPizza('vegetarienne')" style="justify-content:flex-start;padding:12px 16px;">🍕 Végétarienne</button>
+    </div>
+    <button class="btn btn-secondary" onclick="closeModal('modalChoixPizza')">Annuler</button>
+  </div>
+</div>
+
+<!-- Modal Supprimer Session -->
+<div class="modal-overlay" id="modalSupprimerSession" style="display:none;" onclick="closeModalOutside(event,'modalSupprimerSession')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-handle"></div>
+    <h3 class="modal-title">🗑️ Supprimer une session</h3>
+    <div class="form-group">
+      <label>Choisir la session à supprimer</label>
+      <select id="delSelectSession"><option value="">-- Sélectionner --</option></select>
+    </div>
+    <div id="delSessionInfo" style="display:none;margin-bottom:14px;">
+      <div class="info-box" style="background:rgba(239,68,68,.1);border-color:rgba(239,68,68,.3);color:#ef4444;font-size:13px;">
+        ⚠️ Action irréversible. Toutes les inscriptions liées seront supprimées.
+      </div>
+    </div>
+    <button class="btn btn-primary" style="background:#ef4444;border-color:#ef4444;" onclick="doSupprimerSessionAdmin()">🗑️ Supprimer définitivement</button>
+    <button class="btn btn-secondary" style="margin-top:8px;" onclick="closeModal('modalSupprimerSession')">Annuler</button>
+  </div>
+</div>
+
+<!-- Modal Modifier Session -->
+<div class="modal-overlay" id="modalModifierSession" style="display:none;" onclick="closeModalOutside(event,'modalModifierSession')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-handle"></div>
+    <h3 class="modal-title">✏️ Modifier une session</h3>
+    <div class="form-group">
+      <label>Choisir la session</label>
+      <select id="msSelectSession" onchange="chargerSessionAModifier(this.value)">
+        <option value="">-- Sélectionner --</option>
+      </select>
+    </div>
+    <div id="msFormFields" style="display:none;">
+      <div class="form-group"><label>Nom</label><input type="text" id="msNom"></div>
+      <div class="form-group"><label>Date</label><input type="date" id="msDate"></div>
+      <div class="form-group"><label>Heure</label><input type="time" id="msHeure"></div>
+      <div class="form-group"><label>Lieu</label>
+        <select id="msLieu"><option>Paris Sud</option><option>Paris Intra Muros</option><option>Autre</option></select>
+      </div>
+      <div class="form-group"><label>Type</label>
+        <select id="msType"><option>Peinture</option><option>Tracage</option><option>Assemblage</option></select>
+      </div>
+      <div class="form-group"><label>Capacité max</label><input type="number" id="msCapacite" placeholder="25 (optionnel)"></div>
+      <div class="form-group"><label>Lien Telegram</label><input type="url" id="msTelegram" placeholder="https://t.me/..."></div>
+      <div class="form-group">
+        <div id="msPizzaToggle" onclick="togglePizzaModify()" style="display:flex;align-items:center;gap:12px;padding:11px 14px;background:rgba(255,255,255,.07);border:1.5px solid var(--border);border-radius:9px;cursor:pointer;user-select:none;-webkit-user-select:none;">
+          <div id="msPizzaBox" style="width:20px;height:20px;flex-shrink:0;border-radius:4px;border:2px solid #3B82F6;background:transparent;display:flex;align-items:center;justify-content:center;transition:background .15s;pointer-events:none;"></div>
+          <span style="font-size:14px;pointer-events:none;">🍕 Session avec pizza</span>
+        </div>
+        <input type="checkbox" id="msPizza" style="display:none;">
+      </div>
+      <div class="form-group"><label>Description</label><textarea id="msDesc" rows="2" placeholder="Optionnel"></textarea></div>
+      <button class="btn btn-primary" onclick="doModifierSession()">💾 Enregistrer</button>
+    </div>
+    <button class="btn btn-secondary" style="margin-top:8px;" onclick="closeModal('modalModifierSession')">Annuler</button>
+  </div>
+</div>
+
+<!-- Modal Gérer Membres Tifo -->
+<div class="modal-overlay" id="modalGererMembresTifo" style="display:none;" onclick="closeModalOutside(event,'modalGererMembresTifo')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-handle"></div>
+    <h3 class="modal-title">👥 Membres — Cellule Tifo</h3>
+    <p style="font-size:12px;color:var(--gris);margin-bottom:4px;">🖌️ 1re session ou peu autonome</p>
+    <p style="font-size:12px;color:var(--gris);margin-bottom:4px;">🖌️🖌️ Autonome sur tâche manuelle</p>
+    <p style="font-size:12px;color:var(--gris);margin-bottom:16px;">🖌️🖌️🖌️ Tâches précises en totale autonomie</p>
+    <div id="membresTifoListe"></div>
+  </div>
+</div>
+
 <!-- Modal Saisir Score (Bureau+) -->
 <div class="modal-overlay" id="modalScore" style="display:none;" onclick="closeModalOutside(event,'modalScore')">
   <div class="modal" onclick="event.stopPropagation()">
@@ -1242,11 +1243,12 @@ function applyRights(membre) {
   if (hasCelluleSticks(membre)) {
     document.getElementById('adminSectionSticks').style.display = 'block';
   }
-  if (hasCelluleTifo(membre)) {
-    document.getElementById('adminSectionTifo').style.display = 'block';
-  }
   if (estCellule) {
     document.getElementById('adminSectionStats').style.display = 'block';
+  }
+
+  if (hasCelluleTifo(membre)) {
+    document.getElementById('adminSectionTifo').style.display = 'block';
   }
 
   // Demandes inscription
@@ -1719,45 +1721,6 @@ async function refuserDemande(membreId) {
 }
 
 // ─── SESSIONS ─────────────────────────────────────────────────
-async function toggleParticipants(sessionId, e) {
-  e.stopPropagation();
-  const el = document.getElementById('participants_' + sessionId);
-  if (!el) return;
-  if (el.style.display !== 'none') {
-    el.style.display = 'none';
-    e.target.textContent = '👥 Voir les participants';
-    return;
-  }
-  e.target.textContent = '⏳ Chargement…';
-  try {
-    const { inscrits } = await UL.getSessionDetails(sessionId);
-    const statutLabel = { inscrit:'📋 Inscrit', present:'✅ Présent', absent:'❌ Absent' };
-    if (!inscrits.length) {
-      el.innerHTML = '<div style="font-size:13px;color:var(--gris);text-align:center;padding:8px 0;">Aucun participant</div>';
-    } else {
-      el.innerHTML = inscrits.map(i => `
-        <div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--border);font-size:12px;">
-          <div style="flex:1;min-width:0;">
-            <div style="font-weight:600;">@${i.membre?.pseudo_telegram||'?'}</div>
-            <div style="color:var(--gris);font-size:11px;">${i.membre?.prenom||''} ${i.membre?.nom||''}</div>
-          </div>
-          <div style="font-size:11px;color:var(--gris);flex-shrink:0;text-align:right;">
-            ${i.membre?.section?.nom ? `<div>🛡️ ${i.membre.section.nom}</div>` : ''}
-            <div style="margin-top:2px;">${i.membre?.statut ? `<span class="statut-${i.membre.statut}" style="font-size:11px;">${i.membre.statut}</span>` : ''}</div>
-          </div>
-          <span class="badge ${i.statut==='present'?'badge-vert':i.statut==='absent'?'badge-rouge':'badge-bleu'}" style="flex-shrink:0;font-size:11px;">
-            ${statutLabel[i.statut]||i.statut}
-          </span>
-        </div>`).join('');
-    }
-    el.style.display = 'block';
-    e.target.textContent = '👥 Masquer les participants';
-  } catch(err) {
-    toast('Erreur chargement participants', 'error');
-    e.target.textContent = '👥 Voir les participants';
-  }
-}
-
 async function loadSessions() {
   const m = UL.getCurrentMembre();
   try {
@@ -1781,12 +1744,11 @@ function renderSessionCard(s, withAdmin = false) {
   const isTerminee = s.statut === 'terminee';
   const showAdmin = withAdmin && isCellule(m);
 
-  // Badge statut (toujours affiché à droite)
   const badgeStatut = `<span class="badge ${isOpen ? 'badge-vert' : isPlanned ? 'badge-bleu' : 'badge-gris'}" style="flex-shrink:0;">
     ${isOpen ? 'En cours' : isPlanned ? 'À venir' : isTerminee ? 'Terminée' : 'Annulée'}
   </span>`;
 
-  // Barre admin sous la card (code présence + inscrits + pizzas uniquement — pas Ouvrir/Supprimer)
+  // Barre admin : code présence + inscrits + pizzas (sans Ouvrir / Supprimer / Fermer)
   const adminBar = showAdmin ? `
     <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-top:10px;padding-top:10px;border-top:1px solid var(--border);">
       ${isOpen ? `<div class="session-code" style="font-size:20px;letter-spacing:.15em;margin-right:4px;">${s.code_presence || '----'}</div>` : ''}
@@ -1794,14 +1756,14 @@ function renderSessionCard(s, withAdmin = false) {
       ${s.avec_pizza && isOpen ? `<button class="btn btn-sm" style="background:rgba(255,149,0,.15);color:var(--pizza);border:1px solid rgba(255,149,0,.3);" onclick="voirPizzas('${s.id}',event)">🍕 Pizzas</button>` : ''}
     </div>` : '';
 
-  // Liste participants inline (visible pour tous sur l'onglet Tifo)
-  const participantsId = `participants_${s.id}`;
+  // Liste participants (visible pour tous, lazy)
+  const pid = `participants_${s.id}`;
   const participantsToggle = `
     <div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border);" onclick="event.stopPropagation()">
       <button class="btn btn-sm btn-secondary" style="width:100%;" onclick="toggleParticipants('${s.id}', event)">
         👥 Voir les participants
       </button>
-      <div id="${participantsId}" style="display:none;margin-top:10px;"></div>
+      <div id="${pid}" style="display:none;margin-top:10px;"></div>
     </div>`;
 
   return `<div class="session-card ${isOpen ? 'open' : ''}" onclick="openSession('${s.id}')">
@@ -1817,6 +1779,45 @@ function renderSessionCard(s, withAdmin = false) {
     ${adminBar}
     ${participantsToggle}
   </div>`;
+}
+
+async function toggleParticipants(sessionId, e) {
+  e.stopPropagation();
+  const btn = e.currentTarget;
+  const el = document.getElementById('participants_' + sessionId);
+  if (!el) return;
+  if (el.style.display !== 'none') {
+    el.style.display = 'none';
+    btn.textContent = '👥 Voir les participants';
+    return;
+  }
+  btn.textContent = '⏳ Chargement…';
+  btn.disabled = true;
+  try {
+    const { inscrits } = await UL.getSessionDetails(sessionId);
+    const statutLabel = { inscrit:'📋 Inscrit', present:'✅ Présent', absent:'❌ Absent' };
+    el.innerHTML = inscrits.length ? inscrits.map(i => `
+      <div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--border);font-size:12px;">
+        <div style="flex:1;min-width:0;">
+          <div style="font-weight:600;">@${i.membre?.pseudo_telegram||'?'}</div>
+          <div style="color:var(--gris);font-size:11px;">${i.membre?.prenom||''} ${i.membre?.nom||''}</div>
+        </div>
+        <div style="font-size:11px;color:var(--gris);flex-shrink:0;text-align:right;">
+          ${i.membre?.section?.nom ? `<div>🛡️ ${i.membre.section.nom}</div>` : ''}
+          ${i.membre?.statut ? `<div style="margin-top:2px;">${i.membre.statut}</div>` : ''}
+        </div>
+        <span class="badge ${i.statut==='present'?'badge-vert':i.statut==='absent'?'badge-rouge':'badge-bleu'}" style="flex-shrink:0;font-size:11px;">
+          ${statutLabel[i.statut]||i.statut}
+        </span>
+      </div>`).join('')
+      : '<div style="font-size:13px;color:var(--gris);text-align:center;padding:8px 0;">Aucun participant</div>';
+    el.style.display = 'block';
+    btn.textContent = '👥 Masquer les participants';
+  } catch(err) {
+    toast('Erreur chargement participants', 'error');
+    btn.textContent = '👥 Voir les participants';
+  }
+  btn.disabled = false;
 }
 
 async function openSession(sessionId) {
@@ -1862,7 +1863,6 @@ async function openSession(sessionId) {
 }
 
 async function doInscrire(id) {
-  // Récupérer si la session a pizza pour préparer le flux
   currentSessionId = id;
   try {
     const { session: s } = await UL.getSessionDetails(id);
@@ -1870,7 +1870,6 @@ async function doInscrire(id) {
   } catch(e) {
     currentSessionAvecPizza = false;
   }
-  // Fermer le modal session et ouvrir la confirmation d'engagement
   closeModal('modalSession');
   showModal('modalConfirmInscription');
 }
@@ -1878,10 +1877,8 @@ async function doInscrire(id) {
 async function confirmerInscription() {
   closeModal('modalConfirmInscription');
   if (currentSessionAvecPizza) {
-    // Ouvrir le choix pizza
     showModal('modalChoixPizza');
   } else {
-    // Inscription directe sans pizza
     await _finaliserInscription(null);
   }
 }
@@ -1897,7 +1894,9 @@ async function _finaliserInscription(pizza) {
     if (pizza && pizza !== 'non') {
       await UL.savePizzaChoice(currentSessionId, pizza);
     }
-    const msg = pizza && pizza !== 'non' ? `Inscription confirmée ! Pizza : ${pizza} 🍕` : 'Inscription confirmée ! ✅';
+    const msg = pizza && pizza !== 'non'
+      ? `Inscription confirmée ! Pizza : ${pizza} 🍕`
+      : 'Inscription confirmée ! ✅';
     toast(msg, 'success');
     loadSessions();
   } catch(e) {
@@ -1947,51 +1946,30 @@ async function doSupprimerSession(id, e) {
 }
 async function voirInscrits(id, nom, e) {
   e.stopPropagation();
-  const m = UL.getCurrentMembre();
-  const peutNoter = hasCelluleTifo(m);
   try {
-    const { session: s, inscrits } = await UL.getSessionDetails(id);
+    const { inscrits } = await UL.getSessionDetails(id);
     const presents = inscrits.filter(i => i.statut === 'present');
     const inscritsListe = inscrits.filter(i => i.statut === 'inscrit');
-    const statutLabel = { inscrit:'📋 Inscrit', present:'✅ Présent', absent:'❌ Absent' };
     document.getElementById('modalAdminSessionContent').innerHTML = `
       <h3 class="modal-title">Inscrits — ${nom}</h3>
       <div style="font-size:13px;color:var(--gris);margin-bottom:14px;">
         ✅ ${presents.length} présents · 📋 ${inscritsListe.length} inscrits · Total: ${inscrits.length}
       </div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;">
-        <button class="btn btn-sm btn-secondary" onclick="copierInscrits(${JSON.stringify(inscrits.map(i=>i.membre?.pseudo_telegram||'?'))})">📋 Liste complète</button>
-        <button class="btn btn-sm btn-secondary" onclick="copierPresents(${JSON.stringify(presents.map(i=>i.membre?.pseudo_telegram||'?'))})">✅ Liste présents (${presents.length})</button>
-        ${s?.avec_pizza ? `<button class="btn btn-sm" style="background:rgba(255,149,0,.15);color:var(--pizza);border:1px solid rgba(255,149,0,.3);" onclick="voirPizzas('${id}', {stopPropagation:()=>{}})">🍕 Pizzas</button>` : ''}
-      </div>
-      ${inscrits.map(i => {
-        const nb = i.membre?.etoiles || 0;
-        const pinceaux = peutNoter ? [1,2,3].map(n =>
-          `<button onclick="doNoterMembre('${i.membre_id}',${n})" title="${n} pinceau${n>1?'x':''}"
-            style="background:none;border:none;cursor:pointer;font-size:17px;padding:1px;line-height:1;opacity:${nb>=n?1:0.28};">🖌️</button>`
-        ).join('') : `<span style="font-size:15px;opacity:.7;">${'🖌️'.repeat(nb)||'—'}</span>`;
-        return `
-        <div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border);font-size:13px;">
+      <button class="btn btn-sm btn-secondary" style="margin-bottom:14px;" onclick="copierInscrits(${JSON.stringify(inscrits.map(i=>i.membre?.pseudo_telegram||'?'))})">📋 Copier liste Telegram</button>
+      ${inscrits.map(i => `
+        <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px;">
           <div class="avatar" style="width:32px;height:32px;font-size:12px;">${(i.membre?.prenom||'?')[0]}</div>
-          <div style="flex:1;min-width:0;">
+          <div style="flex:1;">
             <div style="font-weight:600;">${i.membre?.prenom||''} ${i.membre?.nom||''}</div>
-            <div style="color:var(--gris);font-size:12px;">@${i.membre?.pseudo_telegram||'?'}</div>
+            <div style="color:var(--gris);">@${i.membre?.pseudo_telegram||'?'}</div>
           </div>
-          <div id="notationRow_${i.membre_id}" style="display:flex;align-items:center;gap:1px;">${pinceaux}</div>
-          <span class="badge ${i.statut==='present'?'badge-vert':i.statut==='absent'?'badge-rouge':'badge-bleu'}" style="flex-shrink:0;">
-            ${statutLabel[i.statut]||i.statut}
+          <span class="badge ${i.statut==='present'?'badge-vert':i.statut==='absent'?'badge-rouge':'badge-bleu'}">
+            ${i.statut}
           </span>
-        </div>`;
-      }).join('')}
+        </div>`).join('')}
     `;
     showModal('modalAdminSession');
   } catch(e) { toast('Erreur', 'error'); }
-}
-
-function copierPresents(pseudos) {
-  if (!pseudos.length) return toast('Aucun présent', 'error');
-  const texte = `✅ Présents (${pseudos.length}) :\n` + pseudos.map((p,i) => `${i+1}. @${p}`).join('\n');
-  navigator.clipboard.writeText(texte).then(() => toast(`Liste de ${pseudos.length} présent${pseudos.length>1?'s':''} copiée !`, 'success'));
 }
 async function voirPizzas(id, e) {
   e.stopPropagation();
@@ -2014,23 +1992,36 @@ function copierInscrits(pseudos) {
   navigator.clipboard.writeText(texte).then(() => toast('Liste copiée !', 'success'));
 }
 
-// ─── CRÉER SESSION (reset form + ouvre modal) ─────────────────
+// ─── Toggle pizza custom ──────────────────────────────────────
+let _sPizzaActif = false;
+function togglePizzaCreate() {
+  _sPizzaActif = !_sPizzaActif;
+  const box = document.getElementById('sPizzaBox');
+  const cb = document.getElementById('sPizza');
+  box.style.background = _sPizzaActif ? '#1A56DB' : 'transparent';
+  box.style.borderColor = _sPizzaActif ? '#1A56DB' : '#3B82F6';
+  box.innerHTML = _sPizzaActif
+    ? '<svg viewBox="0 0 10 8" style="width:10px;height:8px;pointer-events:none"><polyline points="1,4 3.5,7 9,1" style="fill:none;stroke:white;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round"/></svg>'
+    : '';
+  if (cb) cb.checked = _sPizzaActif;
+}
+
+// ─── Créer session (reset form) ───────────────────────────────
 function ouvrirCreerSession() {
-  // Reset complet du form pour éviter les états résiduels
   ['sNom','sDate','sHeure','sCapacite','sTelegram','sDesc'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.value = '';
+    const el = document.getElementById(id); if (el) el.value = '';
   });
-  const pizza = document.getElementById('sPizza');
-  if (pizza) pizza.checked = false;
-  const lieu = document.getElementById('sLieu');
-  if (lieu) lieu.value = 'Paris Sud';
-  const type = document.getElementById('sType');
-  if (type) type.value = 'Peinture';
+  // Reset toggle pizza
+  _sPizzaActif = false;
+  const box = document.getElementById('sPizzaBox');
+  if (box) { box.style.background = 'transparent'; box.style.borderColor = '#3B82F6'; box.innerHTML = ''; }
+  const cb = document.getElementById('sPizza'); if (cb) cb.checked = false;
+  const lieu = document.getElementById('sLieu'); if (lieu) lieu.value = 'Paris Sud';
+  const type = document.getElementById('sType'); if (type) type.value = 'Peinture';
   showModal('modalCreerSession');
 }
 
-// ─── SUPPRIMER SESSION (Admin Tifo) ───────────────────────────
+// ─── Supprimer session ────────────────────────────────────────
 async function ouvrirSupprimerSession() {
   try {
     const sessions = await UL.getSessionsWithStats();
@@ -2061,7 +2052,7 @@ async function doSupprimerSessionAdmin() {
   } catch(e) { toast(e.message || 'Erreur suppression', 'error'); }
 }
 
-// ─── MODIFIER SESSION (Admin Tifo) ────────────────────────────
+// ─── Modifier session ─────────────────────────────────────────
 async function ouvrirModifierSession() {
   try {
     const sessions = await UL.getSessionsWithStats();
@@ -2087,10 +2078,31 @@ async function chargerSessionAModifier(id) {
     document.getElementById('msType').value = s.type_session || 'Peinture';
     document.getElementById('msCapacite').value = s.capacite_max || '';
     document.getElementById('msTelegram').value = s.lien_telegram || '';
-    document.getElementById('msPizza').checked = !!s.avec_pizza;
+    // Toggle pizza modifier
+    const actif = !!s.avec_pizza;
+    document.getElementById('msPizza').checked = actif;
+    const box = document.getElementById('msPizzaBox');
+    if (box) {
+      box.style.background = actif ? '#1A56DB' : 'transparent';
+      box.style.borderColor = actif ? '#1A56DB' : '#3B82F6';
+      box.innerHTML = actif ? '<svg viewBox="0 0 10 8" style="width:10px;height:8px;pointer-events:none"><polyline points="1,4 3.5,7 9,1" style="fill:none;stroke:white;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round"/></svg>' : '';
+    }
     document.getElementById('msDesc').value = s.description || '';
     document.getElementById('msFormFields').style.display = 'block';
   } catch(e) { toast('Erreur chargement session', 'error'); }
+}
+
+let _msPizzaActif = false;
+function togglePizzaModify() {
+  _msPizzaActif = !_msPizzaActif;
+  const box = document.getElementById('msPizzaBox');
+  const cb = document.getElementById('msPizza');
+  box.style.background = _msPizzaActif ? '#1A56DB' : 'transparent';
+  box.style.borderColor = _msPizzaActif ? '#1A56DB' : '#3B82F6';
+  box.innerHTML = _msPizzaActif
+    ? '<svg viewBox="0 0 10 8" style="width:10px;height:8px;pointer-events:none"><polyline points="1,4 3.5,7 9,1" style="fill:none;stroke:white;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round"/></svg>'
+    : '';
+  if (cb) cb.checked = _msPizzaActif;
 }
 
 async function doModifierSession() {
@@ -2116,43 +2128,32 @@ async function doModifierSession() {
   } catch(e) { toast(e.message || 'Erreur modification', 'error'); }
 }
 
-// ─── GÉRER MEMBRES TIFO (notation étoiles) ────────────────────
+// ─── Gérer membres tifo ───────────────────────────────────────
 async function ouvrirGererMembresTifo() {
   try {
     const membres = await UL.getAllMembres();
     const tifo = membres.filter(m =>
-      m.roles_app && (
-        m.roles_app.includes('cellule_tifo') ||
-        m.roles_app.includes('admin_app') ||
-        m.roles_app.includes('bureau_app')
-      )
+      m.roles_app && (m.roles_app.includes('cellule_tifo') ||
+        m.roles_app.includes('admin_app') || m.roles_app.includes('bureau_app'))
     );
     const el = document.getElementById('membresTifoListe');
-    if (!tifo.length) {
-      el.innerHTML = '<div class="empty-state"><div>👥</div>Aucun membre cellule tifo</div>';
-    } else {
-      el.innerHTML = tifo.map(m => {
-        const nb = m.etoiles || 0;
-        const pinceaux = [1,2,3].map(n => `
-          <button onclick="doNoterMembre('${m.id}',${n})" title="${n} pinceau${n>1?'x':''}"
-            style="background:none;border:none;cursor:pointer;font-size:20px;padding:2px;line-height:1;opacity:${nb>=n?1:0.3};">
-            🖌️
-          </button>`).join('');
-        return `
-          <div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);">
-            <div class="avatar" style="width:36px;height:36px;font-size:13px;flex-shrink:0;">
-              ${((m.prenom||'?')[0]+(m.nom||'?')[0]).toUpperCase()}
-            </div>
+    el.innerHTML = !tifo.length
+      ? '<div class="empty-state"><div>👥</div>Aucun membre cellule tifo</div>'
+      : tifo.map(m => {
+          const nb = m.etoiles || 0;
+          const pinceaux = [1,2,3].map(n =>
+            `<button onclick="doNoterMembre('${m.id}',${n})"
+              style="background:none;border:none;cursor:pointer;font-size:20px;padding:2px;line-height:1;opacity:${nb>=n?1:0.3};">🖌️</button>`
+          ).join('');
+          return `<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);">
+            <div class="avatar" style="width:36px;height:36px;font-size:13px;flex-shrink:0;">${((m.prenom||'?')[0]+(m.nom||'?')[0]).toUpperCase()}</div>
             <div style="flex:1;min-width:0;">
               <div style="font-weight:600;font-size:13px;">${m.prenom||''} ${m.nom||''}</div>
               <div style="font-size:12px;color:var(--gris);">@${m.pseudo_telegram||'?'}</div>
             </div>
-            <div id="notationRow_${m.id}" style="display:flex;align-items:center;gap:2px;">
-              ${pinceaux}
-            </div>
+            <div id="notationRow_${m.id}" style="display:flex;align-items:center;gap:2px;">${pinceaux}</div>
           </div>`;
-      }).join('');
-    }
+        }).join('');
     showModal('modalGererMembresTifo');
   } catch(e) { toast('Erreur chargement membres', 'error'); }
 }
@@ -2160,16 +2161,55 @@ async function ouvrirGererMembresTifo() {
 async function doNoterMembre(membreId, etoiles) {
   try {
     await UL.setEtoilesMembre(membreId, etoiles);
-    // Mettre à jour visuellement les pinceaux sans recharger
     const row = document.getElementById('notationRow_' + membreId);
-    if (row) {
-      row.querySelectorAll('button').forEach((btn, i) => {
-        btn.style.opacity = (i < etoiles) ? '1' : '0.3';
-      });
-    }
-    const labels = ['', '🖌️ Débutant', '🖌️🖌️ Autonome', '🖌️🖌️🖌️ Expert'];
-    toast(`Notation mise à jour : ${labels[etoiles]}`, 'success');
+    if (row) row.querySelectorAll('button').forEach((btn, i) => { btn.style.opacity = (i < etoiles) ? '1' : '0.3'; });
+    const labels = ['','🖌️ Débutant','🖌️🖌️ Autonome','🖌️🖌️🖌️ Expert'];
+    toast(`Notation : ${labels[etoiles]}`, 'success');
   } catch(e) { toast('Erreur notation', 'error'); }
+}
+
+async function voirInscrits(id, nom, e) {
+  e.stopPropagation();
+  const m = UL.getCurrentMembre();
+  const peutNoter = hasCelluleTifo(m);
+  try {
+    const { session: s, inscrits } = await UL.getSessionDetails(id);
+    const presents = inscrits.filter(i => i.statut === 'present');
+    const inscritsListe = inscrits.filter(i => i.statut === 'inscrit');
+    const statutLabel = { inscrit:'📋 Inscrit', present:'✅ Présent', absent:'❌ Absent' };
+    document.getElementById('modalAdminSessionContent').innerHTML = `
+      <h3 class="modal-title">Inscrits — ${nom}</h3>
+      <div style="font-size:13px;color:var(--gris);margin-bottom:14px;">
+        ✅ ${presents.length} présents · 📋 ${inscritsListe.length} inscrits · Total: ${inscrits.length}
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;">
+        <button class="btn btn-sm btn-secondary" onclick="copierInscrits(${JSON.stringify(inscrits.map(i=>i.membre?.pseudo_telegram||'?'))})">📋 Liste complète</button>
+        <button class="btn btn-sm btn-secondary" onclick="copierPresents(${JSON.stringify(presents.map(i=>i.membre?.pseudo_telegram||'?'))})">✅ Présents (${presents.length})</button>
+        ${s?.avec_pizza ? `<button class="btn btn-sm" style="background:rgba(255,149,0,.15);color:var(--pizza);border:1px solid rgba(255,149,0,.3);" onclick="voirPizzas('${id}',{stopPropagation:()=>{}})">🍕 Pizzas</button>` : ''}
+      </div>
+      ${inscrits.map(i => {
+        const nb = i.membre?.etoiles || 0;
+        const pinceaux = peutNoter
+          ? [1,2,3].map(n => `<button onclick="doNoterMembre('${i.membre_id}',${n})" style="background:none;border:none;cursor:pointer;font-size:17px;padding:1px;line-height:1;opacity:${nb>=n?1:0.28};">🖌️</button>`).join('')
+          : `<span style="font-size:15px;opacity:.7;">${'🖌️'.repeat(nb)||'—'}</span>`;
+        return `<div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border);font-size:13px;">
+          <div class="avatar" style="width:32px;height:32px;font-size:12px;">${(i.membre?.prenom||'?')[0]}</div>
+          <div style="flex:1;min-width:0;">
+            <div style="font-weight:600;">${i.membre?.prenom||''} ${i.membre?.nom||''}</div>
+            <div style="color:var(--gris);font-size:12px;">@${i.membre?.pseudo_telegram||'?'}</div>
+          </div>
+          <div id="notationRow_${i.membre_id}" style="display:flex;align-items:center;gap:1px;">${pinceaux}</div>
+          <span class="badge ${i.statut==='present'?'badge-vert':i.statut==='absent'?'badge-rouge':'badge-bleu'}" style="flex-shrink:0;">${statutLabel[i.statut]||i.statut}</span>
+        </div>`;
+      }).join('')}`;
+    showModal('modalAdminSession');
+  } catch(e) { toast('Erreur', 'error'); }
+}
+
+function copierPresents(pseudos) {
+  if (!pseudos.length) return toast('Aucun présent', 'error');
+  const texte = `✅ Présents (${pseudos.length}) :\n` + pseudos.map((p,i) => `${i+1}. @${p}`).join('\n');
+  navigator.clipboard.writeText(texte).then(() => toast(`${pseudos.length} présent(s) copié(s) !`, 'success'));
 }
 
 async function doCreerSession() {
