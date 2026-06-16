@@ -193,11 +193,10 @@
 
   <!-- ── PAGE SESSIONS ──────────────────────────────────────── -->
   <div id="pageSessions" class="page">
+    <h2 style="font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:.05em;margin-bottom:16px;">🖌️ Tifo</h2>
 
-    <!-- Bouton créer session (Bureau+ ou Membre Cellule) -->
-    <div id="btnCreerSession" style="display:none;margin-bottom:16px;">
-      <button class="btn btn-primary" onclick="showModal('modalCreerSession')">+ Nouvelle session</button>
-    </div>
+    <!-- btnCreerSession gardé hidden pour compatibilité applyRights -->
+    <div id="btnCreerSession" style="display:none;"></div>
 
     <div class="section-title">Sessions à venir</div>
     <div id="sessionsListe"></div>
@@ -273,6 +272,18 @@
   <!-- ── PAGE ADMIN ────────────────────────────────────────── -->
   <div id="pageAdmin" class="page">
     <h2 style="font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:.05em;margin-bottom:16px;">⚙️ Administration</h2>
+
+    <!-- TIFO — Admin + Bureau + Cellule Tifo -->
+    <div id="adminSectionTifo" style="display:none;">
+      <div class="section-title">🖌️ Tifo</div>
+      <div class="card" style="margin-bottom:10px;">
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <button class="btn btn-secondary" onclick="showModal('modalCreerSession')">➕ Créer une session</button>
+          <button class="btn btn-secondary" onclick="ouvrirModifierSession()">✏️ Modifier une session</button>
+          <button class="btn btn-secondary" onclick="ouvrirGererMembresTifo()">👥 Gérer les membres</button>
+        </div>
+      </div>
+    </div>
 
     <!-- MEMBRES — Admin + Bureau -->
     <div id="adminSectionMembres" style="display:none;">
@@ -481,7 +492,7 @@
     </div>
     <div class="nav-item" onclick="showPage('pageSessions')" id="nav1">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
-      <span>Sessions</span>
+      <span>Tifo</span>
     </div>
     <div class="nav-item" onclick="showPage('pageBoutique')" id="nav4">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
@@ -574,6 +585,54 @@
     <div class="form-group"><label>Description</label><textarea id="sDesc" rows="2" placeholder="Optionnel"></textarea></div>
     <button class="btn btn-primary" onclick="doCreerSession()">Créer la session</button>
     <button class="btn btn-secondary" style="margin-top:8px;" onclick="closeModal('modalCreerSession')">Annuler</button>
+  </div>
+</div>
+
+<!-- Modal Gérer Membres Tifo (notation) -->
+<div class="modal-overlay" id="modalGererMembresTifo" style="display:none;" onclick="closeModalOutside(event,'modalGererMembresTifo')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-handle"></div>
+    <h3 class="modal-title">👥 Membres — Cellule Tifo</h3>
+    <p style="font-size:12px;color:var(--gris);margin-bottom:4px;">🖌️ 1re session ou peu autonome</p>
+    <p style="font-size:12px;color:var(--gris);margin-bottom:4px;">🖌️🖌️ Autonome sur tâche manuelle</p>
+    <p style="font-size:12px;color:var(--gris);margin-bottom:16px;">🖌️🖌️🖌️ Tâches précises en totale autonomie</p>
+    <div id="membresTifoListe"></div>
+  </div>
+</div>
+
+<!-- Modal Modifier Session (Cellule Tifo+) -->
+<div class="modal-overlay" id="modalModifierSession" style="display:none;" onclick="closeModalOutside(event,'modalModifierSession')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-handle"></div>
+    <h3 class="modal-title">✏️ Modifier une session</h3>
+    <div class="form-group">
+      <label>Choisir la session</label>
+      <select id="msSelectSession" onchange="chargerSessionAModifier(this.value)">
+        <option value="">-- Sélectionner --</option>
+      </select>
+    </div>
+    <div id="msFormFields" style="display:none;">
+      <div class="form-group"><label>Nom</label><input type="text" id="msNom"></div>
+      <div class="form-group"><label>Date</label><input type="date" id="msDate"></div>
+      <div class="form-group"><label>Heure</label><input type="time" id="msHeure"></div>
+      <div class="form-group"><label>Lieu</label>
+        <select id="msLieu"><option>Paris Sud</option><option>Paris Intra Muros</option><option>Autre</option></select>
+      </div>
+      <div class="form-group"><label>Type</label>
+        <select id="msType"><option>Peinture</option><option>Tracage</option><option>Assemblage</option></select>
+      </div>
+      <div class="form-group"><label>Capacité max</label><input type="number" id="msCapacite" placeholder="25 (optionnel)"></div>
+      <div class="form-group"><label>Lien Telegram</label><input type="url" id="msTelegram" placeholder="https://t.me/..."></div>
+      <div class="form-group">
+        <div style="display:flex;align-items:center;gap:12px;padding:11px 14px;background:rgba(255,255,255,.07);border:1.5px solid var(--border);border-radius:9px;cursor:pointer;" onclick="document.getElementById('msPizza').click()">
+          <input type="checkbox" id="msPizza" style="width:20px;height:20px;flex-shrink:0;cursor:pointer;accent-color:var(--blue);" onclick="event.stopPropagation()">
+          <span style="font-size:14px;">🍕 Session avec pizza</span>
+        </div>
+      </div>
+      <div class="form-group"><label>Description</label><textarea id="msDesc" rows="2" placeholder="Optionnel"></textarea></div>
+      <button class="btn btn-primary" onclick="doModifierSession()">💾 Enregistrer</button>
+    </div>
+    <button class="btn btn-secondary" style="margin-top:8px;" onclick="closeModal('modalModifierSession')">Annuler</button>
   </div>
 </div>
 
@@ -1127,13 +1186,11 @@ function applyRights(membre) {
   if (hasCelluleSticks(membre)) {
     document.getElementById('adminSectionSticks').style.display = 'block';
   }
+  if (hasCelluleTifo(membre)) {
+    document.getElementById('adminSectionTifo').style.display = 'block';
+  }
   if (estCellule) {
     document.getElementById('adminSectionStats').style.display = 'block';
-  }
-
-  // Bouton créer session : cellule tifo+
-  if (hasCelluleTifo(membre)) {
-    document.getElementById('btnCreerSession').style.display = 'block';
   }
 
   // Demandes inscription
@@ -1769,27 +1826,38 @@ async function doSupprimerSession(id, e) {
 }
 async function voirInscrits(id, nom, e) {
   e.stopPropagation();
+  const m = UL.getCurrentMembre();
+  const peutNoter = hasCelluleTifo(m);
   try {
     const { inscrits } = await UL.getSessionDetails(id);
     const presents = inscrits.filter(i => i.statut === 'present');
     const inscritsListe = inscrits.filter(i => i.statut === 'inscrit');
+    const statutLabel = { inscrit:'📋 Inscrit', present:'✅ Présent', absent:'❌ Absent' };
     document.getElementById('modalAdminSessionContent').innerHTML = `
       <h3 class="modal-title">Inscrits — ${nom}</h3>
       <div style="font-size:13px;color:var(--gris);margin-bottom:14px;">
         ✅ ${presents.length} présents · 📋 ${inscritsListe.length} inscrits · Total: ${inscrits.length}
       </div>
       <button class="btn btn-sm btn-secondary" style="margin-bottom:14px;" onclick="copierInscrits(${JSON.stringify(inscrits.map(i=>i.membre?.pseudo_telegram||'?'))})">📋 Copier liste Telegram</button>
-      ${inscrits.map(i => `
-        <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px;">
+      ${inscrits.map(i => {
+        const nb = i.membre?.etoiles || 0;
+        const pinceaux = peutNoter ? [1,2,3].map(n =>
+          `<button onclick="doNoterMembre('${i.membre_id}',${n})" title="${n} pinceau${n>1?'x':''}"
+            style="background:none;border:none;cursor:pointer;font-size:17px;padding:1px;line-height:1;opacity:${nb>=n?1:0.28};">🖌️</button>`
+        ).join('') : `<span style="font-size:15px;opacity:.7;">${'🖌️'.repeat(nb)||'—'}</span>`;
+        return `
+        <div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border);font-size:13px;">
           <div class="avatar" style="width:32px;height:32px;font-size:12px;">${(i.membre?.prenom||'?')[0]}</div>
-          <div style="flex:1;">
+          <div style="flex:1;min-width:0;">
             <div style="font-weight:600;">${i.membre?.prenom||''} ${i.membre?.nom||''}</div>
-            <div style="color:var(--gris);">@${i.membre?.pseudo_telegram||'?'}</div>
+            <div style="color:var(--gris);font-size:12px;">@${i.membre?.pseudo_telegram||'?'}</div>
           </div>
-          <span class="badge ${i.statut==='present'?'badge-vert':i.statut==='absent'?'badge-rouge':'badge-bleu'}">
-            ${i.statut}
+          <div id="notationRow_${i.membre_id}" style="display:flex;align-items:center;gap:1px;">${pinceaux}</div>
+          <span class="badge ${i.statut==='present'?'badge-vert':i.statut==='absent'?'badge-rouge':'badge-bleu'}" style="flex-shrink:0;">
+            ${statutLabel[i.statut]||i.statut}
           </span>
-        </div>`).join('')}
+        </div>`;
+      }).join('')}
     `;
     showModal('modalAdminSession');
   } catch(e) { toast('Erreur', 'error'); }
@@ -1813,6 +1881,117 @@ async function voirPizzas(id, e) {
 function copierInscrits(pseudos) {
   const texte = pseudos.map((p,i) => `${i+1}. @${p}`).join('\n');
   navigator.clipboard.writeText(texte).then(() => toast('Liste copiée !', 'success'));
+}
+
+// ─── MODIFIER SESSION (Admin Tifo) ────────────────────────────
+async function ouvrirModifierSession() {
+  try {
+    const sessions = await UL.getSessionsWithStats();
+    const sel = document.getElementById('msSelectSession');
+    sel.innerHTML = '<option value="">-- Sélectionner --</option>' +
+      sessions.map(s => {
+        const d = new Date(s.date).toLocaleDateString('fr-FR', { day:'numeric', month:'short' });
+        return `<option value="${s.id}">${s.nom} — ${d}</option>`;
+      }).join('');
+    document.getElementById('msFormFields').style.display = 'none';
+    showModal('modalModifierSession');
+  } catch(e) { toast('Erreur chargement sessions', 'error'); }
+}
+
+async function chargerSessionAModifier(id) {
+  if (!id) { document.getElementById('msFormFields').style.display = 'none'; return; }
+  try {
+    const { session: s } = await UL.getSessionDetails(id);
+    document.getElementById('msNom').value = s.nom || '';
+    document.getElementById('msDate').value = s.date || '';
+    document.getElementById('msHeure').value = s.heure ? s.heure.slice(0,5) : '';
+    document.getElementById('msLieu').value = s.lieu || 'Paris Sud';
+    document.getElementById('msType').value = s.type_session || 'Peinture';
+    document.getElementById('msCapacite').value = s.capacite_max || '';
+    document.getElementById('msTelegram').value = s.lien_telegram || '';
+    document.getElementById('msPizza').checked = !!s.avec_pizza;
+    document.getElementById('msDesc').value = s.description || '';
+    document.getElementById('msFormFields').style.display = 'block';
+  } catch(e) { toast('Erreur chargement session', 'error'); }
+}
+
+async function doModifierSession() {
+  const id = document.getElementById('msSelectSession').value;
+  if (!id) return toast('Sélectionne une session', 'error');
+  const data = {
+    nom: document.getElementById('msNom').value,
+    date: document.getElementById('msDate').value,
+    heure: document.getElementById('msHeure').value || null,
+    lieu: document.getElementById('msLieu').value,
+    type_session: document.getElementById('msType').value,
+    capacite_max: parseInt(document.getElementById('msCapacite').value) || null,
+    lien_telegram: document.getElementById('msTelegram').value || null,
+    avec_pizza: document.getElementById('msPizza').checked,
+    description: document.getElementById('msDesc').value || null,
+  };
+  if (!data.nom || !data.date) return toast('Nom et date requis', 'error');
+  try {
+    await UL.updateSession(id, data);
+    toast('Session modifiée ✅', 'success');
+    closeModal('modalModifierSession');
+    loadSessions();
+  } catch(e) { toast(e.message || 'Erreur modification', 'error'); }
+}
+
+// ─── GÉRER MEMBRES TIFO (notation étoiles) ────────────────────
+async function ouvrirGererMembresTifo() {
+  try {
+    const membres = await UL.getAllMembres();
+    const tifo = membres.filter(m =>
+      m.roles_app && (
+        m.roles_app.includes('cellule_tifo') ||
+        m.roles_app.includes('admin_app') ||
+        m.roles_app.includes('bureau_app')
+      )
+    );
+    const el = document.getElementById('membresTifoListe');
+    if (!tifo.length) {
+      el.innerHTML = '<div class="empty-state"><div>👥</div>Aucun membre cellule tifo</div>';
+    } else {
+      el.innerHTML = tifo.map(m => {
+        const nb = m.etoiles || 0;
+        const pinceaux = [1,2,3].map(n => `
+          <button onclick="doNoterMembre('${m.id}',${n})" title="${n} pinceau${n>1?'x':''}"
+            style="background:none;border:none;cursor:pointer;font-size:20px;padding:2px;line-height:1;opacity:${nb>=n?1:0.3};">
+            🖌️
+          </button>`).join('');
+        return `
+          <div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);">
+            <div class="avatar" style="width:36px;height:36px;font-size:13px;flex-shrink:0;">
+              ${((m.prenom||'?')[0]+(m.nom||'?')[0]).toUpperCase()}
+            </div>
+            <div style="flex:1;min-width:0;">
+              <div style="font-weight:600;font-size:13px;">${m.prenom||''} ${m.nom||''}</div>
+              <div style="font-size:12px;color:var(--gris);">@${m.pseudo_telegram||'?'}</div>
+            </div>
+            <div id="notationRow_${m.id}" style="display:flex;align-items:center;gap:2px;">
+              ${pinceaux}
+            </div>
+          </div>`;
+      }).join('');
+    }
+    showModal('modalGererMembresTifo');
+  } catch(e) { toast('Erreur chargement membres', 'error'); }
+}
+
+async function doNoterMembre(membreId, etoiles) {
+  try {
+    await UL.setEtoilesMembre(membreId, etoiles);
+    // Mettre à jour visuellement les pinceaux sans recharger
+    const row = document.getElementById('notationRow_' + membreId);
+    if (row) {
+      row.querySelectorAll('button').forEach((btn, i) => {
+        btn.style.opacity = (i < etoiles) ? '1' : '0.3';
+      });
+    }
+    const labels = ['', '🖌️ Débutant', '🖌️🖌️ Autonome', '🖌️🖌️🖌️ Expert'];
+    toast(`Notation mise à jour : ${labels[etoiles]}`, 'success');
+  } catch(e) { toast('Erreur notation', 'error'); }
 }
 
 async function doCreerSession() {
