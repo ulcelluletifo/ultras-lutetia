@@ -28,13 +28,48 @@ async function initSession() {
 // ============================================================
 
 async function loginByTelegram(pseudoTelegram, password) {
-  // On utilise le pseudo Telegram comme email fictif
-  const email = pseudoTelegram.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/@/g, '').replace(/\s+/g, '').replace(/[^a-z0-9]/g, '') + '@ultralutetia.com';
-  const { data, error } = await sb.auth.signInWithPassword({ email, password });
+  // Récupère le vrai email depuis la table membres
+  const { data: membre, error: membreError } = await sb.from('membres')
+    .select('email, id')
+    .eq('pseudo_telegram', pseudoTelegram.replace('@', ''))
+    .single();
+
+  if (membreError || !membre) throw new Error('Pseudo Telegram introuvable');
+  if (!membre.email) throw new Error('Aucun email associé à ce compte');
+
+  const { data, error } = await sb.auth.signInWithPassword({ 
+    email: membre.email, 
+    password 
+  });
   if (error) throw new Error('Identifiants incorrects');
+
   currentUser = data.user;
   currentMembre = await getMembre(data.user.id);
   return { success: true, membre: currentMembre };
+}
+
+async function inscription(data) {
+  // Utilise le vrai email fourni à l'inscription
+  if (!data.email) throw new Error('Email obligatoire');
+
+  const { data: authData, error: authError } = await sb.auth.signUp({
+    email: data.email,
+    password: data.password,
+  });
+  if (authError) throw new Error(authError.message);
+
+  const { error: membreError } = await sb.from('membres').insert({
+    id: authData.user.id,
+    pseudo_telegram: data.pseudoTelegram.replace('@', ''),
+    nom: data.nom,
+    prenom: data.prenom,
+    email: data.email,
+    ville: data.ville || null,
+    code_postal: data.codePostal || null,
+    statut: 'sympathisant',
+  });
+  if (membreError) throw new Error(membreError.message);
+  return { success: true };
 }
 
 async function logout() {
