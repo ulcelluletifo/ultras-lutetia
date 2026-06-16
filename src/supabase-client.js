@@ -28,20 +28,22 @@ async function initSession() {
 // ============================================================
 
 async function loginByTelegram(pseudoTelegram, password) {
-  // Récupère le vrai email depuis la table membres
+  const pseudo = pseudoTelegram.replace('@', '').trim();
+  
   const { data: membre, error: membreError } = await sb.from('membres')
     .select('email, id')
-    .eq('pseudo_telegram', pseudoTelegram.replace('@', ''))
-    .single();
+    .eq('pseudo_telegram', pseudo)
+    .maybeSingle(); // ← maybeSingle() au lieu de single() — ne throw pas si 0 résultat
 
-  if (membreError || !membre) throw new Error('Pseudo Telegram introuvable');
+  if (membreError) throw new Error('Erreur base de données : ' + membreError.message);
+  if (!membre) throw new Error('Pseudo Telegram introuvable : ' + pseudo);
   if (!membre.email) throw new Error('Aucun email associé à ce compte');
 
   const { data, error } = await sb.auth.signInWithPassword({ 
     email: membre.email, 
     password 
   });
-  if (error) throw new Error('Identifiants incorrects');
+  if (error) throw new Error('Identifiants incorrects : ' + error.message);
 
   currentUser = data.user;
   currentMembre = await getMembre(data.user.id);
