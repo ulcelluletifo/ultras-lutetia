@@ -278,8 +278,9 @@
       <div class="section-title">🖌️ Tifo</div>
       <div class="card" style="margin-bottom:10px;">
         <div style="display:flex;flex-direction:column;gap:8px;">
-          <button class="btn btn-secondary" onclick="showModal('modalCreerSession')">➕ Créer une session</button>
+          <button class="btn btn-secondary" onclick="ouvrirCreerSession()">➕ Créer une session</button>
           <button class="btn btn-secondary" onclick="ouvrirModifierSession()">✏️ Modifier une session</button>
+          <button class="btn btn-secondary" style="color:#ef4444;border-color:rgba(239,68,68,.3);" onclick="ouvrirSupprimerSession()">🗑️ Supprimer une session</button>
           <button class="btn btn-secondary" onclick="ouvrirGererMembresTifo()">👥 Gérer les membres</button>
         </div>
       </div>
@@ -633,6 +634,27 @@
       <button class="btn btn-primary" onclick="doModifierSession()">💾 Enregistrer</button>
     </div>
     <button class="btn btn-secondary" style="margin-top:8px;" onclick="closeModal('modalModifierSession')">Annuler</button>
+  </div>
+</div>
+
+<!-- Modal Supprimer Session -->
+<div class="modal-overlay" id="modalSupprimerSession" style="display:none;" onclick="closeModalOutside(event,'modalSupprimerSession')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-handle"></div>
+    <h3 class="modal-title">🗑️ Supprimer une session</h3>
+    <div class="form-group">
+      <label>Choisir la session à supprimer</label>
+      <select id="delSelectSession">
+        <option value="">-- Sélectionner --</option>
+      </select>
+    </div>
+    <div id="delSessionInfo" style="display:none;margin-bottom:14px;">
+      <div class="info-box" style="background:rgba(239,68,68,.1);border-color:rgba(239,68,68,.3);color:#ef4444;font-size:13px;">
+        ⚠️ Cette action est irréversible. Toutes les inscriptions liées seront supprimées.
+      </div>
+    </div>
+    <button class="btn btn-primary" style="background:#ef4444;border-color:#ef4444;" onclick="doSupprimerSessionAdmin()">🗑️ Supprimer définitivement</button>
+    <button class="btn btn-secondary" style="margin-top:8px;" onclick="closeModal('modalSupprimerSession')">Annuler</button>
   </div>
 </div>
 
@@ -1829,7 +1851,7 @@ async function voirInscrits(id, nom, e) {
   const m = UL.getCurrentMembre();
   const peutNoter = hasCelluleTifo(m);
   try {
-    const { inscrits } = await UL.getSessionDetails(id);
+    const { session: s, inscrits } = await UL.getSessionDetails(id);
     const presents = inscrits.filter(i => i.statut === 'present');
     const inscritsListe = inscrits.filter(i => i.statut === 'inscrit');
     const statutLabel = { inscrit:'📋 Inscrit', present:'✅ Présent', absent:'❌ Absent' };
@@ -1838,7 +1860,11 @@ async function voirInscrits(id, nom, e) {
       <div style="font-size:13px;color:var(--gris);margin-bottom:14px;">
         ✅ ${presents.length} présents · 📋 ${inscritsListe.length} inscrits · Total: ${inscrits.length}
       </div>
-      <button class="btn btn-sm btn-secondary" style="margin-bottom:14px;" onclick="copierInscrits(${JSON.stringify(inscrits.map(i=>i.membre?.pseudo_telegram||'?'))})">📋 Copier liste Telegram</button>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;">
+        <button class="btn btn-sm btn-secondary" onclick="copierInscrits(${JSON.stringify(inscrits.map(i=>i.membre?.pseudo_telegram||'?'))})">📋 Liste complète</button>
+        <button class="btn btn-sm btn-secondary" onclick="copierPresents(${JSON.stringify(presents.map(i=>i.membre?.pseudo_telegram||'?'))})">✅ Liste présents (${presents.length})</button>
+        ${s?.avec_pizza ? `<button class="btn btn-sm" style="background:rgba(255,149,0,.15);color:var(--pizza);border:1px solid rgba(255,149,0,.3);" onclick="voirPizzas('${id}', {stopPropagation:()=>{}})">🍕 Pizzas</button>` : ''}
+      </div>
       ${inscrits.map(i => {
         const nb = i.membre?.etoiles || 0;
         const pinceaux = peutNoter ? [1,2,3].map(n =>
@@ -1862,6 +1888,12 @@ async function voirInscrits(id, nom, e) {
     showModal('modalAdminSession');
   } catch(e) { toast('Erreur', 'error'); }
 }
+
+function copierPresents(pseudos) {
+  if (!pseudos.length) return toast('Aucun présent', 'error');
+  const texte = `✅ Présents (${pseudos.length}) :\n` + pseudos.map((p,i) => `${i+1}. @${p}`).join('\n');
+  navigator.clipboard.writeText(texte).then(() => toast(`Liste de ${pseudos.length} présent${pseudos.length>1?'s':''} copiée !`, 'success'));
+}
 async function voirPizzas(id, e) {
   e.stopPropagation();
   try {
@@ -1881,6 +1913,53 @@ async function voirPizzas(id, e) {
 function copierInscrits(pseudos) {
   const texte = pseudos.map((p,i) => `${i+1}. @${p}`).join('\n');
   navigator.clipboard.writeText(texte).then(() => toast('Liste copiée !', 'success'));
+}
+
+// ─── CRÉER SESSION (reset form + ouvre modal) ─────────────────
+function ouvrirCreerSession() {
+  // Reset complet du form pour éviter les états résiduels
+  ['sNom','sDate','sHeure','sCapacite','sTelegram','sDesc'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  const pizza = document.getElementById('sPizza');
+  if (pizza) pizza.checked = false;
+  const lieu = document.getElementById('sLieu');
+  if (lieu) lieu.value = 'Paris Sud';
+  const type = document.getElementById('sType');
+  if (type) type.value = 'Peinture';
+  showModal('modalCreerSession');
+}
+
+// ─── SUPPRIMER SESSION (Admin Tifo) ───────────────────────────
+async function ouvrirSupprimerSession() {
+  try {
+    const sessions = await UL.getSessionsWithStats();
+    const sel = document.getElementById('delSelectSession');
+    sel.innerHTML = '<option value="">-- Sélectionner --</option>' +
+      sessions.map(s => {
+        const d = new Date(s.date).toLocaleDateString('fr-FR', { day:'numeric', month:'short' });
+        return `<option value="${s.id}">${s.nom} — ${d}</option>`;
+      }).join('');
+    sel.onchange = () => {
+      document.getElementById('delSessionInfo').style.display = sel.value ? 'block' : 'none';
+    };
+    document.getElementById('delSessionInfo').style.display = 'none';
+    showModal('modalSupprimerSession');
+  } catch(e) { toast('Erreur chargement sessions', 'error'); }
+}
+
+async function doSupprimerSessionAdmin() {
+  const id = document.getElementById('delSelectSession').value;
+  if (!id) return toast('Sélectionne une session', 'error');
+  const nom = document.getElementById('delSelectSession').selectedOptions[0]?.text || '';
+  if (!confirm(`Supprimer "${nom}" définitivement ?\n\nToutes les inscriptions seront perdues.`)) return;
+  try {
+    await UL.deleteSession(id);
+    toast('Session supprimée ✅', 'success');
+    closeModal('modalSupprimerSession');
+    loadSessions();
+  } catch(e) { toast(e.message || 'Erreur suppression', 'error'); }
 }
 
 // ─── MODIFIER SESSION (Admin Tifo) ────────────────────────────
