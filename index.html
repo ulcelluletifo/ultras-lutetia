@@ -1788,7 +1788,7 @@ const ROLES_DEFS = [
 ];
 let _rolesActifs = new Set();
 
-function openEditMembre(id) {
+async function openEditMembre(id) {
   const m = allMembres.find(x => x.id === id);
   if (!m) return;
   document.getElementById('editMembreId').value = m.id;
