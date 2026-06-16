@@ -627,53 +627,44 @@
         <option value="sympathisant">Sympathisant</option>
         <option value="draft">Draft</option>
         <option value="confirme">Confirmé</option>
-        <option value="membre_cellule">Membre Cellule</option>
-        <option value="bureau">Bureau</option>
-        <option value="admin">Admin</option>
       </select>
     </div>
-    <div class="form-group"><label>Section UL</label>
+    <div class="form-group"><label>Groupe</label>
       <select id="editSection">
-        <option value="">— Aucune section —</option>
-        <option value="ultra-lutetia">Ultra Lutetia</option>
-        <option value="la-vieille-firme">La Vieille Firme</option>
-        <option value="oms">OMS</option>
-        <option value="jeunesse">Jeunesse</option>
-        <option value="very-bad-troup">Very Bad Troup</option>
-        <option value="mad-brigade">Mad Brigade</option>
+        <option value="">Ultra Lutetia (défaut)</option>
       </select>
     </div>
     <div class="form-group">
       <label>Rôles fonctionnels (accès outils)</label>
-      <div style="display:flex;flex-direction:column;gap:8px;margin-top:6px;">
-        <label style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:rgba(255,255,255,.05);border-radius:7px;cursor:pointer;margin:0;">
-          <input type="checkbox" id="role_admin_app" value="admin_app" style="accent-color:#1A56DB;width:16px;height:16px;">
-          <span style="font-size:13px;">⚙️ Admin app — accès total</span>
-        </label>
-        <label style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:rgba(255,255,255,.05);border-radius:7px;cursor:pointer;margin:0;">
-          <input type="checkbox" id="role_bureau_app" value="bureau_app" style="accent-color:#1A56DB;width:16px;height:16px;">
-          <span style="font-size:13px;">🏆 Bureau — gestion générale</span>
-        </label>
-        <label style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:rgba(255,255,255,.05);border-radius:7px;cursor:pointer;margin:0;">
-          <input type="checkbox" id="role_cellule_tifo" value="cellule_tifo" style="accent-color:#1A56DB;width:16px;height:16px;">
-          <span style="font-size:13px;">🎨 Cellule Tifo</span>
-        </label>
-        <label style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:rgba(255,255,255,.05);border-radius:7px;cursor:pointer;margin:0;">
-          <input type="checkbox" id="role_cellule_depl" value="cellule_depl" style="accent-color:#1A56DB;width:16px;height:16px;">
-          <span style="font-size:13px;">🚌 Cellule Déplacement</span>
-        </label>
-        <label style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:rgba(255,255,255,.05);border-radius:7px;cursor:pointer;margin:0;">
-          <input type="checkbox" id="role_cellule_matos" value="cellule_matos" style="accent-color:#1A56DB;width:16px;height:16px;">
-          <span style="font-size:13px;">🛍️ Cellule Matos</span>
-        </label>
-        <label style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:rgba(255,255,255,.05);border-radius:7px;cursor:pointer;margin:0;">
-          <input type="checkbox" id="role_cellule_sticks" value="cellule_sticks" style="accent-color:#1A56DB;width:16px;height:16px;">
-          <span style="font-size:13px;">🎟️ Cellule Sticks</span>
-        </label>
-        <label style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:rgba(255,255,255,.05);border-radius:7px;cursor:pointer;margin:0;">
-          <input type="checkbox" id="role_cellule_comite" value="cellule_comite" style="accent-color:#1A56DB;width:16px;height:16px;">
-          <span style="font-size:13px;">🔔 Comité de passage</span>
-        </label>
+      <div style="display:flex;flex-direction:column;gap:6px;margin-top:8px;" id="rolesContainer">
+        <div onclick="toggleRole('admin_app')" style="display:flex;align-items:center;gap:12px;padding:10px 12px;background:rgba(255,255,255,.05);border-radius:8px;cursor:pointer;border:1.5px solid transparent;transition:border .15s;" id="roleRow_admin_app">
+          <div id="chk_admin_app" style="width:20px;height:20px;border-radius:4px;border:2px solid #3B82F6;background:transparent;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:background .15s;"></div>
+          <span style="font-size:13px;color:#CBD5E1;">⚙️ Admin app — accès total</span>
+        </div>
+        <div onclick="toggleRole('bureau_app')" style="display:flex;align-items:center;gap:12px;padding:10px 12px;background:rgba(255,255,255,.05);border-radius:8px;cursor:pointer;border:1.5px solid transparent;transition:border .15s;" id="roleRow_bureau_app">
+          <div id="chk_bureau_app" style="width:20px;height:20px;border-radius:4px;border:2px solid #3B82F6;background:transparent;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:background .15s;"></div>
+          <span style="font-size:13px;color:#CBD5E1;">🏆 Bureau — gestion générale</span>
+        </div>
+        <div onclick="toggleRole('cellule_tifo')" style="display:flex;align-items:center;gap:12px;padding:10px 12px;background:rgba(255,255,255,.05);border-radius:8px;cursor:pointer;border:1.5px solid transparent;transition:border .15s;" id="roleRow_cellule_tifo">
+          <div id="chk_cellule_tifo" style="width:20px;height:20px;border-radius:4px;border:2px solid #3B82F6;background:transparent;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:background .15s;"></div>
+          <span style="font-size:13px;color:#CBD5E1;">🎨 Cellule Tifo</span>
+        </div>
+        <div onclick="toggleRole('cellule_depl')" style="display:flex;align-items:center;gap:12px;padding:10px 12px;background:rgba(255,255,255,.05);border-radius:8px;cursor:pointer;border:1.5px solid transparent;transition:border .15s;" id="roleRow_cellule_depl">
+          <div id="chk_cellule_depl" style="width:20px;height:20px;border-radius:4px;border:2px solid #3B82F6;background:transparent;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:background .15s;"></div>
+          <span style="font-size:13px;color:#CBD5E1;">🚌 Cellule Déplacement</span>
+        </div>
+        <div onclick="toggleRole('cellule_matos')" style="display:flex;align-items:center;gap:12px;padding:10px 12px;background:rgba(255,255,255,.05);border-radius:8px;cursor:pointer;border:1.5px solid transparent;transition:border .15s;" id="roleRow_cellule_matos">
+          <div id="chk_cellule_matos" style="width:20px;height:20px;border-radius:4px;border:2px solid #3B82F6;background:transparent;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:background .15s;"></div>
+          <span style="font-size:13px;color:#CBD5E1;">🛍️ Cellule Matos</span>
+        </div>
+        <div onclick="toggleRole('cellule_sticks')" style="display:flex;align-items:center;gap:12px;padding:10px 12px;background:rgba(255,255,255,.05);border-radius:8px;cursor:pointer;border:1.5px solid transparent;transition:border .15s;" id="roleRow_cellule_sticks">
+          <div id="chk_cellule_sticks" style="width:20px;height:20px;border-radius:4b;border:2px solid #3B82F6;background:transparent;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:background .15s;"></div>
+          <span style="font-size:13px;color:#CBD5E1;">🎟️ Cellule Sticks</span>
+        </div>
+        <div onclick="toggleRole('cellule_comite')" style="display:flex;align-items:center;gap:12px;padding:10px 12px;background:rgba(255,255,255,.05);border-radius:8px;cursor:pointer;border:1.5px solid transparent;transition:border .15s;" id="roleRow_cellule_comite">
+          <div id="chk_cellule_comite" style="width:20px;height:20px;border-radius:4px;border:2px solid #3B82F6;background:transparent;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:background .15s;"></div>
+          <span style="font-size:13px;color:#CBD5E1;">🔔 Comité de passage</span>
+        </div>
       </div>
     </div>
     <button class="btn btn-primary" onclick="doSauvegarderMembre()">Enregistrer</button>
@@ -2090,6 +2081,36 @@ function renderMembres(membres) {
       </div>
     </div>`).join('');
 }
+// ─── Toggle rôle custom checkbox ─────────────────────────────
+const _rolesActifs = new Set();
+
+function toggleRole(role) {
+  if (_rolesActifs.has(role)) {
+    _rolesActifs.delete(role);
+  } else {
+    _rolesActifs.add(role);
+  }
+  renderRoleCheckbox(role);
+}
+
+function renderRoleCheckbox(role) {
+  const chk = document.getElementById('chk_' + role);
+  const row = document.getElementById('roleRow_' + role);
+  if (!chk) return;
+  const actif = _rolesActifs.has(role);
+  chk.style.background = actif ? '#1A56DB' : 'transparent';
+  chk.style.borderColor = actif ? '#1A56DB' : '#3B82F6';
+  chk.innerHTML = actif ? '<svg viewBox="0 0 10 8" style="width:10px;height:8px;"><polyline points="1,4 3.5,7 9,1" style="fill:none;stroke:white;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;"/></svg>' : '';
+  if (row) row.style.borderColor = actif ? '#1A56DB' : 'transparent';
+}
+
+function setRolesActifs(roles) {
+  _rolesActifs.clear();
+  (roles || []).forEach(r => _rolesActifs.add(r));
+  ['admin_app','bureau_app','cellule_tifo','cellule_depl','cellule_matos','cellule_sticks','cellule_comite']
+    .forEach(r => renderRoleCheckbox(r));
+}
+
 async function openEditMembre(id) {
   const m = allMembres.find(x => x.id === id);
   if (!m) return;
@@ -2098,28 +2119,23 @@ async function openEditMembre(id) {
   document.getElementById('editNom').value = m.nom||'';
   document.getElementById('editTelegram').value = m.pseudo_telegram||'';
   document.getElementById('editEmail').value = m.email||'';
-  document.getElementById('editStatut').value = m.statut;
+  document.getElementById('editStatut').value = ['sympathisant','draft','confirme'].includes(m.statut) ? m.statut : 'confirme';
   // Charger les sections dynamiquement
   try {
     const sections = await UL.getSections();
     const sel = document.getElementById('editSection');
-    sel.innerHTML = '<option value="">— Aucune section —</option>' +
+    sel.innerHTML = '<option value="">Ultra Lutetia (défaut)</option>' +
       sections.map(s => `<option value="${s.id}" ${m.section_id === s.id ? 'selected' : ''}>${esc(s.nom)}</option>`).join('');
   } catch(e) {}
   // Pré-cocher les rôles fonctionnels
-  const roles = m.roles_app || [];
-  ['admin_app','bureau_app','cellule_tifo','cellule_depl','cellule_matos','cellule_sticks','cellule_comite'].forEach(r => {
-    const el = document.getElementById('role_' + r);
-    if (el) el.checked = roles.includes(r);
-  });
+  setRolesActifs(m.roles_app || []);
   showModal('modalEditMembre');
 }
 
 async function doSauvegarderMembre() {
   const id = document.getElementById('editMembreId').value;
   const sectionId = document.getElementById('editSection').value || null;
-  const rolesApp = ['admin_app','bureau_app','cellule_tifo','cellule_depl','cellule_matos','cellule_sticks','cellule_comite']
-    .filter(r => document.getElementById('role_' + r)?.checked);
+  const rolesApp = Array.from(_rolesActifs);
   try {
     await UL.updateMembre(id, {
       prenom: document.getElementById('editPrenom').value.trim(),
