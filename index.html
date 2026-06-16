@@ -732,6 +732,7 @@
 <script src="src/config.js"></script>
 <script src="src/supabase-client.js"></script>
 <script>
+<script>
 // ─── Helpers droits ──────────────────────────────────────────
 const NIVEAUX = ['sympathisant','draft','confirme','membre_cellule','bureau','admin'];
 function hasRole(membre, minRole) {
@@ -745,6 +746,12 @@ function isBureau(membre) {
 }
 function isAdmin(membre) {
   return hasRole(membre, 'admin');
+}
+
+// ─── Confirmation inscription ─────────────────────────────────
+function showConfirmInscription(sessionId) {
+  currentSessionId = sessionId;
+  showModal('modalConfirmInscription');
 }
 
 // ─── State ───────────────────────────────────────────────────
@@ -1066,19 +1073,19 @@ async function loadSessionActions(sessionId, btn) {
     const el = document.getElementById('sessionActions_' + sessionId);
 
     let html = '';
-    if (!estInscrit && isPlanned) {
-      html = `<button class="btn btn-primary" style="width:100%;" onclick="doInscrire('${s.id}', this)">S'inscrire à cette session${s.avec_pizza?' 🍕':''}</button>`;
-    } else if (estInscrit && isPlanned) {
-      html = `<div class="info-box" style="text-align:center;margin:0;">✅ Tu es inscrit(e)</div>`;
-      if (s.lien_telegram) html += `<a href="${esc(s.lien_telegram)}" target="_blank" style="display:block;margin-top:8px;"><button class="btn btn-secondary" style="width:100%;">📲 Rejoindre le groupe Telegram</button></a>`;
-    } else if (estInscrit && isOpen && !estPresent) {
-      html = `<button class="btn btn-success" style="width:100%;" onclick="showModal('modalPresence');currentSessionId='${s.id}'">✅ Valider ma présence (code 4 chiffres)</button>`;
-      if (s.lien_telegram) html += `<a href="${esc(s.lien_telegram)}" target="_blank" style="display:block;margin-top:8px;"><button class="btn btn-secondary" style="width:100%;">📲 Groupe Telegram</button></a>`;
-    } else if (estPresent) {
-      html = `<div class="info-box success" style="text-align:center;margin:0;">✅ Présence validée</div>`;
-    } else if (s.statut === 'terminee') {
-      html = `<div style="text-align:center;font-size:13px;color:var(--gris);">Session terminée</div>`;
-    }
+if (!estInscrit && isPlanned) {
+  html = `<button class="btn btn-primary" style="width:100%;" onclick="showConfirmInscription('${s.id}')">S'inscrire à cette session${s.avec_pizza?' 🍕':''}</button>`;
+} else if (estInscrit && isPlanned) {
+  html = `<div class="info-box" style="text-align:center;margin:0;">✅ Tu es inscrit(e)</div>`;
+  if (s.lien_telegram) html += `<a href="${esc(s.lien_telegram)}" target="_blank" style="display:block;margin-top:8px;"><button class="btn btn-secondary" style="width:100%;">📲 Rejoindre le groupe Telegram</button></a>`;
+} else if (estInscrit && isOpen && !estPresent) {
+  html = `<button class="btn btn-success" style="width:100%;" onclick="showModal('modalPresence');currentSessionId='${s.id}'">✅ Valider ma présence (code 4 chiffres)</button>`;
+  if (s.lien_telegram) html += `<a href="${esc(s.lien_telegram)}" target="_blank" style="display:block;margin-top:8px;"><button class="btn btn-secondary" style="width:100%;">📲 Groupe Telegram</button></a>`;
+} else if (estPresent) {
+  html = `<div class="info-box success" style="text-align:center;margin:0;">✅ Présence validée</div>`;
+} else if (s.statut === 'terminee') {
+  html = `<div style="text-align:center;font-size:13px;color:var(--gris);">Session terminée</div>`;
+}
 
     if (el) el.innerHTML = html || `<div style="font-size:13px;color:var(--gris);text-align:center;">Aucune action disponible</div>`;
   } catch(e) {
@@ -2296,5 +2303,22 @@ function showLoading() {
 }
 function hideLoading() { if (loadingEl) { loadingEl.remove(); loadingEl = null; } }
 </script>
+  
+  <div id="modalConfirmInscription" class="modal" style="display:none;">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>Confirmer l'inscription</h3>
+      <button class="modal-close" onclick="closeModal('modalConfirmInscription')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="info-box" style="margin-bottom:16px;">
+        ⚠️ Toute inscription est considérée comme un engagement de présence. Merci de vérifier votre disponibilité avant de vous inscrire.
+      </div>
+      <button class="btn btn-primary" style="width:100%;" onclick="doInscrire(currentSessionId, this); closeModal('modalConfirmInscription');">
+        Confirmer mon inscription
+      </button>
+    </div>
+  </div>
+</div>
 </body>
 </html>
