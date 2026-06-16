@@ -752,11 +752,13 @@ let currentSessionId = null;
 let currentDeplId = null;
 let allMembres = [];
 
+
 // ─── Init ────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', async () => {
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/ultras-lutetia/sw.js').catch(() => {});
   }
+  document.getElementById('btnLogin').addEventListener('click', doLogin);
   const { membre } = await UL.initSession();
   membre ? showApp(membre) : showLoginPage();
 });
