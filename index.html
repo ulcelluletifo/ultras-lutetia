@@ -1799,7 +1799,6 @@ async function openEditMembre(id) {
   // Statut UL : seulement sympathisant/draft/confirme
   const statutUL = ['sympathisant','draft','confirme'].includes(m.statut) ? m.statut : 'confirme';
   document.getElementById('editStatut').value = statutUL;
-  document.getElementById('editEtoiles').value = m.etoiles||0;
 
   // Section (charger la liste + sélectionner la section du membre)
   try {
@@ -2433,8 +2432,10 @@ function previewPhoto(input, type) {
     };
   } else if (type === 'stick') {
     reader.onload = e => {
-      document.getElementById('photoPreviewImgStick').src = e.target.result;
-      document.getElementById('photoPreviewStick').style.display = 'block';
+      const imgEl = document.getElementById('photoPreviewImgStick');
+      const wrapEl = document.getElementById('photoPreviewStick');
+      if (imgEl) imgEl.src = e.target.result;
+      if (wrapEl) wrapEl.style.display = 'block';
     };
   }
   reader.readAsDataURL(file);
