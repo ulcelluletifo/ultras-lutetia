@@ -289,7 +289,7 @@ async function getSessionDetails(sessionId) {
     .eq('id', sessionId)
     .single();
   const { data: inscrits } = await sb.from('inscriptions_session')
-    .select('*, membre:membres(nom, prenom, pseudo_telegram, etoiles)')
+    .select('*, membre:membres(nom, prenom, pseudo_telegram, statut, etoiles, section:sections(nom))')
     .eq('session_id', sessionId);
   const monInscrit = (inscrits || []).find(i => i.membre_id === currentUser?.id);
   return { session: data, inscrits: inscrits || [], monInscrit };
