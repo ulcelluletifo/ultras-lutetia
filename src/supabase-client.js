@@ -87,27 +87,6 @@ async function changePassword(newPassword) {
   return { success: true };
 }
 
-async function inscription(data) {
-  const email = data.pseudoTelegram.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/@/g, '').replace(/\s+/g, '').replace(/[^a-z0-9]/g, '') + '@ultralutetia.com';
-  const { data: authData, error: authError } = await sb.auth.signUp({
-    email,
-    password: data.password,
-  });
-  if (authError) throw new Error(authError.message);
-
-  const { error: membreError } = await sb.from('membres').insert({
-    id: authData.user.id,
-    pseudo_telegram: data.pseudoTelegram.replace('@',''),
-    nom: data.nom,
-    prenom: data.prenom,
-    email: data.email || null,
-    ville: data.ville || null,
-    code_postal: data.codePostal || null,
-    statut: 'sympathisant',
-  });
-  if (membreError) throw new Error(membreError.message);
-  return { success: true };
-}
 
 // ============================================================
 // MEMBRES
