@@ -310,6 +310,10 @@ async function loadSessions() {
     document.getElementById('sessionsListe').innerHTML = sessions.length
       ? sessions.map(s => renderSessionCard(s)).join('')
       : '<div class="empty-state"><div>📋</div>Aucune session à venir</div>';
+    // Charger l'état d'inscription pour chaque session à venir automatiquement
+    for (const s of sessions) {
+      loadSessionActions(s.id, null);
+    }
     const past = await UL.getPastSessions();
     document.getElementById('sessionsHistorique').innerHTML = past.length
       ? past.map(s => renderSessionCard(s)).join('')
@@ -422,7 +426,7 @@ async function loadSessionActions(sessionId, btn) {
     }
   } catch(e) {
     if (btn) { btn.disabled = false; btn.textContent = originalText || "S'inscrire"; }
-    toast('Impossible de charger les actions', 'error');
+    if (btn) toast('Impossible de charger les actions', 'error');
   }
 }
 
