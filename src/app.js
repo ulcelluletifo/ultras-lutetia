@@ -319,10 +319,12 @@ async function loadSessions() {
     document.getElementById('sessionsHistorique').innerHTML = past.length
       ? past.map(s => renderSessionCard(s)).join('')
       : '<div class="empty-state"><div>📋</div>Aucun historique</div>';
-    // Charger l'état d'inscription après que les deux listes soient dans le DOM
-    setTimeout(() => {
-      Promise.all(sessions.map(s => loadSessionActions(s.id, null).catch(() => {})));
-    }, 100);
+    // Charger l'état d'inscription après rendu DOM complet
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        Promise.all(sessions.map(s => loadSessionActions(s.id, null).catch(() => {})));
+      });
+    });
   } catch(e) { toast('Erreur chargement sessions', 'error'); }
 }
 
