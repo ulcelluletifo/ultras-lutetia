@@ -562,10 +562,10 @@
     <div class="form-group"><label>Capacité max</label><input type="number" id="sCapacite" placeholder="25 (optionnel)"></div>
     <div class="form-group"><label>Lien Telegram</label><input type="url" id="sTelegram" placeholder="https://t.me/..."></div>
     <div class="form-group">
-      <label style="display:flex;align-items:center;gap:12px;padding:11px 14px;background:rgba(255,255,255,.07);border:1.5px solid var(--border);border-radius:9px;cursor:pointer;margin:0;">
-        <input type="checkbox" id="sPizza" style="width:20px;height:20px;flex-shrink:0;cursor:pointer;accent-color:#1A56DB;">
-        <span style="font-size:14px;pointer-events:none;">🍕 Session avec pizza</span>
-      </label>
+      <div style="display:flex;align-items:center;gap:12px;padding:11px 14px;background:rgba(255,255,255,.07);border:1.5px solid var(--border);border-radius:9px;cursor:pointer;" onclick="document.getElementById('sPizza').click(); event.stopPropagation();">
+        <input type="checkbox" id="sPizza" style="width:20px;height:20px;flex-shrink:0;cursor:pointer;accent-color:#1A56DB;" onclick="event.stopPropagation();">
+        <span style="font-size:14px;">🍕 Session avec pizza</span>
+      </div>
     </div>
     <div class="form-group"><label>Description</label><textarea id="sDesc" rows="2" placeholder="Optionnel"></textarea></div>
     <button class="btn btn-primary" onclick="doCreerSession()">Créer la session</button>
@@ -597,10 +597,10 @@
       <div class="form-group"><label>Capacité max</label><input type="number" id="msCapacite" placeholder="25 (optionnel)"></div>
       <div class="form-group"><label>Lien Telegram</label><input type="url" id="msTelegram" placeholder="https://t.me/..."></div>
       <div class="form-group">
-        <label style="display:flex;align-items:center;gap:12px;padding:11px 14px;background:rgba(255,255,255,.07);border:1.5px solid var(--border);border-radius:9px;cursor:pointer;margin:0;">
-          <input type="checkbox" id="msPizza" style="width:20px;height:20px;flex-shrink:0;cursor:pointer;accent-color:#1A56DB;">
-          <span style="font-size:14px;pointer-events:none;">🍕 Session avec pizza</span>
-        </label>
+        <div style="display:flex;align-items:center;gap:12px;padding:11px 14px;background:rgba(255,255,255,.07);border:1.5px solid var(--border);border-radius:9px;cursor:pointer;" onclick="document.getElementById('msPizza').click(); event.stopPropagation();">
+          <input type="checkbox" id="msPizza" style="width:20px;height:20px;flex-shrink:0;cursor:pointer;accent-color:#1A56DB;" onclick="event.stopPropagation();">
+          <span style="font-size:14px;">🍕 Session avec pizza</span>
+        </div>
       </div>
       <div class="form-group"><label>Description</label><textarea id="msDesc" rows="2" placeholder="Optionnel"></textarea></div>
       <button class="btn btn-primary" onclick="doModifierSession()">💾 Enregistrer</button>
