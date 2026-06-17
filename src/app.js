@@ -1,4 +1,3 @@
-
 // ─── Helpers droits — roles_app[] ───────────────────────────
 function hasRoleApp(membre, role) {
   return Array.isArray(membre?.roles_app) && membre.roles_app.includes(role);
