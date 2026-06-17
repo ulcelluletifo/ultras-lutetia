@@ -1,16 +1,22 @@
 // ============================================================
-// ULTRAS LUTETIA — Service Worker v1
+// ULTRAS LUTETIA — Service Worker v2
 // ============================================================
 
-const CACHE_NAME = 'ul-v1';
+const CACHE_NAME = 'ul-v2';
+
+// Fichiers JS/CSS : network-first (toujours la version la plus récente)
+const NETWORK_FIRST = [
+  '/ultras-lutetia/src/app.js',
+  '/ultras-lutetia/src/supabase-client.js',
+  '/ultras-lutetia/src/styles.css',
+  '/ultras-lutetia/src/config.js',
+];
+
+// Fichiers statiques : cache-first
 const ASSETS = [
   '/ultras-lutetia/',
   '/ultras-lutetia/index.html',
-  '/ultras-lutetia/admin.html',
   '/ultras-lutetia/manifest.webmanifest',
-  '/ultras-lutetia/src/config.js',
-  '/ultras-lutetia/src/supabase-client.js',
-  '/ultras-lutetia/src/styles.css',
 ];
 
 self.addEventListener('install', e => {
@@ -30,9 +36,25 @@ self.addEventListener('activate', e => {
 });
 
 self.addEventListener('fetch', e => {
-  // Ne pas intercepter les requêtes Supabase
   if (e.request.url.includes('supabase.co')) return;
 
+  const url = new URL(e.request.url);
+
+  // Network-first pour les fichiers JS/CSS
+  if (NETWORK_FIRST.some(p => url.pathname === p)) {
+    e.respondWith(
+      fetch(e.request).then(response => {
+        if (response && response.status === 200) {
+          const clone = response.clone();
+          caches.open(CACHE_NAME).then(cache => cache.put(e.request, clone));
+        }
+        return response;
+      }).catch(() => caches.match(e.request))
+    );
+    return;
+  }
+
+  // Cache-first pour le reste
   e.respondWith(
     caches.match(e.request).then(cached => {
       if (cached) return cached;
