@@ -310,10 +310,10 @@ async function loadSessions() {
     document.getElementById('sessionsListe').innerHTML = sessions.length
       ? sessions.map(s => renderSessionCard(s)).join('')
       : '<div class="empty-state"><div>📋</div>Aucune session à venir</div>';
-    // Charger l'état d'inscription pour chaque session à venir automatiquement
-    for (const s of sessions) {
-      loadSessionActions(s.id, null);
-    }
+    // Charger l'état d'inscription en parallèle après rendu DOM
+    setTimeout(() => {
+      Promise.all(sessions.map(s => loadSessionActions(s.id, null).catch(() => {})));
+    }, 0);
     const past = await UL.getPastSessions();
     document.getElementById('sessionsHistorique').innerHTML = past.length
       ? past.map(s => renderSessionCard(s)).join('')
@@ -426,7 +426,6 @@ async function loadSessionActions(sessionId, btn) {
     }
   } catch(e) {
     if (btn) { btn.disabled = false; btn.textContent = originalText || "S'inscrire"; }
-    if (btn) toast('Impossible de charger les actions', 'error');
   }
 }
 
@@ -539,13 +538,8 @@ async function doInscrire(id, btn) {
     toast('Inscription confirmée ✅', 'success');
     closeModal('modalConfirmInscription');
     // Mettre à jour uniquement la zone actions de cette session sans recharger toute la liste
-    const actionEl = document.getElementById('sessionActions_' + id);
-    if (actionEl) {
-      const fakBtn = actionEl.querySelector('button');
-      await loadSessionActions(id, fakBtn);
-    } else {
-      loadSessions();
-    }
+    // Rafraîchir silencieusement la zone actions (sans passer de bouton)
+    await loadSessionActions(id, null);
     loadAccueil();
   } catch(e) {
     toast(e.message || 'Impossible de s\'inscrire', 'error');
