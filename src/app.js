@@ -88,8 +88,13 @@ async function doInscription() {
   } catch(e) { hideLoading(); toast(e.message || 'Erreur inscription', 'error'); }
 }
 async function doLogout() {
-  await UL.logout();
-  showLoginPage();
+  try {
+    await UL.logout();
+  } catch(e) {
+    console.error('Erreur déconnexion:', e);
+  } finally {
+    showLoginPage();
+  }
 }
 
 // ─── App init + droits ────────────────────────────────────────
@@ -224,13 +229,7 @@ async function loadAccueil() {
 
 async function loadDemandes() {
   try {
-    const { data } = await UL.sb.from('membres')
-      .select('*, section:sections(nom)')
-      .eq('statut', 'sympathisant')
-      .eq('actif', true)
-      .order('created_at', { ascending: true });
-
-    const demandes = data || [];
+    const demandes = await UL.getDemandes();
     const badge = document.getElementById('demandesBadge');
 
     if (demandes.length > 0) {
@@ -272,7 +271,7 @@ async function validerDemande(membreId, nouveauStatut) {
     await UL.updateStatutMembre(membreId, nouveauStatut);
     toast(`Membre accepté en tant que ${label} ✅`, 'success');
     await loadDemandes();
-  } catch(e) { toast('Erreur', 'error'); }
+  } catch(e) { toast(e.message || 'Une erreur est survenue', 'error'); }
 }
 
 async function refuserDemande(membreId) {
@@ -281,7 +280,7 @@ async function refuserDemande(membreId) {
     await UL.toggleBlocageMembre(membreId, false);
     toast('Demande refusée — compte désactivé', 'success');
     await loadDemandes();
-  } catch(e) { toast('Erreur', 'error'); }
+  } catch(e) { toast(e.message || 'Une erreur est survenue', 'error'); }
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -303,6 +302,7 @@ const PINTES = [
 ];
 
 async function loadSessions() {
+  document.getElementById('sessionsListe').innerHTML = '<div class="empty-state"><div>⏳</div>Chargement…</div>';
   try {
     const sessions = await UL.getUpcomingSessions();
     document.getElementById('sessionsListe').innerHTML = sessions.length
@@ -520,13 +520,13 @@ async function doInscrire(id, btn) {
     closeModal('modalConfirmInscription');
     loadSessions();
   } catch(e) {
-    toast(e.message, 'error');
+    toast(e.message || 'Impossible de s\'inscrire', 'error');
     if (btn) { btn.disabled = false; btn.textContent = "S'inscrire"; }
   }
 }
 async function doDesinscrire(id) {
   try { await UL.desinscrire(id); toast('Désinscription effectuée', 'success'); loadSessions(); }
-  catch(e) { toast(e.message, 'error'); }
+  catch(e) { toast(e.message || 'Impossible de se désinscrire', 'error'); }
 }
 
 // ── Admin : ouvrir / fermer / supprimer ──────────────────────
@@ -536,19 +536,19 @@ async function doOuvrirSession(id, e) {
     const { code } = await UL.openSession(id);
     toast('Session ouverte ! Code : ' + code, 'success');
     loadSessions();
-  } catch(e) { toast('Erreur ouverture session', 'error'); }
+  } catch(e) { toast(e.message || 'Impossible d\'ouvrir la session', 'error'); }
 }
 async function doFermerSession(id, e) {
   if (e) e.stopPropagation();
   if (!confirm('Fermer cette session ?')) return;
   try { await UL.closeSession(id); toast('Session fermée', 'success'); loadSessions(); }
-  catch(e) { toast('Erreur', 'error'); }
+  catch(e) { toast('Impossible d\'ouvrir la session', 'error'); }
 }
 async function doSupprimerSession(id, e) {
   if (e) e.stopPropagation();
   if (!confirm('Supprimer définitivement ?')) return;
   try { await UL.deleteSession(id); toast('Session supprimée', 'success'); loadSessions(); }
-  catch(e) { toast('Erreur', 'error'); }
+  catch(e) { toast('Impossible de fermer la session', 'error'); }
 }
 
 // ── Admin : voir inscrits ────────────────────────────────────
@@ -577,17 +577,17 @@ async function voirInscrits(id, nom, e) {
           ${hasCelluleTifo(m)?`<button class="btn btn-sm btn-danger" style="padding:4px 8px;font-size:11px;" onclick="doDesinscrireAdmin('${id}','${i.membre_id}','${esc(nom)}')">✕</button>`:''}
         </div>`).join('')}`;
     showModal('modalAdminSession');
-  } catch(e) { toast('Erreur', 'error'); }
+  } catch(e) { toast('Impossible de supprimer la session', 'error'); }
 }
 
 async function doDesinscrireAdmin(sessionId, membreId, nom) {
   if (!confirm('Désinscrire ce membre ?')) return;
   try {
-    await UL.sb.from('inscriptions_session').delete().eq('session_id', sessionId).eq('membre_id', membreId);
+    await UL.desinscrireMembreSession(sessionId, membreId);
     toast('Membre désinscrit ✅', 'success');
     voirInscrits(sessionId, nom, null);
     loadAdminSessions();
-  } catch(e) { toast('Erreur', 'error'); }
+  } catch(e) { toast('Impossible de charger les inscrits', 'error'); }
 }
 
 // ── Admin : commandes pizza ───────────────────────────────────
@@ -649,7 +649,7 @@ async function voirCommandesPizza(sessionId, nom, e) {
       <div class="section-title" style="margin-top:16px;margin-bottom:8px;">Pintes</div>
       ${pinteHtml || '<p style="color:var(--gris);font-size:13px;">Aucune pinte</p>'}`;
     showModal('modalAdminSession');
-  } catch(e) { toast('Erreur chargement commandes', 'error'); }
+  } catch(e) { toast('Impossible de charger les commandes pizza', 'error'); }
 }
 
 // ── Participants (visible par tous) ──────────────────────────
@@ -683,7 +683,7 @@ async function toggleParticipants(sessionId, e) {
     el.style.display = 'block';
     btn.textContent = '👥 Masquer les participants';
   } catch(err) {
-    toast('Erreur', 'error');
+    toast('Impossible de charger les participants', 'error');
     btn.textContent = '👥 Voir les participants';
   }
   btn.disabled = false;
@@ -783,6 +783,7 @@ function loadAdminSessions() {
 
 // ─── DÉPLACEMENTS ─────────────────────────────────────────────
 async function loadDeplacements() {
+  document.getElementById('deplacementsListe').innerHTML = '<div class="empty-state"><div>⏳</div>Chargement…</div>';
   try {
     const depls = await UL.getDeplacements(true);
     document.getElementById('deplacementsListe').innerHTML = depls.length
@@ -806,7 +807,7 @@ function renderDeplCard(d) {
   return `<div class="depl-card" onclick="openDepl('${d.id}')">
     <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;">
       <div style="flex:1;min-width:0;">
-        <div class="depl-match">Paris FC — ${d.adversaire || d.match?.equipe_exterieur || '?'}</div>
+        <div class="depl-match">Paris FC — ${esc(d.adversaire || d.match?.equipe_exterieur || '?')}</div>
         <div class="depl-infos">
           ${date ? `<span>📅 ${date}</span>` : ''}
           ${d.stade||d.match?.stade ? `<span>📍 ${d.stade||d.match?.stade}</span>` : ''}
@@ -836,7 +837,7 @@ async function openDepl(deplId) {
     const estPaye = monInscrit && monInscrit.statut_paiement !== 'en_attente';
     const date = d.date_match ? new Date(d.date_match).toLocaleDateString('fr-FR', {weekday:'long', day:'numeric', month:'long'}) : '';
     let html = `
-      <h3 class="modal-title">Paris FC — ${d.adversaire||d.match?.equipe_exterieur}</h3>
+      <h3 class="modal-title">Paris FC — ${esc(d.adversaire||d.match?.equipe_exterieur||'?')}</h3>
       <div style="color:var(--gris);font-size:14px;margin-bottom:16px;line-height:2.2;">
         ${date ? `📅 ${date}<br>` : ''}
         ${d.stade||d.match?.stade ? `🏟️ ${d.stade||d.match?.stade}<br>` : ''}
@@ -885,7 +886,7 @@ async function openDepl(deplId) {
 
 async function doInscritDepl(id) {
   try { await UL.sInscrireDeplacements(id); toast('Inscription confirmée !', 'success'); closeModal('modalDepl'); loadDeplacements(); }
-  catch(e) { toast(e.message, 'error'); }
+  catch(e) { toast(e.message || 'Impossible de s\'inscrire au déplacement', 'error'); }
 }
 async function voirInscritsDepl(deplId) {
   try {
@@ -906,18 +907,18 @@ async function voirInscritsDepl(deplId) {
         </div>`).join('')}
     `;
     showModal('modalAdminSession');
-  } catch(e) { toast('Erreur', 'error'); }
+  } catch(e) { toast('Impossible de charger les inscrits du déplacement', 'error'); }
 }
 async function validerCash(deplId, membreId) {
   try { await UL.validerPaiementCash(deplId, membreId); toast('Paiement cash validé ✅', 'success'); voirInscritsDepl(deplId); }
-  catch(e) { toast('Erreur', 'error'); }
+  catch(e) { toast('Impossible de valider le paiement cash', 'error'); }
 }
 async function copierListeBus(deplId) {
   try {
     const liste = await UL.getListeBusTelegram(deplId);
     await navigator.clipboard.writeText(liste);
     toast('Liste bus copiée !', 'success');
-  } catch(e) { toast('Erreur copie', 'error'); }
+  } catch(e) { toast('Impossible de copier la liste bus', 'error'); }
 }
 async function doCreerDepl() {
   const data = {
@@ -983,11 +984,12 @@ async function doChangeMdp() {
   if (p1.length < 8) return toast('Mot de passe trop court', 'error');
   if (p1 !== p2) return toast('Les mots de passe ne correspondent pas', 'error');
   try { await UL.changePassword(p1); toast('Mot de passe modifié ✅', 'success'); closeModal('modalMdp'); }
-  catch(e) { toast('Erreur', 'error'); }
+  catch(e) { toast(e.message || 'Impossible de changer le mot de passe', 'error'); }
 }
 
 // ─── MEMBRES (Admin) ──────────────────────────────────────────
 async function loadMembres() {
+  document.getElementById('membresList').innerHTML = '<div class="empty-state"><div>⏳</div>Chargement…</div>';
   try {
     allMembres = await UL.getAllMembres();
     renderMembres(allMembres);
@@ -1007,15 +1009,15 @@ function renderMembres(membres) {
   el.innerHTML = membres.map(m => `
     <div class="membre-card">
       <div class="membre-card-header">
-        <div class="avatar">${((m.prenom||'?')[0]+(m.nom||'?')[0]).toUpperCase()}</div>
+        <div class="avatar">${((esc(m.prenom)||'?')[0]+(esc(m.nom)||'?')[0]).toUpperCase()}</div>
         <div style="flex:1;min-width:0;">
-          <div class="membre-name">${m.prenom} ${m.nom}</div>
+          <div class="membre-name">${esc(m.prenom)} ${esc(m.nom)}</div>
           <div class="membre-meta">@${m.pseudo_telegram} · <span class="statut-${m.statut}">${m.statut}</span></div>
           ${m.email ? `<div style="font-size:11px;color:var(--gris);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">✉️ ${esc(m.email)}</div>` : ''}
           ${m.section ? `<div style="font-size:11px;color:var(--bleu-clair);margin-top:1px;">🛡️ ${esc(m.section.nom)}</div>` : ''}
           ${Array.isArray(m.roles_app) && m.roles_app.length ? `<div style="font-size:10px;color:#818CF8;margin-top:2px;">🔑 ${m.roles_app.map(r=>r.replace('_',' ')).join(' · ')}</div>` : ''}
         </div>
-        <span style="font-size:12px;color:var(--bleu-clair);">${m.section?.nom||'Ultra Lutetia'}</span>
+        <span style="font-size:12px;color:var(--bleu-clair);">${esc(m.section?.nom||'Ultra Lutetia')}</span>
       </div>
       <div class="membre-card-actions">
         <button class="btn btn-sm btn-secondary" onclick="openEditMembre('${m.id}')">✏️ Modifier</button>
@@ -1124,7 +1126,7 @@ async function doSauvegarderMembre() {
 }
 async function toggleMembre(id, actif) {
   try { await UL.toggleBlocageMembre(id, actif); toast(actif?'Compte réactivé':'Compte bloqué', 'success'); loadMembres(); }
-  catch(e) { toast('Erreur', 'error'); }
+  catch(e) { toast('Impossible de modifier le statut du membre', 'error'); }
 }
 
 // ─── STATS ────────────────────────────────────────────────────
@@ -1187,7 +1189,7 @@ async function signerCharte() {
     toast('Charte signée ✅', 'success');
     document.getElementById('charteAlert').style.display = 'none';
     showPage('pageAccueil');
-  } catch(e) { toast('Erreur signature', 'error'); }
+  } catch(e) { toast('Impossible de signer la charte', 'error'); }
 }
 
 // ─── ANNONCES ─────────────────────────────────────────────────
@@ -1203,7 +1205,7 @@ async function doPublierAnnonce() {
     document.getElementById('annonceTitre').value = '';
     document.getElementById('annonceContenu').value = '';
     loadAccueil();
-  } catch(e) { toast('Erreur', 'error'); }
+  } catch(e) { toast(e.message || 'Une erreur est survenue', 'error'); }
 }
 
 // ─── MATCHS ───────────────────────────────────────────────────
@@ -1240,7 +1242,7 @@ async function loadMatchsList() {
 async function doSupprimerMatch(id) {
   if (!confirm('Supprimer ce match ?')) return;
   try { await UL.deleteMatch(id); toast('Match supprimé', 'success'); loadMatchsList(); }
-  catch(e) { toast('Erreur', 'error'); }
+  catch(e) { toast(e.message || 'Impossible de supprimer ce match', 'error'); }
 }
 document.getElementById('modalMatchs')?.addEventListener('ul:show', loadMatchsList);
 
@@ -1446,7 +1448,7 @@ function renderToutesCommandes(commandes) {
 
 async function changerStatutCommande(id, statut) {
   try { await UL.updateCommandeStatut(id, statut); toast('Commande mise à jour ✅', 'success'); loadMatos(); }
-  catch(e) { toast('Erreur', 'error'); }
+  catch(e) { toast('Impossible de modifier le statut de la commande', 'error'); }
 }
 
 async function modifierStock(id, nom, stockActuel) {
@@ -1457,13 +1459,13 @@ Nouveau stock pour "${nom}" :`, stockActuel);
     await UL.updateProduit(id, { stock: parseInt(nouveau) });
     toast('Stock mis à jour ✅', 'success');
     loadMatos();
-  } catch(e) { toast('Erreur', 'error'); }
+  } catch(e) { toast(e.message || 'Une erreur est survenue', 'error'); }
 }
 
 async function doArchiverProduit(id) {
   if (!confirm('Archiver cet article ?')) return;
   try { await UL.archiverProduit(id); toast('Article archivé', 'success'); loadMatos(); }
-  catch(e) { toast('Erreur', 'error'); }
+  catch(e) { toast('Impossible d\'archiver cet article', 'error'); }
 }
 
 // ── STICKS ─────────────────────────────────────────────────────
@@ -1577,7 +1579,7 @@ async function doDistribuerStick() {
     toast('Distribution enregistrée ✅', 'success');
     closeModal('modalDistribuer');
     loadSticks();
-  } catch(e) { toast(e.message || 'Erreur', 'error'); }
+  } catch(e) { toast(e.message || 'Impossible d\'enregistrer la distribution', 'error'); }
 }
 
 // ── COTISATION ─────────────────────────────────────────────────
@@ -1650,17 +1652,17 @@ function renderCotisations(membres) {
 
 async function doValiderCotisationCash(membreId) {
   try { await UL.validerCotisationCash(membreId); toast('Cotisation validée (cash) ✅', 'success'); loadListeCotisations(); }
-  catch(e) { toast(e.message || 'Erreur', 'error'); }
+  catch(e) { toast(e.message || 'Impossible de valider la cotisation cash', 'error'); }
 }
 async function doValiderCotisationHA(membreId) {
   try { await UL.validerCotisationHelloAsso(membreId); toast('Cotisation validée (HelloAsso) ✅', 'success'); loadListeCotisations(); }
-  catch(e) { toast(e.message || 'Erreur', 'error'); }
+  catch(e) { toast(e.message || 'Impossible de valider la cotisation HelloAsso', 'error'); }
 }
 async function doSauvegarderConfigCotisation() {
   const lien = document.getElementById('configLienCotisation').value.trim();
   const montant = document.getElementById('configMontantCotisation').value.trim();
   try { await UL.updateConfigCotisation(lien, montant); toast('Config cotisation enregistrée ✅', 'success'); }
-  catch(e) { toast('Erreur', 'error'); }
+  catch(e) { toast('Impossible de sauvegarder la configuration', 'error'); }
 }
 
 // ─── MATOS ────────────────────────────────────────────────────
@@ -1745,7 +1747,7 @@ async function doCreerProduit() {
       photoUrl = await UL.uploadPhotoMatos(photoFile, nom);
     }
 
-    const { data: produit, error } = await UL.sb.from('produits').insert({
+    const produit = await UL.createProduit({
       nom,
       description: document.getElementById('pDesc').value || null,
       categorie: document.getElementById('pCat').value,
@@ -1757,8 +1759,7 @@ async function doCreerProduit() {
       mode: document.getElementById('pMode').value,
       statut: 'disponible',
       photo_url: photoUrl,
-    }).select().single();
-    if (error) throw error;
+    });
 
     hideLoading();
     const sectionNom = acces === 'section'
@@ -1784,6 +1785,7 @@ async function doCreerProduit() {
 let allMatchs = [], allEvenements = [], currentFiltreCalendrier = 'tous';
 
 async function loadCalendrier() {
+  document.getElementById('calendrierListe').innerHTML = '<div class="empty-state"><div>⏳</div>Chargement…</div>';
   try {
     const [matchs, evenements] = await Promise.all([
       UL.getMatchs(),
@@ -1896,10 +1898,10 @@ async function saisirScore(matchId) {
   const ext = prompt('Score adversaire :');
   if (ext === null) return;
   try {
-    await UL.sb.from('matchs').update({ score_domicile: parseInt(dom), score_exterieur: parseInt(ext), statut: 'termine' }).eq('id', matchId);
+    await UL.saisirScoreMatch(matchId, parseInt(dom), parseInt(ext));
     toast('Score enregistré ✅', 'success');
     loadCalendrier();
-  } catch(e) { toast('Erreur', 'error'); }
+  } catch(e) { toast(e.message || 'Une erreur est survenue', 'error'); }
 }
 
 // ─── CARTAGE ──────────────────────────────────────────────────
@@ -1971,7 +1973,7 @@ function ouvrirCreerEvenement() {
 
 async function ouvrirModifierEvenement(id) {
   try {
-    const { data: ev } = await UL.sb.from('evenements').select('*').eq('id', id).single();
+    const ev = await UL.getEvenement(id);
     if (!ev) return toast('Événement introuvable', 'error');
     document.getElementById('evId').value = ev.id;
     document.getElementById('modalEvenementTitre').textContent = "Modifier l'événement";
@@ -2000,10 +2002,10 @@ async function doSauvegarderEvenement() {
   const id = document.getElementById('evId').value;
   try {
     if (id) {
-      await UL.sb.from('evenements').update(data).eq('id', id);
+      await UL.saveEvenement(data, id);
       toast('Événement modifié ✅', 'success');
     } else {
-      await UL.sb.from('evenements').insert(data);
+      await UL.saveEvenement(data);
       toast('Événement créé ✅', 'success');
     }
     closeModal('modalEvenement');
@@ -2014,22 +2016,16 @@ async function doSauvegarderEvenement() {
 async function doSupprimerEvenement(id) {
   if (!confirm('Supprimer cet événement ?')) return;
   try {
-    await UL.sb.from('evenements').delete().eq('id', id);
+    await UL.deleteEvenement(id);
     toast('Événement supprimé', 'success');
     loadCalendrier();
-  } catch(e) { toast('Erreur', 'error'); }
+  } catch(e) { toast('Impossible de supprimer l\'événement', 'error'); }
 }
 
 // ─── DEMANDES ADMIN (page dédiée) ────────────────────────────
 async function loadDemandesAdmin() {
   try {
-    const { data } = await UL.sb.from('membres')
-      .select('*, section:sections(nom)')
-      .eq('statut', 'sympathisant')
-      .eq('actif', true)
-      .order('created_at', { ascending: true });
-
-    const demandes = data || [];
+    const demandes = await UL.getDemandes();
     const badge = document.getElementById('demandesBadge2');
     if (badge) {
       badge.textContent = demandes.length + ' en attente';
@@ -2068,7 +2064,7 @@ async function validerDemandeAdmin(membreId, statut) {
     await UL.updateStatutMembre(membreId, statut);
     toast(`Membre accepté → ${statut} ✅`, 'success');
     loadDemandesAdmin();
-  } catch(e) { toast('Erreur', 'error'); }
+  } catch(e) { toast('Impossible de valider la demande', 'error'); }
 }
 
 async function refuserDemandeAdmin(membreId) {
@@ -2077,7 +2073,7 @@ async function refuserDemandeAdmin(membreId) {
     await UL.toggleBlocageMembre(membreId, false);
     toast('Demande refusée', 'success');
     loadDemandesAdmin();
-  } catch(e) { toast('Erreur', 'error'); }
+  } catch(e) { toast('Impossible de refuser la demande', 'error'); }
 }
 
 // ─── UTILS ────────────────────────────────────────────────────
