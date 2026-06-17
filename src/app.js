@@ -260,8 +260,9 @@ async function loadDemandes() {
           </div>
         </div>
         <div style="display:flex;gap:6px;flex-wrap:wrap;">
-          <button class="btn btn-sm btn-success" onclick="validerDemande('${m.id}','draft')">✅ Accepter → Draft</button>
-          <button class="btn btn-sm btn-secondary" onclick="validerDemande('${m.id}','confirme')">⭐ Accepter → Confirmé</button>
+          <button class="btn btn-sm btn-secondary" onclick="validerDemande('${m.id}','sympathisant')">💙 Sympathisant</button>
+          <button class="btn btn-sm btn-success" onclick="validerDemande('${m.id}','draft')">✅ Draft</button>
+          <button class="btn btn-sm btn-primary" onclick="validerDemande('${m.id}','confirme')">⭐ Confirmé</button>
           <button class="btn btn-sm btn-danger" onclick="refuserDemande('${m.id}')">❌ Refuser</button>
         </div>
       </div>`).join('');
@@ -269,7 +270,7 @@ async function loadDemandes() {
 }
 
 async function validerDemande(membreId, nouveauStatut) {
-  const label = nouveauStatut === 'draft' ? 'Draft' : 'Confirmé';
+  const label = nouveauStatut === 'draft' ? 'Draft' : nouveauStatut === 'sympathisant' ? 'Sympathisant' : 'Confirmé';
   try {
     await UL.updateStatutMembre(membreId, nouveauStatut);
     toast(`Membre accepté en tant que ${label} ✅`, 'success');
@@ -2063,7 +2064,8 @@ async function doSupprimerEvenement(id) {
 // ─── DEMANDES ADMIN (page dédiée) ────────────────────────────
 async function loadDemandesAdmin() {
   try {
-    const demandes = await UL.getDemandes();
+    const tous = await UL.getAllMembres();
+    const demandes = tous.filter(m => m.statut === 'sympathisant' && m.actif !== false);
     const badge = document.getElementById('demandesBadge2');
     if (badge) {
       badge.textContent = demandes.length + ' en attente';
@@ -2089,8 +2091,9 @@ async function loadDemandesAdmin() {
           </div>
         </div>
         <div style="display:flex;gap:6px;flex-wrap:wrap;">
+          <button class="btn btn-sm btn-secondary" onclick="validerDemandeAdmin('${m.id}','sympathisant')">💙 Sympa.</button>
           <button class="btn btn-sm btn-success" onclick="validerDemandeAdmin('${m.id}','draft')">✅ Draft</button>
-          <button class="btn btn-sm btn-secondary" onclick="validerDemandeAdmin('${m.id}','confirme')">⭐ Confirmé</button>
+          <button class="btn btn-sm btn-primary" onclick="validerDemandeAdmin('${m.id}','confirme')">⭐ Confirmé</button>
           <button class="btn btn-sm btn-danger" onclick="refuserDemandeAdmin('${m.id}')">❌ Refuser</button>
         </div>
       </div>`).join('');
