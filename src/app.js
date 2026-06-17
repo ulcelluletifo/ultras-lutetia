@@ -1060,9 +1060,11 @@ function renderMembres(membres) {
       </div>
       <div class="membre-card-actions">
         <button class="btn btn-sm btn-secondary" onclick="openEditMembre('${m.id}')">✏️ Modifier</button>
+        <button class="btn btn-sm btn-secondary" onclick="adminResetMdp('${m.id}','${esc(m.email||'')}','${esc(m.prenom||'')}')">🔑 MDP</button>
         <button class="btn btn-sm ${m.actif?'btn-danger':'btn-success'}" onclick="toggleMembre('${m.id}',${!m.actif})">
           ${m.actif?'Bloquer':'Débloquer'}
         </button>
+        <button class="btn btn-sm btn-danger" onclick="supprimerMembre('${m.id}','${esc(m.prenom||'')} ${esc(m.nom||'')}')">🗑</button>
       </div>
     </div>`).join('');
 }
@@ -1169,6 +1171,26 @@ async function toggleMembre(id, actif) {
 }
 
 // ─── STATS ────────────────────────────────────────────────────
+async function adminResetMdp(membreId, email, prenom) {
+  if (!email) return toast('Aucun email pour ce membre', 'error');
+  if (!confirm(`Envoyer un email de réinitialisation de mot de passe à ${prenom} (${email}) ?`)) return;
+  try {
+    await UL.updateMembreMdp(membreId);
+    toast(`Email de réinitialisation envoyé à ${prenom} ✅`, 'success');
+  } catch(e) { toast(e.message || 'Impossible d\'envoyer le reset', 'error'); }
+}
+
+async function supprimerMembre(membreId, nom) {
+  if (!confirm(`Supprimer définitivement ${nom} ? Cette action est irréversible.`)) return;
+  try {
+    await UL.supprimerMembre(membreId);
+    toast(`${nom} supprimé ✅`, 'success');
+    allMembres = allMembres.filter(m => m.id !== membreId);
+    renderMembres(allMembres);
+  } catch(e) { toast(e.message || 'Impossible de supprimer ce membre', 'error'); }
+}
+
+
 async function loadStats() {
   const el = document.getElementById('statsContent');
   try {
