@@ -309,6 +309,7 @@ async function refreshSessionsActions(sessions) {
 }
 
 async function loadSessions() {
+  console.trace('loadSessions appelé depuis:');
   document.getElementById('sessionsListe').innerHTML = '<div class="empty-state"><div>⏳</div>Chargement…</div>';
   try {
     const [sessions, past] = await Promise.all([
@@ -321,7 +322,8 @@ async function loadSessions() {
     document.getElementById('sessionsHistorique').innerHTML = past.length
       ? past.map(s => renderSessionCard(s)).join('')
       : '<div class="empty-state"><div>📋</div>Aucun historique</div>';
-    // innerHTML est synchrone — le DOM est prêt immédiatement
+    // Attendre que la page soit display:block avant de requêter les états
+    await new Promise(r => setTimeout(r, 50));
     await refreshSessionsActions(sessions);
   } catch(e) { toast('Erreur chargement sessions', 'error'); }
 }
