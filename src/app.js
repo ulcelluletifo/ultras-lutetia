@@ -433,7 +433,13 @@ async function loadSessionActions(sessionId, btn) {
       }, 300);
     }
   } catch(e) {
+    console.error('loadSessionActions erreur:', sessionId, e);
     if (btn) { btn.disabled = false; btn.textContent = originalText || "S'inscrire"; }
+    // Fallback : remettre un bouton cliquable si appel silencieux
+    if (!btn) {
+      const elErr = document.getElementById('sessionActions_' + sessionId);
+      if (elErr) elErr.innerHTML = `<button class="btn btn-primary" style="width:100%;padding:8px;" onclick="loadSessionActions('${sessionId}', this)">S'inscrire</button>`;
+    }
   }
 }
 
