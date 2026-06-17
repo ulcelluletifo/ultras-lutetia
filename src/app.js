@@ -202,9 +202,7 @@ async function loadAccueil() {
     el.innerHTML = sessions.length
       ? sessions.slice(0,2).map(s => renderSessionCard(s)).join('')
       : '<p style="color:var(--gris);font-size:14px;">Aucune session à venir</p>';
-    setTimeout(() => {
-      sessions.slice(0,2).forEach(s => loadSessionActions(s.id, null).catch(() => {}));
-    }, 300);
+    await refreshSessionsActions(sessions.slice(0,2));
   } catch(e) {}
   // Déplacement
   try {
@@ -306,6 +304,10 @@ const PINTES = [
   { id: 'sans',     label: 'Sans pinte', emoji: '❌' },
 ];
 
+async function refreshSessionsActions(sessions) {
+  await Promise.all(sessions.map(s => loadSessionActions(s.id, null).catch(() => {})));
+}
+
 async function loadSessions() {
   document.getElementById('sessionsListe').innerHTML = '<div class="empty-state"><div>⏳</div>Chargement…</div>';
   try {
@@ -319,10 +321,8 @@ async function loadSessions() {
     document.getElementById('sessionsHistorique').innerHTML = past.length
       ? past.map(s => renderSessionCard(s)).join('')
       : '<div class="empty-state"><div>📋</div>Aucun historique</div>';
-    // Charger l'état d'inscription après rendu DOM
-    setTimeout(() => {
-      sessions.forEach(s => loadSessionActions(s.id, null).catch(() => {}));
-    }, 500);
+    // innerHTML est synchrone — le DOM est prêt immédiatement
+    await refreshSessionsActions(sessions);
   } catch(e) { toast('Erreur chargement sessions', 'error'); }
 }
 
