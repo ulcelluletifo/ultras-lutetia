@@ -1,3 +1,4 @@
+
 // ─── Helpers droits — roles_app[] ───────────────────────────
 function hasRoleApp(membre, role) {
   return Array.isArray(membre?.roles_app) && membre.roles_app.includes(role);
@@ -202,6 +203,9 @@ async function loadAccueil() {
     el.innerHTML = sessions.length
       ? sessions.slice(0,2).map(s => renderSessionCard(s)).join('')
       : '<p style="color:var(--gris);font-size:14px;">Aucune session à venir</p>';
+    setTimeout(() => {
+      sessions.slice(0,2).forEach(s => loadSessionActions(s.id, null).catch(() => {}));
+    }, 300);
   } catch(e) {}
   // Déplacement
   try {
@@ -313,7 +317,7 @@ async function loadSessions() {
     // Charger l'état d'inscription en parallèle après rendu DOM
     setTimeout(() => {
       Promise.all(sessions.map(s => loadSessionActions(s.id, null).catch(() => {})));
-    }, 0);
+    }, 300);
     const past = await UL.getPastSessions();
     document.getElementById('sessionsHistorique').innerHTML = past.length
       ? past.map(s => renderSessionCard(s)).join('')
