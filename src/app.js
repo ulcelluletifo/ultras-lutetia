@@ -701,8 +701,10 @@ async function toggleParticipants(sessionId, e) {
   }
   btn.textContent = '⏳ Chargement…';
   btn.disabled = true;
+  // Retirer le prefix acc_ pour l'appel Supabase
+  const realId = sessionId.replace(/^acc_/, '');
   try {
-    const { inscrits } = await UL.getSessionDetails(sessionId);
+    const { inscrits } = await UL.getSessionDetails(realId);
     const statutEmoji = { inscrit:'📋', present:'✅', absent:'❌' };
     el.innerHTML = inscrits.length
       ? inscrits.map(i => `
