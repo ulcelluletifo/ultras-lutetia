@@ -200,9 +200,9 @@ async function loadAccueil() {
     const sessions = await UL.getUpcomingSessions();
     const el = document.getElementById('sessionsAccueil');
     el.innerHTML = sessions.length
-      ? sessions.slice(0,2).map(s => renderSessionCard(s)).join('')
+      ? sessions.slice(0,2).map(s => renderSessionCard(s, 'acc_')).join('')
       : '<p style="color:var(--gris);font-size:14px;">Aucune session à venir</p>';
-    await refreshSessionsActions(sessions.slice(0,2));
+    await refreshSessionsActions(sessions.slice(0,2), 'acc_');
   } catch(e) {}
   // Déplacement
   try {
@@ -304,8 +304,8 @@ const PINTES = [
   { id: 'sans',     label: 'Sans pinte', emoji: '❌' },
 ];
 
-async function refreshSessionsActions(sessions) {
-  await Promise.all(sessions.map(s => loadSessionActions(s.id, null).catch(() => {})));
+async function refreshSessionsActions(sessions, prefix='') {
+  await Promise.all(sessions.map(s => loadSessionActions(s.id, null, prefix).catch(() => {})));
 }
 
 async function loadSessions() {
@@ -325,7 +325,7 @@ async function loadSessions() {
   } catch(e) { toast('Erreur chargement sessions', 'error'); }
 }
 
-function renderSessionCard(s) {
+function renderSessionCard(s, prefix='') {
   const m = UL.getCurrentMembre();
   const date = new Date(s.date).toLocaleDateString('fr-FR', { weekday:'short', day:'numeric', month:'short' });
   const types = { Tracage:'🖊️', Assemblage:'🔧', Peinture:'🖌️' };
@@ -361,23 +361,23 @@ function renderSessionCard(s) {
     </div>
 
     <!-- Zone actions membre -->
-    <div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border);" id="sessionActions_${s.id}">
+    <div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border);" id="sessionActions_${prefix}${s.id}">
       <div style="text-align:center;padding:8px;color:var(--gris);font-size:13px;">⏳</div>
     </div>
 
     <!-- Participants (visible par tous) -->
     <div style="margin-top:8px;">
-      <button class="btn btn-secondary" style="width:100%;padding:8px;" onclick="toggleParticipants('${s.id}', event)">
+      <button class="btn btn-secondary" style="width:100%;padding:8px;" onclick="toggleParticipants('${prefix}${s.id}', event)">
         👥 Voir les participants
       </button>
-      <div id="participants_${s.id}" style="display:none;margin-top:8px;"></div>
+      <div id="participants_${prefix}${s.id}" style="display:none;margin-top:8px;"></div>
     </div>
 
     ${adminBar}
   </div>`;
 }
 
-async function loadSessionActions(sessionId, btn) {
+async function loadSessionActions(sessionId, btn, prefix='') {
   const originalText = btn ? btn.textContent : '';
   if (btn) { btn.disabled = true; btn.textContent = '⏳…'; }
   try {
@@ -386,7 +386,7 @@ async function loadSessionActions(sessionId, btn) {
     const estPresent  = monInscrit?.statut === 'present';
     const isOpen      = s.statut === 'en_cours';
     const isPlanned   = s.statut === 'a_venir';
-    const el          = document.getElementById('sessionActions_' + sessionId);
+    const el          = document.getElementById('sessionActions_' + prefix + sessionId);
     let html = '';
 
     if (!estInscrit && isPlanned) {
@@ -428,7 +428,7 @@ async function loadSessionActions(sessionId, btn) {
     } else {
       // DOM pas encore prêt — réessayer dans 300ms
       setTimeout(() => {
-        const el2 = document.getElementById('sessionActions_' + sessionId);
+        const el2 = document.getElementById('sessionActions_' + prefix + sessionId);
         if (el2) el2.innerHTML = html || '';
       }, 300);
     }
@@ -437,7 +437,7 @@ async function loadSessionActions(sessionId, btn) {
     if (btn) { btn.disabled = false; btn.textContent = originalText || "S'inscrire"; }
     // Fallback : remettre un bouton cliquable si appel silencieux
     if (!btn) {
-      const elErr = document.getElementById('sessionActions_' + sessionId);
+      const elErr = document.getElementById('sessionActions_' + prefix + sessionId);
       if (elErr) elErr.innerHTML = `<button class="btn btn-primary" style="width:100%;padding:8px;" onclick="loadSessionActions('${sessionId}', this)">S'inscrire</button>`;
     }
   }
