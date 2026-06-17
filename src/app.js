@@ -309,7 +309,6 @@ async function refreshSessionsActions(sessions) {
 }
 
 async function loadSessions() {
-  console.trace('loadSessions appelé depuis:');
   document.getElementById('sessionsListe').innerHTML = '<div class="empty-state"><div>⏳</div>Chargement…</div>';
   try {
     const [sessions, past] = await Promise.all([
@@ -322,8 +321,6 @@ async function loadSessions() {
     document.getElementById('sessionsHistorique').innerHTML = past.length
       ? past.map(s => renderSessionCard(s)).join('')
       : '<div class="empty-state"><div>📋</div>Aucun historique</div>';
-    // Attendre que la page soit display:block avant de requêter les états
-    await new Promise(r => setTimeout(r, 50));
     await refreshSessionsActions(sessions);
   } catch(e) { toast('Erreur chargement sessions', 'error'); }
 }
@@ -365,9 +362,7 @@ function renderSessionCard(s) {
 
     <!-- Zone actions membre -->
     <div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border);" id="sessionActions_${s.id}">
-      <button class="btn btn-primary" style="width:100%;padding:8px;" onclick="loadSessionActions('${s.id}', this)">
-        ${isPlanned ? "S'inscrire à cette session" + (s.avec_pizza?' 🍕':'') : isOpen ? 'Voir mes options' : 'Session terminée'}
-      </button>
+      <div style="text-align:center;padding:8px;color:var(--gris);font-size:13px;">⏳</div>
     </div>
 
     <!-- Participants (visible par tous) -->
