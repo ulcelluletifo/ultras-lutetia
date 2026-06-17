@@ -372,6 +372,7 @@ function renderSessionCard(s) {
 }
 
 async function loadSessionActions(sessionId, btn) {
+  const originalText = btn ? btn.textContent : '';
   if (btn) { btn.disabled = true; btn.textContent = '⏳…'; }
   try {
     const { session: s, monInscrit } = await UL.getSessionDetails(sessionId);
@@ -413,9 +414,15 @@ async function loadSessionActions(sessionId, btn) {
       html = `<div style="text-align:center;font-size:13px;color:var(--gris);">Session terminée</div>`;
     }
 
-    if (el) el.innerHTML = html || `<div style="font-size:13px;color:var(--gris);text-align:center;">Aucune action disponible</div>`;
+    if (el) {
+      el.innerHTML = html || `<div style="font-size:13px;color:var(--gris);text-align:center;">Aucune action disponible</div>`;
+    } else if (btn) {
+      btn.disabled = false;
+      btn.textContent = originalText;
+    }
   } catch(e) {
-    if (btn) { btn.disabled = false; btn.textContent = "S'inscrire"; }
+    if (btn) { btn.disabled = false; btn.textContent = originalText || "S'inscrire"; }
+    toast('Impossible de charger les actions', 'error');
   }
 }
 
@@ -527,7 +534,15 @@ async function doInscrire(id, btn) {
     await UL.inscrire(id);
     toast('Inscription confirmée ✅', 'success');
     closeModal('modalConfirmInscription');
-    loadSessions();
+    // Mettre à jour uniquement la zone actions de cette session sans recharger toute la liste
+    const actionEl = document.getElementById('sessionActions_' + id);
+    if (actionEl) {
+      const fakBtn = actionEl.querySelector('button');
+      await loadSessionActions(id, fakBtn);
+    } else {
+      loadSessions();
+    }
+    loadAccueil();
   } catch(e) {
     toast(e.message || 'Impossible de s\'inscrire', 'error');
     if (btn) { btn.disabled = false; btn.textContent = "S'inscrire"; }
