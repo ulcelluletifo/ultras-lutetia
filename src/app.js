@@ -319,12 +319,10 @@ async function loadSessions() {
     document.getElementById('sessionsHistorique').innerHTML = past.length
       ? past.map(s => renderSessionCard(s)).join('')
       : '<div class="empty-state"><div>📋</div>Aucun historique</div>';
-    // Charger l'état d'inscription après rendu DOM complet
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        Promise.all(sessions.map(s => loadSessionActions(s.id, null).catch(() => {})));
-      });
-    });
+    // Charger l'état d'inscription après rendu DOM
+    setTimeout(() => {
+      sessions.forEach(s => loadSessionActions(s.id, null).catch(() => {}));
+    }, 500);
   } catch(e) { toast('Erreur chargement sessions', 'error'); }
 }
 
@@ -430,6 +428,12 @@ async function loadSessionActions(sessionId, btn) {
     } else if (btn) {
       btn.disabled = false;
       btn.textContent = originalText;
+    } else {
+      // DOM pas encore prêt — réessayer dans 300ms
+      setTimeout(() => {
+        const el2 = document.getElementById('sessionActions_' + sessionId);
+        if (el2) el2.innerHTML = html || '';
+      }, 300);
     }
   } catch(e) {
     if (btn) { btn.disabled = false; btn.textContent = originalText || "S'inscrire"; }
