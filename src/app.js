@@ -232,7 +232,7 @@ async function loadAccueil() {
 async function loadDemandes() {
   try {
     const tous = await UL.getAllMembres();
-    const demandes = tous.filter(m => m.statut === 'sympathisant' && m.actif !== false);
+    const demandes = tous.filter(m => m.statut === 'sympathisant' && !m.actif);
     const badge = document.getElementById('demandesBadge');
 
     if (demandes.length > 0) {
@@ -272,7 +272,7 @@ async function loadDemandes() {
 async function validerDemande(membreId, nouveauStatut) {
   const label = nouveauStatut === 'draft' ? 'Draft' : nouveauStatut === 'sympathisant' ? 'Sympathisant' : 'Confirmé';
   try {
-    await UL.updateStatutMembre(membreId, nouveauStatut);
+    await UL.updateMembre(membreId, { statut: nouveauStatut, actif: true });
     toast(`Membre accepté en tant que ${label} ✅`, 'success');
     await loadDemandes();
   } catch(e) { toast(e.message || 'Une erreur est survenue', 'error'); }
@@ -2065,7 +2065,7 @@ async function doSupprimerEvenement(id) {
 async function loadDemandesAdmin() {
   try {
     const tous = await UL.getAllMembres();
-    const demandes = tous.filter(m => m.statut === 'sympathisant' && m.actif !== false);
+    const demandes = tous.filter(m => m.statut === 'sympathisant' && !m.actif);
     const badge = document.getElementById('demandesBadge2');
     if (badge) {
       badge.textContent = demandes.length + ' en attente';
@@ -2102,7 +2102,7 @@ async function loadDemandesAdmin() {
 
 async function validerDemandeAdmin(membreId, statut) {
   try {
-    await UL.updateStatutMembre(membreId, statut);
+    await UL.updateMembre(membreId, { statut, actif: true });
     toast(`Membre accepté → ${statut} ✅`, 'success');
     loadDemandesAdmin();
   } catch(e) { toast('Impossible de valider la demande', 'error'); }
