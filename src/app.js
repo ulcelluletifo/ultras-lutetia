@@ -1,4 +1,3 @@
-
 // ─── Helpers droits — roles_app[] ───────────────────────────
 function hasRoleApp(membre, role) {
   return Array.isArray(membre?.roles_app) && membre.roles_app.includes(role);
@@ -468,10 +467,12 @@ function ouvrirModalPresence(sessionId, avecPizza) {
 
 function selectPizza(id, rowEl) {
   document.querySelectorAll('#pizzaChoixContainer [data-pizza]').forEach(el => {
+    el.removeAttribute('data-selected');
     el.style.background = 'rgba(255,255,255,.07)';
     el.style.borderColor = 'rgba(255,255,255,.12)';
     el.querySelector('span:last-child').style.color = '#94A3B8';
   });
+  rowEl.setAttribute('data-selected', '1');
   rowEl.style.background = 'rgba(26,86,219,.18)';
   rowEl.style.borderColor = '#1A56DB';
   rowEl.querySelector('span:last-child').style.color = '#E2E8F0';
@@ -479,10 +480,12 @@ function selectPizza(id, rowEl) {
 
 function selectPinte(id, rowEl) {
   document.querySelectorAll('#pinteChoixContainer [data-pinte]').forEach(el => {
+    el.removeAttribute('data-selected');
     el.style.background = 'rgba(255,255,255,.07)';
     el.style.borderColor = 'rgba(255,255,255,.12)';
     el.querySelector('span:last-child').style.color = '#94A3B8';
   });
+  rowEl.setAttribute('data-selected', '1');
   rowEl.style.background = 'rgba(26,86,219,.18)';
   rowEl.style.borderColor = '#1A56DB';
   rowEl.querySelector('span:last-child').style.color = '#E2E8F0';
@@ -494,8 +497,8 @@ async function doValiderPresence(avecPizza = false) {
 
   let pizza = null, pinte = null;
   if (avecPizza) {
-    const pizzaEl = document.querySelector('#pizzaChoixContainer [data-pizza][style*="rgba(26,86,219"]');
-    const pinteEl = document.querySelector('#pinteChoixContainer [data-pinte][style*="rgba(26,86,219"]');
+    const pizzaEl = document.querySelector('#pizzaChoixContainer [data-pizza][data-selected]');
+    const pinteEl = document.querySelector('#pinteChoixContainer [data-pinte][data-selected]');
     if (!pizzaEl) return toast('Choisis une pizza (ou "Je ne mange pas")', 'error');
     if (!pinteEl) return toast('Choisis une option pinte', 'error');
     pizza = pizzaEl.dataset.pizza;
