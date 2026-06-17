@@ -228,7 +228,8 @@ async function loadAccueil() {
 
 async function loadDemandes() {
   try {
-    const demandes = await UL.getDemandes();
+    const tous = await UL.getAllMembres();
+    const demandes = tous.filter(m => m.statut === 'sympathisant' && m.actif !== false);
     const badge = document.getElementById('demandesBadge');
 
     if (demandes.length > 0) {
@@ -516,6 +517,7 @@ async function doValiderPresence(avecPizza = false) {
 
 // ── Inscrire / désinscrire ────────────────────────────────────
 async function doInscrire(id, btn) {
+  if (!id) return toast('Erreur : session introuvable', 'error');
   if (btn) { btn.disabled = true; btn.textContent = '⏳…'; }
   try {
     await UL.inscrire(id);
