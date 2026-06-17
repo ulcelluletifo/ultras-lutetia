@@ -25,6 +25,8 @@ function peutValiderInscriptions(membre) {
 // ─── Confirmation inscription ─────────────────────────────────
 function showConfirmInscription(sessionId) {
   currentSessionId = sessionId;
+  const btn = document.getElementById('btnConfirmerInscription');
+  if (btn) btn.setAttribute('data-session-id', sessionId);
   showModal('modalConfirmInscription');
 }
 
@@ -517,6 +519,8 @@ async function doValiderPresence(avecPizza = false) {
 
 // ── Inscrire / désinscrire ────────────────────────────────────
 async function doInscrire(id, btn) {
+  if (!id && btn) id = btn.getAttribute('data-session-id');
+  if (!id) id = currentSessionId;
   if (!id) return toast('Erreur : session introuvable', 'error');
   if (btn) { btn.disabled = true; btn.textContent = '⏳…'; }
   try {
