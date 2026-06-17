@@ -309,18 +309,20 @@ const PINTES = [
 async function loadSessions() {
   document.getElementById('sessionsListe').innerHTML = '<div class="empty-state"><div>⏳</div>Chargement…</div>';
   try {
-    const sessions = await UL.getUpcomingSessions();
+    const [sessions, past] = await Promise.all([
+      UL.getUpcomingSessions(),
+      UL.getPastSessions(),
+    ]);
     document.getElementById('sessionsListe').innerHTML = sessions.length
       ? sessions.map(s => renderSessionCard(s)).join('')
       : '<div class="empty-state"><div>📋</div>Aucune session à venir</div>';
-    // Charger l'état d'inscription en parallèle après rendu DOM
-    setTimeout(() => {
-      Promise.all(sessions.map(s => loadSessionActions(s.id, null).catch(() => {})));
-    }, 300);
-    const past = await UL.getPastSessions();
     document.getElementById('sessionsHistorique').innerHTML = past.length
       ? past.map(s => renderSessionCard(s)).join('')
       : '<div class="empty-state"><div>📋</div>Aucun historique</div>';
+    // Charger l'état d'inscription après que les deux listes soient dans le DOM
+    setTimeout(() => {
+      Promise.all(sessions.map(s => loadSessionActions(s.id, null).catch(() => {})));
+    }, 100);
   } catch(e) { toast('Erreur chargement sessions', 'error'); }
 }
 
