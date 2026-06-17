@@ -171,13 +171,32 @@ async function toggleBlocageMembre(membreId, actif) {
 
 async function adminResetPassword(membreId, newPassword) {
   // Nécessite une Edge Function Supabase en prod
-  // Pour le dev, on passe par l'API admin
-  const email = await sb.from('membres')
-    .select('pseudo_telegram')
-    .eq('id', membreId)
-    .single();
-  // TODO: implémenter via Edge Function
-  return { success: true, message: 'Reset envoyé' };
+  return { success: true, message: 'Non implémenté' };
+}
+
+async function updateMembreMdp(membreId, newPassword) {
+  const { data: membre } = await sb.from('membres')
+    .select('email').eq('id', membreId).single();
+  if (!membre?.email) throw new Error('Email introuvable pour ce membre');
+  // Envoyer un email de reset — seule option sans Edge Function
+  const { error } = await sb.auth.resetPasswordForEmail(membre.email);
+  if (error) throw error;
+  return { success: true };
+}
+
+async function supprimerMembre(membreId) {
+  // Suppression logique : désactiver + anonymiser les données personnelles
+  const { error } = await sb.from('membres')
+    .update({
+      actif: false,
+      email: null,
+      pseudo_telegram: 'supprimé_' + membreId.slice(0,8),
+      prenom: '[Supprimé]',
+      nom: '',
+    })
+    .eq('id', membreId);
+  if (error) throw error;
+  return { success: true };
 }
 
 // Évaluations
@@ -1111,7 +1130,7 @@ window.UL = {
   // Membres
   getMembre, getAllMembres, updateMembre, updateStatutMembre,
   updateSectionMembre, setEtoilesMembre, toggleBlocageMembre,
-  adminResetPassword, setEvaluation, getEvaluations,
+  adminResetPassword, updateMembreMdp, supprimerMembre, setEvaluation, getEvaluations,
   // Référentiels
   getSections, getCellules, rattacherCellule,
   // Calendrier
