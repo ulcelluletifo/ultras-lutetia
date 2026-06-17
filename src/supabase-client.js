@@ -302,7 +302,7 @@ async function getMembresNonSignataires() {
 async function getUpcomingSessions() {
   const today = new Date().toISOString().split('T')[0];
   const { data, error } = await sb.from('sessions_tifo')
-    .select('*, cellule:cellules(nom)')
+    .select('*')
     .gte('date', today)
     .in('statut', ['a_venir', 'en_cours'])
     .order('date');
@@ -354,8 +354,8 @@ async function desinscrire(sessionId) {
 
 async function validerPresence(sessionId, code) {
   const { data: session } = await sb.from('sessions_tifo')
-    .select('code_presence').eq('id', sessionId).single();
-  if (!session || session.code_presence !== code) throw new Error('Code incorrect');
+    .select('code_validation').eq('id', sessionId).single();
+  if (!session || session.code_validation !== code) throw new Error('Code incorrect');
   const { error } = await sb.from('inscriptions_session')
     .update({ statut: 'present', updated_at: new Date().toISOString() })
     .eq('session_id', sessionId)
@@ -385,7 +385,7 @@ async function createSession(sessionData) {
 async function openSession(sessionId) {
   const code = Math.floor(1000 + Math.random() * 9000).toString();
   const { data, error } = await sb.from('sessions_tifo')
-    .update({ statut: 'en_cours', code_presence: code })
+    .update({ statut: 'en_cours', code_validation: code })
     .eq('id', sessionId).select().single();
   if (error) throw error;
   return { session: data, code };
@@ -398,7 +398,7 @@ async function closeSession(sessionId) {
     .eq('session_id', sessionId)
     .eq('statut', 'inscrit');
   const { data, error } = await sb.from('sessions_tifo')
-    .update({ statut: 'terminee', code_presence: null })
+    .update({ statut: 'terminee', code_validation: null })
     .eq('id', sessionId).select().single();
   if (error) throw error;
   return data;
@@ -670,7 +670,7 @@ async function validerCotisation(membreId, montant, saison, modePaiement = 'cash
 
 async function getAnnonces() {
   const { data } = await sb.from('annonces')
-    .select('*, publie_par:membres(nom, prenom), cellule:cellules(nom)')
+    .select('*, publie_par:membres(nom, prenom)')
     .eq('actif', true)
     .order('created_at', { ascending: false })
     .limit(10);
