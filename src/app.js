@@ -77,7 +77,8 @@ async function doInscription() {
   const ville = document.getElementById('regVille').value.trim();
   const pwd = document.getElementById('regPassword').value;
   const rgpd = document.getElementById('regRgpd').checked;
-  if (!prenom || !nom || !pseudo || !pwd) return toast('Champs obligatoires manquants', 'error');
+  if (!prenom || !nom || !pseudo || !pwd || !email) return toast('Champs obligatoires manquants (email requis)', 'error');
+  if (!email.includes('@')) return toast('Email invalide', 'error');
   if (pwd.length < 8) return toast('Mot de passe trop court (8 min)', 'error');
   if (!rgpd) return toast('Accepte les conditions RGPD', 'error');
   try {
